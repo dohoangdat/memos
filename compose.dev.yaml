@@ -1,0 +1,19 @@
+# Local dev: builds memos from this source tree.
+# Use ./scripts/dev-up.sh to build the frontend and (re)start this container.
+services:
+  memos:
+    build:
+      context: .
+      dockerfile: scripts/Dockerfile
+      args:
+        # Must be YY.MM.N or YY.MM.D-dev.<sha7>; dev-up.sh sets these.
+        VERSION: ${MEMOS_VERSION:?run ./scripts/dev-up.sh or set MEMOS_VERSION}
+        COMMIT: ${MEMOS_COMMIT:-unknown}
+    image: memos-dev:local
+    container_name: memos-dev
+    volumes:
+      - ~/.memos-dev/:/var/opt/memos
+    ports:
+      # 5230 is used by the existing stable "memos" container
+      - 127.0.0.1:5231:5230
+    restart: unless-stopped
