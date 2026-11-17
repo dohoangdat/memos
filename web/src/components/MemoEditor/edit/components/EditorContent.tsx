@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, lazy, Suspense } from "react";
 import Editor from "../Editor";
 import { useEditorContext, useEditorSelector } from "../state";
 import type { EditorContentProps } from "../types";
@@ -6,7 +6,9 @@ import type { EditorController } from "../types/editorController";
 
 // The editor itself is imported eagerly: the memo view needs it on every page, so
 // splitting it would only make the composer paint empty for a beat. The session
-// around it is what loads lazily (see MemoEditor.tsx).
+// around it is what loads lazily (see MemoEditor.tsx). The classic editor is only
+// for those who turn it on, so it loads on first use.
+const ClassicEditor = lazy(() => import("../classic/ClassicEditor"));
 
 /**
  * Hosts the Markdown Editor behind the EditorController contract. The
@@ -22,6 +24,24 @@ export const EditorContent = forwardRef<EditorController, EditorContentProps>(({
   const handleContentChange = (content: string) => {
     dispatch(actions.updateContent(content));
   };
+
+  if (sourceMode.isClassicMode) {
+    return (
+      <div className="relative w-full flex flex-col flex-1">
+        <Suspense fallback={<div className="min-h-32 w-full" />}>
+          <ClassicEditor
+            ref={ref}
+            value={content}
+            placeholder={placeholder || ""}
+            isFocusMode={isFocusMode}
+            onContentChange={handleContentChange}
+            onFiles={onFiles}
+            onSubmit={onSubmit}
+          />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full flex flex-col flex-1">

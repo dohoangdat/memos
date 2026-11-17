@@ -3,6 +3,7 @@ import { DrawingSheet } from "@/components/DrawingSheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useInstance } from "@/contexts/InstanceContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { updateDevicePreferences, useDevicePreferences } from "@/hooks/useDevicePreferences";
 import { useSourceMode } from "@/hooks/useSourceMode";
 import { showErrorToast, toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -108,8 +109,17 @@ export const EditSession: React.FC<EditSessionProps> = ({
 
   // Source mode only changes how the text is edited, so every composer offers it.
   const [editorMode, setEditorMode] = useSourceMode();
-  const isSourceMode = editorMode === "source";
-  const sourceMode = { isSourceMode, onToggle: () => setEditorMode(isSourceMode ? "rich" : "source") };
+  const { classicEditor: isClassicMode } = useDevicePreferences();
+  const isSourceMode = editorMode === "source" && !isClassicMode;
+  const sourceMode = {
+    isSourceMode,
+    onToggle: () => {
+      if (isClassicMode) updateDevicePreferences({ classicEditor: false });
+      setEditorMode(isSourceMode ? "rich" : "source");
+    },
+    isClassicMode,
+    onToggleClassic: () => updateDevicePreferences({ classicEditor: !isClassicMode }),
+  };
 
   const { isInitialized } = useMemoInit({ editorRef, draftKey, autoFocus, mode: editorMode });
   // An edit starts from the memo and never persists a draft; only new memos and comments do.

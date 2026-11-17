@@ -7,21 +7,25 @@ describe("device preferences", () => {
 
   it("defaults to link previews on and double-click editing off", () => {
     const { result } = renderHook(() => useDevicePreferences());
-    expect(result.current).toEqual({ linkPreview: true, doubleClickEdit: false });
+    expect(result.current).toEqual({ linkPreview: true, doubleClickEdit: false, classicEditor: false });
   });
 
   it("reads saved values and ignores malformed ones", () => {
     localStorage.setItem(DEVICE_PREFERENCES_KEY, JSON.stringify({ linkPreview: false, doubleClickEdit: "yes" }));
     const { result } = renderHook(() => useDevicePreferences());
-    expect(result.current).toEqual({ linkPreview: false, doubleClickEdit: false });
+    expect(result.current).toEqual({ linkPreview: false, doubleClickEdit: false, classicEditor: false });
   });
 
   it("persists updates and shares them with every reader", () => {
     const first = renderHook(() => useDevicePreferences());
     const second = renderHook(() => useDevicePreferences());
-    act(() => updateDevicePreferences({ doubleClickEdit: true }));
-    expect(first.result.current).toEqual({ linkPreview: true, doubleClickEdit: true });
-    expect(second.result.current).toEqual({ linkPreview: true, doubleClickEdit: true });
-    expect(JSON.parse(localStorage.getItem(DEVICE_PREFERENCES_KEY) ?? "null")).toEqual({ linkPreview: true, doubleClickEdit: true });
+    act(() => updateDevicePreferences({ doubleClickEdit: true, classicEditor: false }));
+    expect(first.result.current).toEqual({ linkPreview: true, doubleClickEdit: true, classicEditor: false });
+    expect(second.result.current).toEqual({ linkPreview: true, doubleClickEdit: true, classicEditor: false });
+    expect(JSON.parse(localStorage.getItem(DEVICE_PREFERENCES_KEY) ?? "null")).toEqual({
+      linkPreview: true,
+      doubleClickEdit: true,
+      classicEditor: false,
+    });
   });
 });

@@ -111,3 +111,30 @@
     outline-offset: 1px;
   }
 }
+
+/* Columns from the classic editor (`<div class="wpc-columns wpc-cols-N">`), in the editor and the memo view alike. */
+.wpc-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.wpc-columns.wpc-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.wpc-columns.wpc-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.wpc-column {
+  min-width: 0;
+}
+.wpc-column > * + * {
+  margin-top: 0.75rem;
+}
+/* Columns stack on narrow screens. */
+@media (max-width: 640px) {
+  .wpc-columns,
+  .wpc-columns.wpc-cols-3,
+  .wpc-columns.wpc-cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

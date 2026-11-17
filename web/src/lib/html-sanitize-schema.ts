@@ -71,6 +71,7 @@ export const ALLOWED_TAGS = [
   "thead",
   "tr",
   "tt",
+  "u",
   "ul",
   "var",
 ];
@@ -140,6 +141,8 @@ const GLOBAL_ATTRIBUTES = [
   "valign",
   "value",
   "width",
+  // Filtered to the classic editor's formatting by allowedStyle.
+  "style",
 ];
 
 const ARIA_LABELS = ["aria-describedby", "aria-label", "aria-labelledby"];
@@ -150,7 +153,7 @@ const ELEMENT_ATTRIBUTES: Record<string, readonly string[]> = {
   blockquote: ["cite"],
   code: ["class"],
   del: ["cite"],
-  div: ["itemscope", "itemtype"],
+  div: ["itemscope", "itemtype", "class"],
   dl: ARIA_LABELS,
   h2: ["class"],
   iframe: ["src", "width", "height", "frameborder", "allowfullscreen", "allow", "title", "referrerpolicy", "loading"],
@@ -176,6 +179,7 @@ const ELEMENT_ATTRIBUTE_PREFIXES: Record<string, readonly string[]> = {
 const CLASS_NAMES: Record<string, readonly (string | RegExp)[]> = {
   a: ["data-footnote-backref"],
   code: [/^language-./, "math-inline", "math-display"],
+  div: ["wpc-columns", /^wpc-cols-[2-4]$/, "wpc-column"],
   h2: ["sr-only"],
   li: ["task-list-item"],
   ol: ["contains-task-list"],
@@ -207,8 +211,33 @@ const hasAllowedProtocol = (url: string, protocols: readonly string[]): boolean 
 };
 
 /**
+ * The inline styles the classic editor writes: text color and highlight, font, size and
+ * alignment. Any other property, and any value that could load or run something, is dropped.
+ */
+const STYLE_PROPERTIES = new Set(["color", "background-color", "font-family", "font-size", "text-align"]);
+const STYLE_VALUE = /^[\w\s#%.,'"()+-]+$/;
+const UNSAFE_STYLE_VALUE = /url\s*\(|expression|javascript:|image-set|@import|\\/i;
+
+export const allowedStyle = (value: string): string | null => {
+  const declarations = value
+    .split(";")
+    .map((declaration) => {
+      const colon = declaration.indexOf(":");
+      if (colon === -1) return null;
+      const property = declaration.slice(0, colon).trim().toLowerCase();
+      const propertyValue = declaration.slice(colon + 1).trim();
+      if (!STYLE_PROPERTIES.has(property) || !propertyValue) return null;
+      if (!STYLE_VALUE.test(propertyValue) || UNSAFE_STYLE_VALUE.test(propertyValue)) return null;
+      return `${property}: ${propertyValue}`;
+    })
+    .filter((declaration): declaration is string => declaration !== null);
+  return declarations.length ? declarations.join("; ") : null;
+};
+
+/**
  * What of an attribute raw HTML in a memo may keep on element `tag`: its value, the class
- * names allowed there, or null to drop it. Event handlers and styles are never allowed.
+ * names allowed there, or null to drop it. Event handlers are never allowed; styles only
+ * through allowedStyle.
  */
 export const allowedAttributeValue = (tag: string, name: string, value: string): string | null => {
   const allowed =
@@ -216,6 +245,7 @@ export const allowedAttributeValue = (tag: string, name: string, value: string):
     ELEMENT_ATTRIBUTES[tag]?.includes(name) ||
     ELEMENT_ATTRIBUTE_PREFIXES[tag]?.some((prefix) => name.startsWith(prefix));
   if (!allowed) return null;
+  if (name === "style") return allowedStyle(value);
   if (name === "class") {
     const patterns = CLASS_NAMES[tag] ?? [];
     const names = value

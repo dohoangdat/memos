@@ -68,10 +68,13 @@ export interface EditorViewToggles {
   onToggleFocusMode: () => void;
 }
 
-/** The composer's source-mode switch: a checked item in the ＋ menu. The text itself shows the mode. */
+/** The composer's editor switches: checked items in the ＋ menu. The text itself shows the mode. */
 export interface EditorSourceModeToggle {
   isSourceMode: boolean;
   onToggle: () => void;
+  /** The classic (WordPress-style) editor, kept per device. Markdown mode and it exclude each other. */
+  isClassicMode?: boolean;
+  onToggleClassic?: () => void;
 }
 
 export interface EditorToolbarProps {

@@ -1,6 +1,17 @@
 import { Button, Menu, Spinner, Tooltip } from "@usememos/ui";
 import { uniqBy } from "lodash-es";
-import { CodeXmlIcon, ImageIcon, LinkIcon, MapPinIcon, Maximize2Icon, MicIcon, PaletteIcon, PaperclipIcon, PlusIcon } from "lucide-react";
+import {
+  CodeXmlIcon,
+  ImageIcon,
+  LayoutTemplateIcon,
+  LinkIcon,
+  MapPinIcon,
+  Maximize2Icon,
+  MicIcon,
+  PaletteIcon,
+  PaperclipIcon,
+  PlusIcon,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LinkMemoDialog, LocationDialog } from "@/components/MemoMetadata";
 import type { MapPoint } from "@/components/map/types";
@@ -174,6 +185,16 @@ const InsertMenu = (props: InsertMenuProps) => {
           <Menu.CheckboxItem checked={sourceMode.isSourceMode} onCheckedChange={sourceMode.onToggle} closeOnClick icon={<CodeXmlIcon />}>
             {t("editor.markdown-mode")}
           </Menu.CheckboxItem>
+          {sourceMode.onToggleClassic && (
+            <Menu.CheckboxItem
+              checked={Boolean(sourceMode.isClassicMode)}
+              onCheckedChange={sourceMode.onToggleClassic}
+              closeOnClick
+              icon={<LayoutTemplateIcon />}
+            >
+              {t("editor.classic-mode")}
+            </Menu.CheckboxItem>
+          )}
         </Menu.Popup>
       </Menu.Root>
 

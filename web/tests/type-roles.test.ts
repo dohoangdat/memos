@@ -45,6 +45,7 @@ describe("type roles", () => {
         // Memo text and the composer: the editor's 16px reading size.
         "components/MemoEditor/MemoEditor.tsx",
         "components/MemoEditor/edit/Editor.tsx",
+        "components/MemoEditor/edit/classic/ClassicEditor.tsx",
         "components/MemoEditor/view/MemoContentView.tsx",
         // Emoji and custom icons, whose font size is the icon box.
         "components/AppSidebar/ViewsSection.tsx",

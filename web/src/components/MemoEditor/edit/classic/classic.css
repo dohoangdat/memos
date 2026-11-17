@@ -1,0 +1,151 @@
+/* The classic editor's document. Memo content rhythm: 16px text on 24px lines, 12px between blocks. */
+.classic-editor-content {
+  min-height: 8rem;
+  outline: none;
+  color: var(--mu-text, inherit);
+  overflow-wrap: break-word;
+}
+
+.classic-editor-content > * + *,
+.classic-editor-content .wpc-column > * + * {
+  margin-top: 0.75rem;
+}
+
+.classic-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.classic-editor-content h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+}
+.classic-editor-content h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+.classic-editor-content h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+.classic-editor-content h4 {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+.classic-editor-content h5,
+.classic-editor-content h6 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.classic-editor-content ul {
+  list-style: disc;
+  padding-inline-start: 1.5rem;
+}
+.classic-editor-content ol {
+  list-style: decimal;
+  padding-inline-start: 1.5rem;
+}
+.classic-editor-content li > p {
+  margin: 0;
+}
+.classic-editor-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-inline-start: 0.25rem;
+}
+.classic-editor-content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.classic-editor-content ul[data-type="taskList"] li > label {
+  margin-top: 0.3rem;
+  user-select: none;
+}
+.classic-editor-content ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.classic-editor-content blockquote {
+  border-inline-start: 3px solid var(--mu-line, #d4d4d8);
+  padding-inline-start: 1rem;
+  opacity: 0.85;
+}
+
+.classic-editor-content code {
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.875em;
+  background: var(--mu-well, rgba(127, 127, 127, 0.15));
+}
+
+.classic-editor-content pre {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  background: var(--mu-well, rgba(127, 127, 127, 0.15));
+}
+
+.classic-editor-content pre code {
+  padding: 0;
+  background: none;
+}
+
+.classic-editor-content a {
+  color: var(--mu-accent, #2563eb);
+  text-decoration: underline;
+}
+
+.classic-editor-content hr {
+  border: none;
+  border-top: 1px solid var(--mu-line, #d4d4d8);
+  margin: 1rem 0;
+}
+
+.classic-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+.classic-editor-content img.ProseMirror-selectednode {
+  outline: 2px solid var(--mu-accent, #2563eb);
+}
+
+.classic-editor-content table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.classic-editor-content th,
+.classic-editor-content td {
+  border: 1px solid var(--mu-line, #d4d4d8);
+  padding: 0.4rem 0.6rem;
+  vertical-align: top;
+  position: relative;
+}
+.classic-editor-content th {
+  font-weight: 600;
+  background: var(--mu-well, rgba(127, 127, 127, 0.1));
+}
+.classic-editor-content .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(37, 99, 235, 0.15);
+}
+
+/* Columns are outlined while editing so empty ones can be clicked into. */
+.classic-editor-content .wpc-column {
+  border: 1px dashed var(--mu-line, #d4d4d8);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+}
