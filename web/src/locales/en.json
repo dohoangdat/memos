@@ -534,9 +534,7 @@
       "has-task-list": "hasTaskList",
       "remove": "Remove filter"
     },
-    "compact-mode": "Compact mode",
     "connections": "Connections",
-    "grid-compact-hint": "Grid layouts always use compact cards.",
     "layout": "Layout",
     "layout-auto": "Auto",
     "layout-auto-description": "As many columns as fit the screen",
@@ -579,8 +577,6 @@
       "revoked": "Share link revoked",
       "title": "Share this memo"
     },
-    "show-less": "Show less",
-    "show-more": "Show more",
     "task-actions": {
       "check-all": "Check all tasks",
       "uncheck-all": "Uncheck all tasks",
@@ -598,7 +594,8 @@
       "space-description": "Everyone in {{space}}"
     },
     "add-reaction": "Add reaction",
-    "remove-reaction": "Remove reaction"
+    "remove-reaction": "Remove reaction",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Archived successfully",
@@ -1471,5 +1468,15 @@
     "back": "Back {{seconds}} seconds",
     "forward": "Forward {{seconds}} seconds",
     "speed": "Playback speed {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

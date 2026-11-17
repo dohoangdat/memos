@@ -312,25 +312,18 @@ describe("<PagedMemoList>", () => {
       feed.memos = [memo];
     });
 
-    it("threads compact=false at one column with compact mode off", () => {
-      const renderer = vi.fn((m: Memo) => <div key={m.name} />);
-      renderList(renderer);
-      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: false });
-    });
-
-    it("threads compact=true at one column with compact mode on", () => {
-      view.compactMode = true;
+    it("always renders memos as previews at one column", () => {
       const renderer = vi.fn((m: Memo) => <div key={m.name} />);
       renderList(renderer);
       expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true });
     });
 
-    it("respects the compact setting in the narrow-width fallback even when columns are allowed", () => {
+    it("renders previews in the narrow-width fallback when columns are allowed", () => {
       // jsdom measures 0px, so the flow fallback renders and behaves exactly like maxColumns = 1.
       view.maxColumns = 0;
       const renderer = vi.fn((m: Memo) => <div key={m.name} />);
       renderList(renderer);
-      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: false });
+      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true });
     });
 
     it("forces compact once the width fits the grid", () => {

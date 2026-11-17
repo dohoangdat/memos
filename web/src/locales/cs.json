@@ -427,7 +427,6 @@
       "has-task-list": "maSeznamUkolu",
       "remove": "Odebrat filtr"
     },
-    "compact-mode": "Kompaktní režim",
     "link-preview": "Náhled odkazu",
     "load-more": "Načíst více",
     "order-by": "Řadit dle",
@@ -458,8 +457,6 @@
       "image-title": "Sdílet jako obrázek",
       "open-image": "Sdílet jako obrázek"
     },
-    "show-less": "Zobrazit méně",
-    "show-more": "Zobrazit více",
     "visibility": {
       "private": "Soukromá",
       "protected": "Chráněná",
@@ -486,7 +483,6 @@
     "moved": "Poznámka přesunuta",
     "back-to": "Zpět na {{source}}",
     "connections": "Připojení",
-    "grid-compact-hint": "Mřížkové rozvržení vždy používá kompaktní karty.",
     "layout": "Rozvržení",
     "layout-auto": "Automaticky",
     "layout-auto-description": "Tolik sloupců, kolik se vejde na obrazovku",
@@ -498,7 +494,8 @@
     "parent-memo": "Nadřazená poznámka",
     "view-options": "Možnosti zobrazení",
     "add-reaction": "Přidejte reakci",
-    "remove-reaction": "Odstraňte reakci"
+    "remove-reaction": "Odstraňte reakci",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Úspěšně archivováno",
@@ -1474,5 +1471,15 @@
     "back": "Zpět o {{seconds}} sekund",
     "forward": "Vpřed o {{seconds}} sekund",
     "speed": "Rychlost přehrávání {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

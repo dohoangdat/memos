@@ -426,7 +426,6 @@
       "has-task-list": "téLlistaTasques",
       "remove": "Elimina el filtre"
     },
-    "compact-mode": "Mode compacte",
     "link-preview": "Previsualització d'enllaços",
     "load-more": "Carrega més",
     "order-by": "Ordena per",
@@ -457,8 +456,6 @@
       "image-title": "Comparteix com a imatge",
       "open-image": "Comparteix com a imatge"
     },
-    "show-less": "Mostra menys",
-    "show-more": "Mostra més",
     "visibility": {
       "private": "Privat",
       "protected": "Espai de treball",
@@ -485,7 +482,6 @@
     "moved": "Nota moguda",
     "back-to": "Torna a {{source}}",
     "connections": "Connexions",
-    "grid-compact-hint": "Els dissenys de quadrícula sempre utilitzen targetes compactes.",
     "layout": "Disseny",
     "layout-auto": "Automàtic",
     "layout-auto-description": "Tantes columnes com càpiguen a la pantalla",
@@ -497,7 +493,8 @@
     "parent-memo": "Nota principal",
     "view-options": "Opcions de visualització",
     "add-reaction": "Afegeix reacció",
-    "remove-reaction": "Elimina la reacció"
+    "remove-reaction": "Elimina la reacció",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arxivat correctament",
@@ -1472,5 +1469,15 @@
     "back": "Enrere {{seconds}} segons",
     "forward": "Endavant {{seconds}} segons",
     "speed": "Velocitat de reproducció {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

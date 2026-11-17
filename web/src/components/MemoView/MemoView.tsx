@@ -1,6 +1,5 @@
 import { forwardRef, memo, Suspense, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useColumnGridUntrapped } from "@/components/ColumnGrid/ColumnGridContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useResolvedUser } from "@/contexts/MentionResolutionContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
@@ -19,6 +18,23 @@ import type { MemoViewHandle, MemoViewProps } from "./types";
 
 const MemoShareImageDialog = lazyWithReload(() => import("../MemoActionMenu/MemoShareImageDialog"));
 const PreviewImageDialog = lazyWithReload(() => import("../PreviewImageDialog"));
+const MemoReaderDialog = lazyWithReload(() => import("./MemoFullscreen").then((module) => ({ default: module.MemoReaderDialog })));
+const MemoEditDialog = lazyWithReload(() => import("./MemoFullscreen").then((module) => ({ default: module.MemoEditDialog })));
+
+/** Parts of a card that act on their own: a click there never opens the memo. */
+const INTERACTIVE_SELECTOR =
+  'a, button, input, textarea, select, label, summary, video, audio, img, iframe, [role="button"], [role="menuitem"], [role="checkbox"], [contenteditable="true"], [data-memo-no-open]';
+
+/** Whether a pointer event started inside the card's own DOM (not a portal) on a plain part of it. */
+const isPlainCardTarget = (event: React.MouseEvent<HTMLElement>): boolean => {
+  const target = event.target as Element;
+  if (!event.currentTarget.contains(target)) return false;
+  const interactive = target.closest(INTERACTIVE_SELECTOR);
+  return !interactive || !event.currentTarget.contains(interactive);
+};
+
+/** How long a click waits for a second one before it opens the reader instead of the editor. */
+const DOUBLE_CLICK_WAIT_MS = 250;
 
 const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
   const {
@@ -31,9 +47,12 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     showVisibility,
     showPinned,
     showSpace,
+    presentation = "card",
   } = props;
   const cardRef = useRef<HTMLDivElement>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  // A memo is read and edited full screen, never in place: the card only ever shows its preview.
+  const [overlay, setOverlay] = useState<"read" | "edit" | null>(null);
+  const isEditing = false;
   const [cardWidth, setCardWidth] = useState(0);
 
   const currentUser = useCurrentUser();
@@ -66,44 +85,48 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
 
   const { previewState, openPreview, setPreviewOpen } = useImagePreview();
 
-  const focusMountedEditor = useCallback(() => {
-    const editorRoot = cardRef.current?.querySelector<HTMLElement>('.memo-editor-root[contenteditable="true"]');
-    const fallbackInput = cardRef.current?.querySelector<HTMLElement>("textarea, input");
-    (editorRoot ?? fallbackInput)?.focus();
-  }, []);
+  const openEditor = useCallback(() => setOverlay("edit"), []);
+  const closeEditor = useCallback(() => setOverlay(null), []);
+  const handleFocusModeChange = useCallback(() => {}, []);
 
-  // The body edits in place: the card, its header and its frame stay, and the memo's
-  // own editing session takes the body's place until it saves or cancels.
-  const openEditor = useCallback(() => {
-    if (isEditing) {
-      focusMountedEditor();
-      return;
-    }
-    setIsEditing(true);
-  }, [focusMountedEditor, isEditing]);
-  const closeEditor = useCallback(() => setIsEditing(false), []);
-
-  // The grid keys tiles by memo name (see getMemoKey), so the focused editor
-  // identifies its own tile by name and untraps it for the duration.
-  const { setUntrappedKey, clearUntrappedKey } = useColumnGridUntrapped();
-  const handleFocusModeChange = useCallback(
-    (isFocusMode: boolean) => {
-      if (isFocusMode) {
-        setUntrappedKey(memoData.name);
-      } else {
-        clearUntrappedKey(memoData.name);
+  // A click on a list's card reads the memo; a double click (or Edit) edits it. On a mouse the
+  // first click waits briefly for a second; a tap opens the reader at once.
+  const readerEnabled = presentation === "card" && Boolean(compact);
+  const clickTimerRef = useRef<number | undefined>(undefined);
+  const pointerTypeRef = useRef<string>("mouse");
+  useEffect(() => () => window.clearTimeout(clickTimerRef.current), []);
+  const handleCardClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (!readerEnabled || event.detail > 1 || !isPlainCardTarget(event)) return;
+      if (window.getSelection()?.toString()) return;
+      window.clearTimeout(clickTimerRef.current);
+      if (readonly || pointerTypeRef.current !== "mouse") {
+        setOverlay("read");
+        return;
+      }
+      clickTimerRef.current = window.setTimeout(() => setOverlay("read"), DOUBLE_CLICK_WAIT_MS);
+    },
+    [readerEnabled, readonly],
+  );
+  const handleCardDoubleClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      if (readonly || !isPlainCardTarget(event)) return;
+      window.clearTimeout(clickTimerRef.current);
+      event.preventDefault();
+      window.getSelection()?.removeAllRanges();
+      setOverlay("edit");
+    },
+    [readonly],
+  );
+  const handleCardKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      if (readerEnabled && event.key === "Enter" && event.target === event.currentTarget) {
+        event.preventDefault();
+        setOverlay("read");
       }
     },
-    [memoData.name, setUntrappedKey, clearUntrappedKey],
+    [readerEnabled],
   );
-  // Release the slot when the editor closes or this card unmounts. Both calls
-  // are ownership-scoped, so mounting cards never clobber another card's slot.
-  useEffect(() => {
-    if (!isEditing) {
-      clearUntrappedKey(memoData.name);
-    }
-  }, [isEditing, memoData.name, clearUntrappedKey]);
-  useEffect(() => () => clearUntrappedKey(memoData.name), [memoData.name, clearUntrappedKey]);
 
   useImperativeHandle(ref, () => ({ openEditor }), [openEditor]);
 
@@ -182,9 +205,21 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
 
   const article = (
     <article
-      className={cn(MEMO_CARD_BASE_CLASSES, "group/memo", showCommentPreview ? "mb-0 rounded-b-none" : "mb-2", className)}
+      className={cn(
+        MEMO_CARD_BASE_CLASSES,
+        "group/memo",
+        showCommentPreview ? "mb-0 rounded-b-none" : "mb-2",
+        readerEnabled && "cursor-pointer",
+        className,
+      )}
       ref={cardRef}
-      tabIndex={readonly ? -1 : 0}
+      tabIndex={readonly && !readerEnabled ? -1 : 0}
+      onPointerDown={(event) => {
+        pointerTypeRef.current = event.pointerType;
+      }}
+      onClick={handleCardClick}
+      onDoubleClick={handleCardDoubleClick}
+      onKeyDown={handleCardKeyDown}
     >
       {/* The pinned mark steps aside while the memo is edited in place. */}
       {showPinned && memoData.pinned && !isEditing && <MemoPinnedMark />}
@@ -221,7 +256,26 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     article
   );
 
-  return <MemoViewContext.Provider value={contextValue}>{memoDisplay}</MemoViewContext.Provider>;
+  return (
+    <MemoViewContext.Provider value={contextValue}>
+      {memoDisplay}
+      {overlay === "read" && (
+        <Suspense fallback={null}>
+          <MemoReaderDialog
+            memo={memoData}
+            viewProps={{ parentPage: parentPageProp, timeDisplay, showCreator, showVisibility, showSpace }}
+            canEdit={!readonly}
+            onClose={closeEditor}
+          />
+        </Suspense>
+      )}
+      {overlay === "edit" && (
+        <Suspense fallback={null}>
+          <MemoEditDialog name={memoData.name} onClose={closeEditor} />
+        </Suspense>
+      )}
+    </MemoViewContext.Provider>
+  );
 });
 
 MemoView.displayName = "MemoView";

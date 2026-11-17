@@ -420,12 +420,9 @@
       "has-task-list": "टास्क लिस्ट है",
       "remove": "फ़िल्टर हटाएँ"
     },
-    "compact-mode": "कॉम्पैक्ट मोड",
     "link-preview": "लिंक पूर्वावलोकन",
     "load-more": "और लोड करें",
     "order-by": "क्रमबद्ध करें",
-    "show-less": "कम दिखाएँ",
-    "show-more": "और दिखाएँ",
     "visibility": {
       "private": "निजी",
       "protected": "सदस्य",
@@ -472,7 +469,6 @@
     "back-to": "{{source}} पर वापस जाएं",
     "count-memos-updated-in-date": "{{count}} {{memos}} को {{date}} पर अपडेट किया गया",
     "connections": "कनेक्शन",
-    "grid-compact-hint": "ग्रिड लेआउट हमेशा कॉम्पैक्ट कार्ड का इस्तेमाल करते हैं।",
     "layout": "लेआउट",
     "layout-auto": "ऑटो",
     "layout-auto-description": "स्क्रीन में जितने कॉलम फिट हों",
@@ -491,7 +487,8 @@
     },
     "view-options": "ऑप्शन देखें",
     "add-reaction": "रिएक्शन जोड़ें",
-    "remove-reaction": "रिएक्शन हटाएँ"
+    "remove-reaction": "रिएक्शन हटाएँ",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "सफलतापूर्वक संग्रहीत किया गया",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} सेकंड पीछे",
     "forward": "{{seconds}} सेकंड आगे",
     "speed": "प्लेबैक गति {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

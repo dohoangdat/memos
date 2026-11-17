@@ -497,8 +497,6 @@
       "has-task-list": "מכיל רשימת משימות",
       "remove": "הסרת מסנן"
     },
-    "compact-mode": "מצב קומפקטי",
-    "grid-compact-hint": "פריסות רשת משתמשות תמיד בכרטיסים קומפקטיים.",
     "layout": "פריסה",
     "layout-auto": "אוטומטי",
     "layout-auto-description": "מספר העמודות המרבי שמתאים למסך",
@@ -539,8 +537,6 @@
       "revoked": "קישור השיתוף בוטל",
       "title": "שתפו את הפתק הזה"
     },
-    "show-less": "הצג פחות",
-    "show-more": "הצג עוד",
     "task-actions": {
       "check-all": "סמן את כל המשימות",
       "uncheck-all": "בטל סימון של כל המשימות",
@@ -567,7 +563,8 @@
     "on-this-memo": "על תזכיר זה",
     "parent-memo": "תזכיר אב",
     "add-reaction": "הוסף תגובה",
-    "remove-reaction": "הסר תגובה"
+    "remove-reaction": "הסר תגובה",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "הועבר לארכיון בהצלחה",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} שניות אחורה",
     "forward": "{{seconds}} שניות קדימה",
     "speed": "מהירות השמעה {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

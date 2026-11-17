@@ -464,7 +464,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Αφαίρεση φίλτρου"
     },
-    "compact-mode": "Συμπαγής λειτουργία",
     "link-preview": "Προεπισκόπηση συνδέσμου",
     "load-more": "Φορτώστε περισσότερα",
     "newest-first": "Πρώτα τα νεότερα",
@@ -497,8 +496,6 @@
       "revoked": "Ο σύνδεσμος κοινής χρήσης ανακλήθηκε",
       "title": "Μοιραστείτε αυτό το σημείωμα"
     },
-    "show-less": "Δείξτε λιγότερα",
-    "show-more": "Εμφάνιση περισσότερων",
     "task-actions": {
       "check-all": "Ελέγξτε όλες τις εργασίες",
       "uncheck-all": "Καταργήστε την επιλογή όλων των εργασιών",
@@ -522,7 +519,6 @@
     "moved": "Το σημειώμα μετακινήθηκε",
     "back-to": "Επιστροφή στο {{source}}",
     "connections": "Συνδέσεις",
-    "grid-compact-hint": "Οι διατάξεις πλέγματος χρησιμοποιούν πάντα συμπαγείς κάρτες.",
     "layout": "Διάταξη",
     "layout-auto": "Αυτόματη",
     "layout-auto-description": "Τόσες στήλες όσες χωράνε στην οθόνη",
@@ -534,7 +530,8 @@
     "parent-memo": "Γονικό σημείωμα",
     "view-options": "Επιλογές προβολής",
     "add-reaction": "Προσθέστε την αντίδραση",
-    "remove-reaction": "Αφαιρέστε την αντίδραση"
+    "remove-reaction": "Αφαιρέστε την αντίδραση",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Αρχειοθετήθηκε με επιτυχία",
@@ -1471,5 +1468,15 @@
     "back": "Πίσω {{seconds}} δευτερόλεπτα",
     "forward": "Μπροστά {{seconds}} δευτερόλεπτα",
     "speed": "Ταχύτητα αναπαραγωγής {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

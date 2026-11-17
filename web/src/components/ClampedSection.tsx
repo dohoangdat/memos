@@ -1,8 +1,5 @@
-import { Button } from "@usememos/ui";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useTranslate } from "@/utils/i18n";
 
 // A collapsed section shows this much content; anything taller folds behind a fade.
 export const CLAMP_PREVIEW_HEIGHT_PX = 240;
@@ -17,16 +14,14 @@ interface ClampedSectionProps {
 }
 
 /**
- * The one truncation mechanism for compact cards: measure the content, and when it is
- * tall enough, collapse it to a fixed-height preview with a fade and a Show more/less
- * toggle. The inner div is never clamped, so observing it keeps the measurement live
- * while images and embeds load.
+ * The preview of a memo in a list: content taller than the trigger is cut to a fixed-height
+ * preview behind a fade. There is no in-place expand; the card opens the memo full screen
+ * to read the rest. The inner div is never clamped, so observing it keeps the measurement
+ * live while images and embeds load.
  */
 const ClampedSection = ({ enabled, children }: ClampedSectionProps) => {
-  const t = useTranslate();
   const measureRef = useRef<HTMLDivElement>(null);
   const [clamped, setClamped] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const el = measureRef.current;
@@ -42,40 +37,19 @@ const ClampedSection = ({ enabled, children }: ClampedSectionProps) => {
     return () => observer.disconnect();
   }, [enabled]);
 
-  const collapsed = clamped && !expanded;
-
   return (
-    <>
-      <div
-        className={cn("relative w-full", collapsed && "overflow-hidden")}
-        style={collapsed ? { maxHeight: CLAMP_PREVIEW_HEIGHT_PX } : undefined}
-      >
-        <div ref={measureRef} className="w-full flex flex-col justify-start items-start gap-2">
-          {children}
-        </div>
-        {collapsed && (
-          // The fade is part of the preview: clicking it reads the whole memo, like Show more.
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-hidden
-            onClick={() => setExpanded(true)}
-            className="absolute inset-x-0 bottom-0 h-16 cursor-pointer bg-linear-to-t from-mu-surface from-0% via-mu-surface/60 via-40% to-transparent to-100%"
-          />
-        )}
+    <div
+      className={cn("relative w-full", clamped && "overflow-hidden")}
+      style={clamped ? { maxHeight: CLAMP_PREVIEW_HEIGHT_PX } : undefined}
+      data-clamped={clamped || undefined}
+    >
+      <div ref={measureRef} className="w-full flex flex-col justify-start items-start gap-2">
+        {children}
       </div>
       {clamped && (
-        <Button
-          variant="ghost"
-          size="sm"
-          aria-expanded={!collapsed}
-          iconEnd={collapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
-          onClick={() => setExpanded((prev) => !prev)}
-        >
-          {t(collapsed ? "memo.show-more" : "memo.show-less")}
-        </Button>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-mu-surface from-0% via-mu-surface/60 via-40% to-transparent to-100%" />
       )}
-    </>
+    </div>
   );
 };
 

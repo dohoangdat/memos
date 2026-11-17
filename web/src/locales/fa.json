@@ -420,12 +420,9 @@
       "has-task-list": "دارای لیست کارها",
       "remove": "حذف فیلتر"
     },
-    "compact-mode": "حالت فشرده",
     "link-preview": "پیش‌نمایش پیوند",
     "load-more": "بارگذاری بیشتر",
     "order-by": "مرتب‌سازی بر اساس",
-    "show-less": "نمایش کمتر",
-    "show-more": "نمایش بیشتر",
     "visibility": {
       "private": "خصوصی",
       "protected": "فضای کار",
@@ -472,7 +469,6 @@
     "back-to": "بازگشت به {{source}}",
     "count-memos-updated-in-date": "{{count}} {{memos}} به‌روزرسانی شده در {{date}}",
     "connections": "اتصالات",
-    "grid-compact-hint": "طرح‌بندی‌های شبکه‌ای همیشه از کارت‌های فشرده استفاده می‌کنند.",
     "layout": "طرح‌بندی",
     "layout-auto": "خودکار",
     "layout-auto-description": "به تعداد ستون‌هایی که صفحه نمایش را پر می‌کنند",
@@ -491,7 +487,8 @@
     },
     "view-options": "گزینه‌های مشاهده",
     "add-reaction": "افزودن واکنش",
-    "remove-reaction": "حذف واکنش"
+    "remove-reaction": "حذف واکنش",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "با موفقیت آرشیو شد",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} ثانیه عقب",
     "forward": "{{seconds}} ثانیه جلو",
     "speed": "سرعت پخش {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

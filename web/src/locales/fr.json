@@ -426,7 +426,6 @@
       "has-task-list": "aListeTâches",
       "remove": "Retirer le filtre"
     },
-    "compact-mode": "Mode compact",
     "link-preview": "Aperçu des liens",
     "load-more": "Charger plus",
     "order-by": "Trier par",
@@ -457,8 +456,6 @@
       "image-title": "Partager en tant qu'image",
       "open-image": "Partager en tant qu'image"
     },
-    "show-less": "Afficher moins",
-    "show-more": "Afficher plus",
     "visibility": {
       "private": "Privé",
       "protected": "Protégé",
@@ -485,7 +482,6 @@
     "moved": "Mémo déplacé",
     "back-to": "Retour à {{source}}",
     "connections": "Connexions",
-    "grid-compact-hint": "Les mises en page en grille utilisent toujours des cartes compactes.",
     "layout": "Mise en page",
     "layout-auto": "Automatique",
     "layout-auto-description": "Autant de colonnes que l'écran peut en afficher",
@@ -497,7 +493,8 @@
     "parent-memo": "Mémo parent",
     "view-options": "Options d'affichage",
     "add-reaction": "Ajouter une réaction",
-    "remove-reaction": "Supprimer la réaction"
+    "remove-reaction": "Supprimer la réaction",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Archivé avec succès",
@@ -1472,5 +1469,15 @@
     "back": "Reculer de {{seconds}} secondes",
     "forward": "Avancer de {{seconds}} secondes",
     "speed": "Vitesse de lecture {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

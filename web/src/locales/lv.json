@@ -465,7 +465,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Noņemt filtru"
     },
-    "compact-mode": "Kompaktais režīms",
     "link-preview": "Saites priekšskatījums",
     "load-more": "Ielādēt vairāk",
     "newest-first": "Jaunākie vispirms",
@@ -498,8 +497,6 @@
       "revoked": "Kopīgošanas saite ir atsaukta",
       "title": "Kopīgojiet šo piezīmi"
     },
-    "show-less": "Rādīt mazāk",
-    "show-more": "Rādīt vairāk",
     "task-actions": {
       "check-all": "Pārbaudiet visus uzdevumus",
       "uncheck-all": "Noņemiet atzīmi no visiem uzdevumiem",
@@ -523,7 +520,6 @@
     "moved": "Piezīme pārvietota",
     "back-to": "Atpakaļ uz {{source}}",
     "connections": "Savienojumi",
-    "grid-compact-hint": "Režģa izkārtojumos vienmēr tiek izmantotas kompaktas kartes.",
     "layout": "Izkārtojums",
     "layout-auto": "Automātiski",
     "layout-auto-description": "Tik daudz kolonnu, cik ietilpst ekrānā",
@@ -535,7 +531,8 @@
     "parent-memo": "Galvenā piezīme",
     "view-options": "Skata opcijas",
     "add-reaction": "Pievienojiet reakciju",
-    "remove-reaction": "Noņemiet reakciju"
+    "remove-reaction": "Noņemiet reakciju",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Veiksmīgi arhivēts",
@@ -1472,5 +1469,15 @@
     "back": "Atpakaļ {{seconds}} sekundes",
     "forward": "Uz priekšu {{seconds}} sekundes",
     "speed": "Atskaņošanas ātrums {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

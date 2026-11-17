@@ -465,7 +465,6 @@
       "has-task-list": "areTaskList",
       "remove": "Eliminați filtrul"
     },
-    "compact-mode": "Mod compact",
     "link-preview": "Previzualizare link",
     "load-more": "Încărcați mai multe",
     "newest-first": "Cel mai nou primul",
@@ -498,8 +497,6 @@
       "revoked": "Linkul de distribuire a fost revocat",
       "title": "Distribuiți această notă"
     },
-    "show-less": "Arată mai puțin",
-    "show-more": "Arată mai multe",
     "task-actions": {
       "check-all": "Verificați toate sarcinile",
       "uncheck-all": "Debifați toate sarcinile",
@@ -523,7 +520,6 @@
     "moved": "Nota mutată",
     "back-to": "Înapoi la {{source}}",
     "connections": "Conexiuni",
-    "grid-compact-hint": "Aspectele de tip grilă utilizează întotdeauna carduri compacte.",
     "layout": "Aspect",
     "layout-auto": "Automat",
     "layout-auto-description": "Atâtea coloane câte se potrivesc pe ecran",
@@ -535,7 +531,8 @@
     "parent-memo": "Notă părinte",
     "view-options": "Opțiuni de vizualizare",
     "add-reaction": "Adăugați reacția",
-    "remove-reaction": "Îndepărtați reacția"
+    "remove-reaction": "Îndepărtați reacția",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arhivat cu succes",
@@ -1472,5 +1469,15 @@
     "back": "Înapoi {{seconds}} secunde",
     "forward": "Înainte {{seconds}} secunde",
     "speed": "Viteză de redare {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

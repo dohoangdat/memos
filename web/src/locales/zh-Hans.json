@@ -457,9 +457,7 @@
       "has-task-list": "有待办",
       "remove": "移除筛选"
     },
-    "compact-mode": "紧凑模式",
     "connections": "关联",
-    "grid-compact-hint": "网格布局始终使用紧凑卡片。",
     "layout": "布局",
     "layout-auto": "自动",
     "layout-auto-description": "根据屏幕宽度显示尽可能多的列",
@@ -475,8 +473,6 @@
     "on-this-memo": "本条备忘录",
     "order-by": "排序",
     "parent-memo": "父备忘录",
-    "show-less": "显示较少",
-    "show-more": "查看更多",
     "view-options": "视图选项",
     "visibility": {
       "private": "私有",
@@ -527,7 +523,8 @@
     "parent-unavailable-description": "它可能已被删除，或者您可能已失去访问权限。",
     "moved": "备忘录已移动",
     "add-reaction": "添加表态",
-    "remove-reaction": "移除表态"
+    "remove-reaction": "移除表态",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "归档成功",
@@ -1471,5 +1468,15 @@
     "back": "后退 {{seconds}} 秒",
     "forward": "前进 {{seconds}} 秒",
     "speed": "播放速度 {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

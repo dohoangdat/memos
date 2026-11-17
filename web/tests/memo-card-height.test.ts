@@ -49,9 +49,11 @@ describe("estimateMemoCardHeight", () => {
   it("does not count an inline managed image again as an attachment gallery", () => {
     const image = buildAttachment({ name: "attachments/image", filename: "image.png", type: "image/png" });
     const inline = buildMemo({ content: "![image](/file/attachments/image)", attachments: [image] });
-    const external = buildMemo({ content: "![image](https://example.com/image.png)", attachments: [image] });
 
-    expect(estimateMemoCardHeight(inline, { columnWidth: 320 })).toBeLessThan(estimateMemoCardHeight(external, { columnWidth: 320 }));
+    const textOnly = buildMemo({ content: "![image](/file/attachments/image)", attachments: [] });
+
+    // The inline image is counted once, as text, not again as a gallery tile.
+    expect(estimateMemoCardHeight(inline, { columnWidth: 320 })).toBe(estimateMemoCardHeight(textOnly, { columnWidth: 320 }));
   });
 
   it("estimates the visible comment preview height and caps it at three comments", () => {

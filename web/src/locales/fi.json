@@ -464,7 +464,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Poista suodatin"
     },
-    "compact-mode": "Tiivis tila",
     "link-preview": "Linkin esikatselu",
     "load-more": "Lataa lisää",
     "newest-first": "Uusin ensin",
@@ -497,8 +496,6 @@
       "revoked": "Jaa linkki peruutettu",
       "title": "Jaa tämä muistio"
     },
-    "show-less": "Näytä vähemmän",
-    "show-more": "Näytä lisää",
     "task-actions": {
       "check-all": "Tarkista kaikki tehtävät",
       "uncheck-all": "Poista kaikkien tehtävien valinta",
@@ -522,7 +519,6 @@
     "moved": "Muistio siirretty",
     "back-to": "Takaisin kohtaan {{source}}",
     "connections": "Yhteydet",
-    "grid-compact-hint": "Ruudukkoasetteluissa käytetään aina kompakteja kortteja.",
     "layout": "Asettelu",
     "layout-auto": "Automaattinen",
     "layout-auto-description": "Niin monta saraketta kuin näytölle mahtuu",
@@ -534,7 +530,8 @@
     "parent-memo": "Ylämuistio",
     "view-options": "Näytä asetukset",
     "add-reaction": "Lisää reaktio",
-    "remove-reaction": "Poista reaktio"
+    "remove-reaction": "Poista reaktio",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arkistointi onnistui",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} sekuntia taaksepäin",
     "forward": "{{seconds}} sekuntia eteenpäin",
     "speed": "Toistonopeus {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -131,7 +131,7 @@ const PagedMemoList = (props: Props) => {
   const { isUserSettingsInitialized } = useAuth();
   const { filters, memoView, removeFilter, setFilters, setMemoView } = useMemoFilterContext();
   const { setQuickFindOpen } = useAppSidebar();
-  const { maxColumns, compactMode } = useView();
+  const { maxColumns } = useView();
   // maxColumns is a ceiling: 1 = single reading column, 0 = as many as fit. The single
   // column renders in normal document flow; anything wider becomes the packed grid.
   const multiColumn = maxColumns !== 1;
@@ -153,10 +153,8 @@ const PagedMemoList = (props: Props) => {
     return () => observer.disconnect();
   }, []);
   const useGrid = multiColumn && (fitsGridWidth ?? true);
-  // Grid tiles are always bounded/compact; the narrow-width fallback behaves exactly like
-  // maxColumns = 1, so it respects the user's own compact setting. Centralized here so the
-  // pages don't each repeat the policy.
-  const effectiveCompact = compactMode || useGrid;
+  // Lists always show memos as previews; the card opens the memo full screen to read or edit it.
+  const effectiveCompact = true;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error, isFetchNextPageError, refetch } =
     useInfiniteMemos(

@@ -10,9 +10,7 @@ vi.mock("@/utils/i18n", () => ({
       "common.timeline": "Timeline",
       "common.created-at": "Created",
       "common.last-updated-at": "Last updated",
-      "memo.compact-mode": "Compact mode",
       "memo.direction": "Direction",
-      "memo.grid-compact-hint": "Grid layouts always use compact cards.",
       "memo.layout": "Layout",
       "memo.layout-auto": "Auto",
       "memo.layout-auto-description": "As many columns as fit",
@@ -35,7 +33,7 @@ describe("MemoDisplaySettingMenu", () => {
     localStorage.clear();
   });
 
-  it("opens from an accessible trigger and explains the compact grid constraint", () => {
+  it("opens from an accessible trigger with layout and order options", () => {
     render(
       <ViewProvider>
         <MemoDisplaySettingMenu />
@@ -53,16 +51,8 @@ describe("MemoDisplaySettingMenu", () => {
     // Each option is a horizontal Field: its label names the Select or Switch at the end of the row.
     expect(screen.getByRole("combobox", { name: "Order by" })).toHaveTextContent("Created");
     expect(screen.getByRole("combobox", { name: "Direction" })).toHaveTextContent("Newest first");
-    const compactMode = screen.getByRole("switch", { name: "Compact mode" });
-    // The Timeline opens memos as previews by default.
-    expect(compactMode).toBeChecked();
-    expect(compactMode).toBeEnabled();
-
-    fireEvent.click(screen.getByRole("button", { name: "2 columns" }));
-
-    expect(compactMode).toBeChecked();
-    expect(compactMode).toHaveAttribute("aria-disabled", "true");
-    expect(compactMode).toHaveAccessibleDescription("Grid layouts always use compact cards.");
+    // Memos always show as previews in lists, so there is no compact switch.
+    expect(screen.queryByRole("switch", { name: "Compact mode" })).toBeNull();
   });
 
   it("opens only from the arrow, not the adjacent Timeline link", () => {

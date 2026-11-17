@@ -420,12 +420,9 @@
       "has-task-list": "कार्यसूची आहे",
       "remove": "फिल्टर काढा"
     },
-    "compact-mode": "संक्षिप्त मोड",
     "link-preview": "दुवा पूर्वावलोकन",
     "load-more": "अधिक लोड करा",
     "order-by": "क्रमवारी",
-    "show-less": "कमी दाखवा",
-    "show-more": "अधिक दाखवा",
     "visibility": {
       "private": "खाजगी",
       "protected": "संरक्षित",
@@ -472,7 +469,6 @@
     "back-to": "{{source}} कडे परत",
     "count-memos-updated-in-date": "{{count}} {{memos}} हे {{date}} वर अद्यतनित केले",
     "connections": "जोडण्या",
-    "grid-compact-hint": "ग्रिड लेआउटमध्ये नेहमी संक्षिप्त कार्ड वापरले जातात.",
     "layout": "लेआउट",
     "layout-auto": "ऑटो",
     "layout-auto-description": "स्क्रीनवर मावतील तितके स्तंभ",
@@ -491,7 +487,8 @@
     },
     "view-options": "पाहण्याचे पर्याय",
     "add-reaction": "प्रतिक्रिया जोडा",
-    "remove-reaction": "प्रतिक्रिया काढून टाका"
+    "remove-reaction": "प्रतिक्रिया काढून टाका",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "यशस्वीरित्या संग्रहित केले",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} सेकंद मागे",
     "forward": "{{seconds}} सेकंद पुढे",
     "speed": "प्लेबॅक वेग {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -1,4 +1,4 @@
-import { buttonClasses, Field, Popover, Select, Separator, Switch, Toggle, ToggleGroup, Tooltip } from "@usememos/ui";
+import { buttonClasses, Field, Popover, Select, Toggle, ToggleGroup, Tooltip } from "@usememos/ui";
 import { ChevronDownIcon, Columns2Icon, Columns3Icon, InfinityIcon, type LucideIcon, Rows3Icon } from "lucide-react";
 import type { RefObject } from "react";
 import { MAX_COLUMNS_VALUES, type MemoMaxColumns, useView } from "@/contexts/ViewContext";
@@ -21,10 +21,7 @@ const LAYOUT_OPTIONS: Record<MemoMaxColumns, { icon: LucideIcon; key: "layout-li
 
 function MemoDisplaySettingsContent() {
   const t = useTranslate();
-  const { orderByTimeAsc, timeBasis, compactMode, maxColumns, setTimeBasis, setOrderByTimeAsc, setCompactMode, setMaxColumns } = useView();
-  // Multi-column grids always render compact tiles, so the toggle is shown as on and locked
-  // there; it only becomes a real choice at a single column.
-  const compactLocked = maxColumns !== 1;
+  const { orderByTimeAsc, timeBasis, maxColumns, setTimeBasis, setOrderByTimeAsc, setMaxColumns } = useView();
 
   const timeBasisOptions = { create_time: t("common.created-at"), update_time: t("common.last-updated-at") };
   const sortOrderOptions = { desc: t("memo.newest-first"), asc: t("memo.oldest-first") };
@@ -90,15 +87,6 @@ function MemoDisplaySettingsContent() {
             <Select.Item value="asc">{sortOrderOptions.asc}</Select.Item>
           </Select.Popup>
         </Select.Root>
-      </Field.Root>
-
-      <Separator />
-
-      <Field.Root orientation="horizontal" size="md">
-        <Field.Label>{t("memo.compact-mode")}</Field.Label>
-        {/* Wraps inside the width the controls set, so the hint never widens the popup. */}
-        {compactLocked && <Field.Description className="w-0 min-w-full">{t("memo.grid-compact-hint")}</Field.Description>}
-        <Switch checked={compactLocked || compactMode} onCheckedChange={setCompactMode} disabled={compactLocked} />
       </Field.Root>
     </div>
   );

@@ -420,12 +420,9 @@
       "has-task-list": "Memiliki daftar tugas",
       "remove": "Hapus filter"
     },
-    "compact-mode": "Mode ringkas",
     "link-preview": "Pratinjau tautan",
     "load-more": "Muat lebih banyak",
     "order-by": "Urutkan Berdasarkan",
-    "show-less": "Tampilkan lebih sedikit",
-    "show-more": "Tampilkan lebih banyak",
     "visibility": {
       "private": "Pribadi",
       "protected": "Terlindungi",
@@ -472,7 +469,6 @@
     "back-to": "Kembali ke {{source}}",
     "count-memos-updated-in-date": "{{count}} {{memos}} diperbarui pada {{date}}",
     "connections": "Koneksi",
-    "grid-compact-hint": "Tata letak grid selalu menggunakan kartu ringkas.",
     "layout": "Tata Letak",
     "layout-auto": "Otomatis",
     "layout-auto-description": "Sebanyak kolom yang sesuai dengan layar",
@@ -491,7 +487,8 @@
     },
     "view-options": "Opsi tampilan",
     "add-reaction": "Tambahkan reaksi",
-    "remove-reaction": "Hapus reaksi"
+    "remove-reaction": "Hapus reaksi",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Berhasil diarsipkan",
@@ -1471,5 +1468,15 @@
     "back": "Mundur {{seconds}} detik",
     "forward": "Maju {{seconds}} detik",
     "speed": "Kecepatan putar {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

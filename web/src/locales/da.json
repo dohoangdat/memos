@@ -464,7 +464,6 @@
       "has-task-list": "har Opgaveliste",
       "remove": "Fjern filter"
     },
-    "compact-mode": "Kompakt tilstand",
     "link-preview": "Linkforhåndsvisning",
     "load-more": "Indlæs mere",
     "newest-first": "Nyeste først",
@@ -497,8 +496,6 @@
       "revoked": "Del link tilbagekaldt",
       "title": "Del dette notat"
     },
-    "show-less": "Vis mindre",
-    "show-more": "Vis mere",
     "task-actions": {
       "check-all": "Tjek alle opgaver",
       "uncheck-all": "Fjern markeringen i alle opgaver",
@@ -522,7 +519,6 @@
     "moved": "Notat flyttet",
     "back-to": "Tilbage til {{source}}",
     "connections": "Forbindelser",
-    "grid-compact-hint": "Gitterlayout bruger altid kompakte kort.",
     "layout": "Layout",
     "layout-auto": "Auto",
     "layout-auto-description": "Så mange kolonner som der er plads til på skærmen",
@@ -534,7 +530,8 @@
     "parent-memo": "Overordnet notat",
     "view-options": "Visningsmuligheder",
     "add-reaction": "Tilføj reaktion",
-    "remove-reaction": "Fjern reaktion"
+    "remove-reaction": "Fjern reaktion",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arkiveret",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} sekunder tilbage",
     "forward": "{{seconds}} sekunder frem",
     "speed": "Afspilningshastighed {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -425,7 +425,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Quitar o filtro"
     },
-    "compact-mode": "Modo compacto",
     "link-preview": "Vista previa de ligazóns",
     "load-more": "Cargar máis",
     "order-by": "Orde por",
@@ -456,8 +455,6 @@
       "image-title": "Compartir como imaxe",
       "open-image": "Compartir como imaxe"
     },
-    "show-less": "Mostrar menos",
-    "show-more": "Mostrar máis",
     "visibility": {
       "private": "Privada",
       "protected": "Protexida",
@@ -484,7 +481,6 @@
     "moved": "Nota movida",
     "back-to": "Volver a {{source}}",
     "connections": "Conexións",
-    "grid-compact-hint": "Os deseños de cuadrícula sempre usan tarxetas compactas.",
     "layout": "Deseño",
     "layout-auto": "Automático",
     "layout-auto-description": "Tantas columnas como axusten á pantalla",
@@ -496,7 +492,8 @@
     "parent-memo": "Nota principal",
     "view-options": "Ver opcións",
     "add-reaction": "Engadir reacción",
-    "remove-reaction": "Eliminar a reacción"
+    "remove-reaction": "Eliminar a reacción",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arquivada correctamente",
@@ -1471,5 +1468,15 @@
     "back": "Retroceder {{seconds}} segundos",
     "forward": "Avanzar {{seconds}} segundos",
     "speed": "Velocidade de reprodución {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

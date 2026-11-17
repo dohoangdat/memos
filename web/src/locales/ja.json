@@ -425,8 +425,6 @@
       "has-task-list": "タスクリストあり",
       "remove": "フィルターを削除"
     },
-    "compact-mode": "コンパクト表示",
-    "grid-compact-hint": "グリッドレイアウトでは常にコンパクトなカードで表示されます。",
     "layout": "レイアウト",
     "layout-auto": "自動",
     "layout-auto-description": "画面に収まる分だけ列を表示",
@@ -464,8 +462,6 @@
       "image-title": "画像として共有",
       "open-image": "画像として共有"
     },
-    "show-less": "表示を減らす",
-    "show-more": "もっと見る",
     "view-options": "表示オプション",
     "visibility": {
       "private": "非公開",
@@ -496,7 +492,8 @@
     "on-this-memo": "このメモについて",
     "parent-memo": "親メモ",
     "add-reaction": "リアクションを追加",
-    "remove-reaction": "反応を取り除く"
+    "remove-reaction": "反応を取り除く",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "アーカイブが完了しました",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} 秒戻る",
     "forward": "{{seconds}} 秒進む",
     "speed": "再生速度 {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

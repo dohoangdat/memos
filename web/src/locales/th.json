@@ -420,12 +420,9 @@
       "has-task-list": "มีรายการที่ต้องทำ",
       "remove": "ลบตัวกรอง"
     },
-    "compact-mode": "โหมดกะทัดรัด",
     "link-preview": "ตัวอย่างลิงก์",
     "load-more": "โหลดเพิ่มเติม",
     "order-by": "เรียงตาม",
-    "show-less": "แสดงน้อยลง",
-    "show-more": "แสดงเพิ่มเติม",
     "visibility": {
       "private": "ส่วนตัว",
       "protected": "พื้นที่ทำงาน",
@@ -472,7 +469,6 @@
     "back-to": "กลับไปที่ {{source}}",
     "count-memos-updated-in-date": "{{count}} {{memos}} อัปเดตเมื่อ {{date}}",
     "connections": "การเชื่อมต่อ",
-    "grid-compact-hint": "รูปแบบตารางจะใช้การ์ดแบบกะทัดรัดเสมอ",
     "layout": "รูปแบบการจัดวาง",
     "layout-auto": "อัตโนมัติ",
     "layout-auto-description": "จำนวนคอลัมน์มากที่สุดเท่าที่จะพอดีกับหน้าจอ",
@@ -491,7 +487,8 @@
     },
     "view-options": "ตัวเลือกการดู",
     "add-reaction": "เพิ่มปฏิกิริยา",
-    "remove-reaction": "ลบการตอบสนอง"
+    "remove-reaction": "ลบการตอบสนอง",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "เก็บถาวรเรียบร้อยแล้ว",
@@ -1471,5 +1468,15 @@
     "back": "ย้อนกลับ {{seconds}} วินาที",
     "forward": "ข้ามไป {{seconds}} วินาที",
     "speed": "ความเร็วในการเล่น {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

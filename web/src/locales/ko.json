@@ -420,12 +420,9 @@
       "has-task-list": "할일목록있음",
       "remove": "필터 제거"
     },
-    "compact-mode": "간략 보기",
     "link-preview": "링크 미리보기",
     "load-more": "더보기",
     "order-by": "정렬 기준",
-    "show-less": "간략히 보기",
-    "show-more": "더보기",
     "visibility": {
       "private": "나만 볼 수 있음",
       "protected": "멤버 전용",
@@ -472,7 +469,6 @@
     "back-to": "{{source}}으로 돌아가기",
     "count-memos-updated-in-date": "{{count}} {{memos}}이 {{date}}에 업데이트되었습니다.",
     "connections": "연결",
-    "grid-compact-hint": "그리드 레이아웃은 항상 컴팩트 카드를 사용합니다.",
     "layout": "레이아웃",
     "layout-auto": "자동",
     "layout-auto-description": "화면에 맞는 열 개수",
@@ -491,7 +487,8 @@
     },
     "view-options": "보기 옵션",
     "add-reaction": "반응 추가",
-    "remove-reaction": "반응 제거"
+    "remove-reaction": "반응 제거",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "성공적으로 보관되었습니다",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}}초 뒤로",
     "forward": "{{seconds}}초 앞으로",
     "speed": "재생 속도 {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

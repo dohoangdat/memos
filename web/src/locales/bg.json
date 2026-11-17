@@ -464,7 +464,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Премахване на филтъра"
     },
-    "compact-mode": "Компактен режим",
     "link-preview": "Преглед на връзка",
     "load-more": "Заредете повече",
     "newest-first": "Първо най-новите",
@@ -497,8 +496,6 @@
       "revoked": "Връзката за споделяне е отменена",
       "title": "Споделете тази бележка"
     },
-    "show-less": "Покажи по-малко",
-    "show-more": "Покажи повече",
     "task-actions": {
       "check-all": "Проверете всички задачи",
       "uncheck-all": "Премахнете отметката от всички задачи",
@@ -522,7 +519,6 @@
     "moved": "Бележката е преместена",
     "back-to": "Обратно към {{source}}",
     "connections": "Връзки",
-    "grid-compact-hint": "Мрежовите оформления винаги използват компактни карти.",
     "layout": "Оформление",
     "layout-auto": "Автоматично",
     "layout-auto-description": "Толкова колони, колкото се побират на екрана",
@@ -534,7 +530,8 @@
     "parent-memo": "Родителска бележка",
     "view-options": "Опции за преглед",
     "add-reaction": "Добавете реакция",
-    "remove-reaction": "Премахнете реакцията"
+    "remove-reaction": "Премахнете реакцията",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Архивиран успешно",
@@ -1471,5 +1468,15 @@
     "back": "Назад с {{seconds}} секунди",
     "forward": "Напред с {{seconds}} секунди",
     "speed": "Скорост на възпроизвеждане {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

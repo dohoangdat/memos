@@ -462,9 +462,7 @@
       "has-task-list": "Görev listesi içerir",
       "remove": "Filtreyi kaldır"
     },
-    "compact-mode": "Kompakt görünüm",
     "connections": "Bağlantılar",
-    "grid-compact-hint": "Izgara düzeninde kartlar her zaman kompakt gösterilir.",
     "layout": "Düzen",
     "layout-auto": "Otomatik",
     "layout-auto-description": "Ekrana sığabildiği kadar sütun",
@@ -504,8 +502,6 @@
       "image-title": "Görsel olarak paylaş",
       "open-image": "Görsel olarak paylaş"
     },
-    "show-less": "Daha az göster",
-    "show-more": "Daha fazla göster",
     "view-options": "Görünüm seçenekleri",
     "visibility": {
       "private": "Gizli",
@@ -527,7 +523,8 @@
       "updated": "Görevler güncellendi"
     },
     "add-reaction": "Tepki ekle",
-    "remove-reaction": "Reaksiyonu kaldır"
+    "remove-reaction": "Reaksiyonu kaldır",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arşivlendi",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} saniye geri sar",
     "forward": "{{seconds}} saniye ileri sar",
     "speed": "Oynatma hızı {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -427,7 +427,6 @@
       "has-task-list": "ma listę zadań",
       "remove": "Usuń filtr"
     },
-    "compact-mode": "Tryb kompaktowy",
     "link-preview": "Podgląd linków",
     "load-more": "Załaduj więcej",
     "new-badge": "Nowe",
@@ -459,8 +458,6 @@
       "image-title": "Udostępnij jako obraz",
       "open-image": "Udostępnij jako obraz"
     },
-    "show-less": "Pokaż mniej",
-    "show-more": "Pokaż więcej",
     "visibility": {
       "private": "Prywatne",
       "protected": "Przestrzeń robocza",
@@ -486,7 +483,6 @@
     "moved": "Notatka przeniesiona",
     "back-to": "Powrót do {{source}}",
     "connections": "Połączenia",
-    "grid-compact-hint": "Układy siatki zawsze korzystają z kart kompaktowych.",
     "layout": "Układ",
     "layout-auto": "Automatycznie",
     "layout-auto-description": "Tyle kolumn, ile mieści się na ekranie",
@@ -498,7 +494,8 @@
     "parent-memo": "Notatka nadrzędna",
     "view-options": "Opcje widoku",
     "add-reaction": "Dodaj reakcję",
-    "remove-reaction": "Usuń reakcję"
+    "remove-reaction": "Usuń reakcję",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Zarchiwizowano pomyślnie",
@@ -1473,5 +1470,15 @@
     "back": "Do tyłu o {{seconds}} s",
     "forward": "Do przodu o {{seconds}} s",
     "speed": "Prędkość odtwarzania {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

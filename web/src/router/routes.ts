@@ -11,6 +11,8 @@ export const ROUTES = {
   MAP: "/map",
   VIEWS: "/views",
   SETTING: "/setting",
+  /** The installed app's share target (site.webmanifest `share_target`). */
+  SHARE_TARGET: "/share",
   EXPLORE: "/explore",
   USER_PROFILE: "/u/:username",
   AUTH: "/auth",

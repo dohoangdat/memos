@@ -425,7 +425,6 @@
       "has-task-list": "harGjøremålsListe",
       "remove": "Fjern filter"
     },
-    "compact-mode": "Kompakt modus",
     "link-preview": "Forhåndsvisning av lenke",
     "load-more": "Last inn mer",
     "order-by": "Sorter etter",
@@ -456,8 +455,6 @@
       "image-title": "Del som bilde",
       "open-image": "Del som bilde"
     },
-    "show-less": "Vis mindre",
-    "show-more": "Vis mer",
     "visibility": {
       "private": "Privat",
       "protected": "Beskyttet",
@@ -484,7 +481,6 @@
     "moved": "Notat flyttet",
     "back-to": "Tilbake til {{source}}",
     "connections": "Tilkoblinger",
-    "grid-compact-hint": "Rutenettoppsett bruker alltid kompakte kort.",
     "layout": "Oppsett",
     "layout-auto": "Auto",
     "layout-auto-description": "Så mange kolonner som får plass på skjermen",
@@ -496,7 +492,8 @@
     "parent-memo": "Overordnet notat",
     "view-options": "Visningsalternativer",
     "add-reaction": "Legg til reaksjon",
-    "remove-reaction": "Fjern reaksjonen"
+    "remove-reaction": "Fjern reaksjonen",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arkivering vellykket",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} sekunder tilbake",
     "forward": "{{seconds}} sekunder frem",
     "speed": "Avspillingshastighet {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -18,6 +18,12 @@ export interface MemoViewProps {
   /** Controls whether tag-blurred content is revealed; uncontrolled when omitted. */
   showBlurredContent?: boolean;
   onShowBlurredContentChange?: (show: boolean) => void;
+  /**
+   * "card" (default): a click on a compact card opens the memo full screen to read, a double
+   * click or Edit opens it full screen to edit. "reader": the memo inside that reader, where a
+   * click does not open another one.
+   */
+  presentation?: "card" | "reader";
 }
 
 export interface MemoViewHandle {

@@ -505,8 +505,6 @@
       "has-task-list": "有待辦事項",
       "remove": "移除篩選條件"
     },
-    "compact-mode": "精簡模式",
-    "grid-compact-hint": "網格版面一律使用精簡卡片。",
     "layout": "版面配置",
     "layout-auto": "自動",
     "layout-auto-description": "依螢幕寬度顯示最多可容納的欄數",
@@ -547,8 +545,6 @@
       "revoked": "分享連結已撤銷",
       "title": "分享這份備忘錄"
     },
-    "show-less": "顯示較少",
-    "show-more": "查看更多",
     "task-actions": {
       "check-all": "勾選所有待辦事項",
       "uncheck-all": "取消勾選所有待辦事項",
@@ -575,7 +571,8 @@
     "on-this-memo": "在此備忘錄中",
     "parent-memo": "原始備忘錄",
     "add-reaction": "新增表情回應",
-    "remove-reaction": "移除表情回應"
+    "remove-reaction": "移除表情回應",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "封存成功",
@@ -1471,5 +1468,15 @@
     "back": "倒退 {{seconds}} 秒",
     "forward": "快轉 {{seconds}} 秒",
     "speed": "播放速度 {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

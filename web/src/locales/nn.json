@@ -512,7 +512,6 @@
       "view-all-count_one": "Vis {{count}} kommentar",
       "view-all-count_other": "Vis alle {{count}} kommentarane"
     },
-    "compact-mode": "Kompakt modus",
     "connections": "Tilknytingar",
     "copy-content": "Kopier innhald",
     "copy-link": "Kopier lenkje",
@@ -530,7 +529,6 @@
       "has-task-list": "Har gjeremålsliste",
       "remove": "Fjern filteret"
     },
-    "grid-compact-hint": "Rutenett nyttar alltid kompakte kort.",
     "layout": "Oppsett",
     "layout-auto": "Automatisk",
     "layout-auto-description": "Så mange kolonnar som skjermen har plass til",
@@ -579,8 +577,6 @@
       "revoked": "Delingslenkja er kalla attende",
       "title": "Del dette notatet"
     },
-    "show-less": "Vis mindre",
-    "show-more": "Vis meir",
     "task-actions": {
       "check-all": "Kryss av alle gjeremål",
       "uncheck-all": "Fjern avkryssing frå alle gjeremål",
@@ -598,7 +594,8 @@
       "space-description": "Alle i {{space}}"
     },
     "add-reaction": "Legg til reaksjon",
-    "remove-reaction": "Fjern reaksjon"
+    "remove-reaction": "Fjern reaksjon",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Arkivert",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} sekund tilbake",
     "forward": "{{seconds}} sekund fram",
     "speed": "Avspelingsfart {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

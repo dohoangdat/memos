@@ -92,7 +92,7 @@ describe("TagTree rendering", () => {
     const branch = screen.getByText("a").closest('[role="treeitem"]') as HTMLElement;
     const branchLabelButton = screen.getByText("a").closest("button") as HTMLButtonElement;
     const disclosure = screen.getByLabelText("common.expand #a");
-    const branchCount = within(branch).getByText("12");
+    const branchCount = within(branch).getByText("tag-tree.subs-and-posts");
     expect(disclosure.compareDocumentPosition(branchLabelButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(branchLabelButton).toHaveClass("text-start");
     expect(branchLabelButton.querySelector("svg")).not.toBeInTheDocument();

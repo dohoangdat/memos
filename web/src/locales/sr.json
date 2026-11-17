@@ -465,7 +465,6 @@
       "has-task-list": "хасТаскЛист",
       "remove": "Уклони филтер"
     },
-    "compact-mode": "Компактни режим",
     "link-preview": "Преглед везе",
     "load-more": "Учитај више",
     "newest-first": "Најновије прво",
@@ -498,8 +497,6 @@
       "revoked": "Дељење везе је опозвано",
       "title": "Поделите ову белешку"
     },
-    "show-less": "Прикажи мање",
-    "show-more": "Покажи више",
     "task-actions": {
       "check-all": "Проверите све задатке",
       "uncheck-all": "Поништите избор свих задатака",
@@ -523,7 +520,6 @@
     "moved": "Белешка је премештена",
     "back-to": "Назад на {{source}}",
     "connections": "Везе",
-    "grid-compact-hint": "Распореди мреже увек користе компактне картице.",
     "layout": "Распоред",
     "layout-auto": "Аутоматски",
     "layout-auto-description": "Колико год колона стане на екран",
@@ -535,7 +531,8 @@
     "parent-memo": "Надређена порука",
     "view-options": "Опције приказа",
     "add-reaction": "Додајте реакцију",
-    "remove-reaction": "Уклоните реакцију"
+    "remove-reaction": "Уклоните реакцију",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Архивирано је успешно",
@@ -1472,5 +1469,15 @@
     "back": "Назад {{seconds}} секунди",
     "forward": "Напред {{seconds}} секунди",
     "speed": "Брзина репродукције {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

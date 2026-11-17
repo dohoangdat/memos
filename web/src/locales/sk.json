@@ -466,7 +466,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Odstrániť filter"
     },
-    "compact-mode": "Kompaktný režim",
     "link-preview": "Náhľad odkazu",
     "load-more": "Načítať viac",
     "newest-first": "Najnovšie ako prvé",
@@ -499,8 +498,6 @@
       "revoked": "Odkaz na zdieľanie bol odvolaný",
       "title": "Zdieľajte túto poznámku"
     },
-    "show-less": "Ukážte menej",
-    "show-more": "Ukáž viac",
     "task-actions": {
       "check-all": "Skontrolujte všetky úlohy",
       "uncheck-all": "Zrušte začiarknutie všetkých úloh",
@@ -524,7 +521,6 @@
     "moved": "Poznámka presunutá",
     "back-to": "Späť na {{source}}",
     "connections": "Pripojenia",
-    "grid-compact-hint": "Mriežkové rozloženia vždy používajú kompaktné karty.",
     "layout": "Rozloženie",
     "layout-auto": "Automaticky",
     "layout-auto-description": "Toľko stĺpcov, koľko sa zmestí na obrazovku",
@@ -536,7 +532,8 @@
     "parent-memo": "Nadradená poznámka",
     "view-options": "Možnosti zobrazenia",
     "add-reaction": "Pridajte reakciu",
-    "remove-reaction": "Odstráňte reakciu"
+    "remove-reaction": "Odstráňte reakciu",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Úspešne archivované",
@@ -1473,5 +1470,15 @@
     "back": "Späť o {{seconds}} sekúnd",
     "forward": "Dopredu o {{seconds}} sekúnd",
     "speed": "Rýchlosť prehrávania {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

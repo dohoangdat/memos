@@ -427,7 +427,6 @@
       "has-task-list": "єСписокЗавдань",
       "remove": "Вилучити фільтр"
     },
-    "compact-mode": "Компактний режим",
     "link-preview": "Попередній перегляд посилань",
     "load-more": "Завантажити більше",
     "order-by": "Впорядкувати за",
@@ -458,8 +457,6 @@
       "image-title": "Поділитися як зображення",
       "open-image": "Поділитися як зображення"
     },
-    "show-less": "Показувати менше",
-    "show-more": "Показати більше",
     "visibility": {
       "private": "Приватні",
       "protected": "Робоча область",
@@ -486,7 +483,6 @@
     "moved": "Нотатку переміщено",
     "back-to": "Назад до {{source}}",
     "connections": "З'єднання",
-    "grid-compact-hint": "Макети сітки завжди використовують компактні картки.",
     "layout": "Макет",
     "layout-auto": "Авто",
     "layout-auto-description": "Стільки стовпців, скільки поміщається на екран",
@@ -498,7 +494,8 @@
     "parent-memo": "Батьківська нотатка",
     "view-options": "Параметри перегляду",
     "add-reaction": "Додайте реакцію",
-    "remove-reaction": "Видалити реакцію"
+    "remove-reaction": "Видалити реакцію",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Архівовано успішно",
@@ -1473,5 +1470,15 @@
     "back": "Назад на {{seconds}} секунд",
     "forward": "Вперед на {{seconds}} секунд",
     "speed": "Швидкість відтворення {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -23,6 +23,7 @@ const Home = lazyWithReload(() => import("@/pages/Home"));
 // editing session's and the composer renders with the page, never after it.
 const ComposingHome = lazyWithReload(() => Promise.all([import("@/pages/Home"), preloadMemoEditing()]).then(([page]) => page));
 const Inboxes = lazyWithReload(() => import("@/pages/Inboxes"));
+const ShareTarget = lazyWithReload(() => import("@/pages/ShareTarget"));
 const MemoDetail = lazyWithReload(() => import("@/pages/MemoDetail"));
 const NotFound = lazyWithReload(() => import("@/pages/NotFound"));
 const PermissionDenied = lazyWithReload(() => import("@/pages/PermissionDenied"));
@@ -153,6 +154,7 @@ export const routeConfig: RouteObject[] = [
                   { path: Routes.ATTACHMENTS, element: <Attachments /> },
                   { path: Routes.INBOX, element: <Inboxes /> },
                   { path: Routes.SETTING, element: <Setting /> },
+                  { path: Routes.SHARE_TARGET, element: <ShareTarget /> },
                 ],
               },
             ],

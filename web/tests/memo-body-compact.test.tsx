@@ -91,21 +91,16 @@ describe("<MemoBody /> compact body clamp", () => {
     expect(CLAMP_TRIGGER_HEIGHT_PX).toBeGreaterThan(CLAMP_PREVIEW_HEIGHT_PX);
   });
 
-  it("folds tall compact bodies and keeps them expanded across content changes", async () => {
+  it("folds tall compact bodies into a fixed preview with no in-place expand", async () => {
     // jsdom has no layout; report every element as taller than the fold trigger.
     vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(CLAMP_TRIGGER_HEIGHT_PX + 100);
 
     mockState.memo = createMemo("line 1\nline 2");
-    const { rerender } = render(<MemoBody compact={true} />);
+    const { container } = render(<MemoBody compact={true} />);
 
-    await waitFor(() => expect(screen.getByRole("button", { name: /memo\.show-more/ })).toBeInTheDocument());
-    fireEvent.click(screen.getByRole("button", { name: /memo\.show-more/ }));
-    expect(screen.getByRole("button", { name: /memo\.show-less/ })).toBeInTheDocument();
-
-    mockState.memo = createMemo("line 1\nline 2 updated");
-    rerender(<MemoBody compact={true} />);
-
-    expect(screen.getByRole("button", { name: /memo\.show-less/ })).toBeInTheDocument();
+    // The card opens the memo full screen to read the rest, so the preview has no toggle.
+    await waitFor(() => expect(container.querySelector("[data-clamped]")).toHaveStyle({ maxHeight: `${CLAMP_PREVIEW_HEIGHT_PX}px` }));
+    expect(screen.queryByRole("button", { name: /memo\.show-(more|less)/ })).toBeNull();
   });
 
   it("renders no text view for a memo of attachments alone", () => {
@@ -122,9 +117,9 @@ describe("<MemoBody /> compact body clamp", () => {
     vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(CLAMP_TRIGGER_HEIGHT_PX + 100);
 
     mockState.memo = createMemo("tall content");
-    render(<MemoBody compact={false} />);
+    const { container } = render(<MemoBody compact={false} />);
 
-    expect(screen.queryByRole("button", { name: /memo\.show-more/ })).toBeNull();
+    expect(container.querySelector("[data-clamped]")).toBeNull();
   });
 
   it("renders the sensitive-content action as a button", () => {

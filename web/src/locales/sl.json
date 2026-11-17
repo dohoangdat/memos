@@ -427,7 +427,6 @@
       "has-task-list": "imaSeznamOpravil",
       "remove": "Odstrani filter"
     },
-    "compact-mode": "Strnjeni način",
     "link-preview": "Predogled povezave",
     "load-more": "Naloži več",
     "order-by": "Razvrsti po",
@@ -458,8 +457,6 @@
       "image-title": "Delite kot sliko",
       "open-image": "Delite kot sliko"
     },
-    "show-less": "Prikaži manj",
-    "show-more": "Prikaži več",
     "visibility": {
       "private": "Zasebno",
       "protected": "Za uporabnike",
@@ -486,7 +483,6 @@
     "moved": "Zapisek premaknjen",
     "back-to": "Nazaj na {{source}}",
     "connections": "Povezave",
-    "grid-compact-hint": "Mrežne postavitve vedno uporabljajo kompaktne kartice.",
     "layout": "Postavitev",
     "layout-auto": "Samodejno",
     "layout-auto-description": "Toliko stolpcev, kolikor se prilega zaslonu",
@@ -498,7 +494,8 @@
     "parent-memo": "Nadrejeni zapisek",
     "view-options": "Možnosti pogleda",
     "add-reaction": "Dodajte reakcijo",
-    "remove-reaction": "Odstrani reakcijo"
+    "remove-reaction": "Odstrani reakcijo",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Uspešno arhivirano",
@@ -1473,5 +1470,15 @@
     "back": "Nazaj za {{seconds}} sekund",
     "forward": "Naprej za {{seconds}} sekund",
     "speed": "Hitrost predvajanja {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

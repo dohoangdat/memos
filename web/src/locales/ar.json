@@ -424,12 +424,9 @@
       "has-task-list": "يحتوي على قائمة مهام",
       "remove": "إزالة عامل التصفية"
     },
-    "compact-mode": "الوضع المضغوط",
     "link-preview": "معاينة الرابط",
     "load-more": "تحميل المزيد",
     "order-by": "ترتيب حسب",
-    "show-less": "عرض أقل",
-    "show-more": "عرض المزيد",
     "visibility": {
       "private": "خاص",
       "protected": "محمي",
@@ -476,7 +473,6 @@
     "back-to": "العودة إلى {{source}}",
     "count-memos-updated-in-date": "{{count}} {{memos}} تم التحديث في {{date}}",
     "connections": "الاتصالات",
-    "grid-compact-hint": "تستخدم تخطيطات الشبكة دائمًا بطاقات مضغوطة.",
     "layout": "التخطيط",
     "layout-auto": "تلقائي",
     "layout-auto-description": "عدد الأعمدة حسب عرض الشاشة",
@@ -495,7 +491,8 @@
     },
     "view-options": "خيارات العرض",
     "add-reaction": "إضافة رد فعل",
-    "remove-reaction": "إزالة التفاعل"
+    "remove-reaction": "إزالة التفاعل",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "تمت الأرشفة بنجاح",
@@ -1475,5 +1472,15 @@
     "back": "الرجوع {{seconds}} ثوانٍ",
     "forward": "التقدم {{seconds}} ثوانٍ",
     "speed": "سرعة التشغيل {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

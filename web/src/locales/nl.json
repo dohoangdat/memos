@@ -425,7 +425,6 @@
       "has-task-list": "heeftTakenlijst",
       "remove": "Filter verwijderen"
     },
-    "compact-mode": "Compacte modus",
     "link-preview": "Linkvoorbeeld",
     "load-more": "Meer laden",
     "order-by": "Sorteren op",
@@ -456,8 +455,6 @@
       "image-title": "Deel als afbeelding",
       "open-image": "Deel als afbeelding"
     },
-    "show-less": "Minder tonen",
-    "show-more": "Meer tonen",
     "visibility": {
       "private": "Privé",
       "protected": "Werkruimte",
@@ -484,7 +481,6 @@
     "moved": "Memo verplaatst",
     "back-to": "Terug naar {{source}}",
     "connections": "Verbindingen",
-    "grid-compact-hint": "Rasterindelingen gebruiken altijd compacte kaarten.",
     "layout": "Indeling",
     "layout-auto": "Automatisch",
     "layout-auto-description": "Zoveel kolommen als er op het scherm passen",
@@ -496,7 +492,8 @@
     "parent-memo": "Hoofdmemo",
     "view-options": "Weergaveopties",
     "add-reaction": "Reactie toevoegen",
-    "remove-reaction": "Reactie verwijderen"
+    "remove-reaction": "Reactie verwijderen",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Succesvol gearchiveerd",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} seconden terug",
     "forward": "{{seconds}} seconden vooruit",
     "speed": "Afspeelsnelheid {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

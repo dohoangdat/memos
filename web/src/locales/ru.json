@@ -427,7 +427,6 @@
       "has-task-list": "hasTaskList",
       "remove": "Удалить фильтр"
     },
-    "compact-mode": "Компактный режим",
     "link-preview": "Предпросмотр ссылок",
     "load-more": "Загрузить еще",
     "order-by": "Сортировать по",
@@ -458,8 +457,6 @@
       "image-title": "Поделиться как изображением",
       "open-image": "Поделиться как изображением"
     },
-    "show-less": "Показать меньше",
-    "show-more": "Подробнее",
     "visibility": {
       "private": "Приватная",
       "protected": "Защищённая",
@@ -478,7 +475,6 @@
       "uncheck-all": "Снимите галочки со всех задач",
       "updated": "Задачи обновлены"
     },
-    "grid-compact-hint": "В макетах с сеткой всегда используются компактные карточки.",
     "layout": "Макет",
     "layout-auto": "Автоматически",
     "layout-auto-description": "Столько столбцов, сколько помещается на экране",
@@ -498,7 +494,8 @@
     "on-this-memo": "К этой заметке",
     "parent-memo": "Родительская заметка",
     "add-reaction": "Добавить реакцию",
-    "remove-reaction": "Удалить реакцию"
+    "remove-reaction": "Удалить реакцию",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Перемещено в архив",
@@ -1473,5 +1470,15 @@
     "back": "Назад на {{seconds}} секунд",
     "forward": "Вперёд на {{seconds}} секунд",
     "speed": "Скорость воспроизведения {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }

@@ -88,6 +88,17 @@ const parentPathsOf = (tag: string): string[] => {
   return segments.slice(0, -1).map((_, index) => segments.slice(0, index + 1).join("/"));
 };
 
+/** A row's counts: its direct sub-tags, when it has any, and the memos it tags. */
+const TagCount = ({ subs, posts }: { subs: number; posts?: number }) => {
+  const t = useTranslate();
+  if (!subs) return <span className={SIDEBAR_ROW_COUNT_RAIL_CLASSES}>{posts}</span>;
+  return (
+    <span className={cn(SIDEBAR_ROW_COUNT_RAIL_CLASSES, "whitespace-nowrap")}>
+      {posts === undefined ? t("tag-tree.subs", { n: subs }) : t("tag-tree.subs-and-posts", { subs, posts })}
+    </span>
+  );
+};
+
 const TagMark = ({ className }: { className?: string }) => (
   <HashIcon aria-hidden="true" className={cn(SIDEBAR_ROW_ICON_CLASSES, className)} />
 );
@@ -169,7 +180,7 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
             <span ref={labelRef} className="min-w-0 flex-1 truncate">
               {tag.key}
             </span>
-            <span className={SIDEBAR_ROW_COUNT_RAIL_CLASSES}>{tag.amount}</span>
+            <TagCount subs={tag.subTags.length} posts={tag.amount} />
           </button>
         ) : (
           // A structural segment only exists to reach its children, so the whole row is the
@@ -187,8 +198,8 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
             <span ref={labelRef} className="min-w-0 flex-1 truncate" title={title}>
               {tag.key}
             </span>
-            {/* Empty count rail keeps structural labels truncating at the same edge as tag labels. */}
-            <span aria-hidden="true" className={SIDEBAR_ROW_COUNT_RAIL_CLASSES} />
+            {/* The count rail keeps structural labels truncating at the same edge as tag labels. */}
+            <TagCount subs={tag.subTags.length} />
           </button>
         )}
       </div>

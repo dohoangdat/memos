@@ -534,9 +534,7 @@
       "has-task-list": "Tapşırıq siyahısı var",
       "remove": "Filtri çıxar"
     },
-    "compact-mode": "Yığcam rejim",
     "connections": "Bağlantılar",
-    "grid-compact-hint": "Şəbəkə düzülüşləri həmişə yığcam kartlardan istifadə edir.",
     "layout": "Düzülüş",
     "layout-auto": "Avtomatik",
     "layout-auto-description": "Ekrana sığdığı qədər sütun",
@@ -579,8 +577,6 @@
       "revoked": "Paylaşım keçidi ləğv edildi",
       "title": "Bu qeydi paylaş"
     },
-    "show-less": "Az göstər",
-    "show-more": "Daha çox göstər",
     "task-actions": {
       "check-all": "Bütün tapşırıqları işarələ",
       "uncheck-all": "Bütün tapşırıqların işarəsini götür",
@@ -598,7 +594,8 @@
       "space-description": "{{space}} daxilində hamı"
     },
     "add-reaction": "Reaksiya əlavə et",
-    "remove-reaction": "Reaksiyanı çıxar"
+    "remove-reaction": "Reaksiyanı çıxar",
+    "read-memo": "Read memo"
   },
   "message": {
     "archived-successfully": "Uğurla arxivləndi",
@@ -1471,5 +1468,15 @@
     "back": "{{seconds}} saniyə geri",
     "forward": "{{seconds}} saniyə irəli",
     "speed": "Oynatma sürəti {{rate}}x"
+  },
+  "tag-tree": {
+    "subs": "{{n}} subs",
+    "subs-and-posts": "{{subs}} subs · {{posts}} posts"
+  },
+  "share-target": {
+    "saving": "Saving to Memos…",
+    "saved": "Saved to Memos",
+    "failed": "Could not save what you shared.",
+    "retry": "Try again"
   }
 }
