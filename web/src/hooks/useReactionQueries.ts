@@ -3,6 +3,7 @@ import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-quer
 import { memoServiceClient } from "@/connect";
 import { findMemoRecord, memoKeys, updateMemoReactions } from "@/hooks/useMemoQueries";
 import { memoShareKeys } from "@/hooks/useMemoShareQueries";
+import { starredMemoKeys } from "@/hooks/useStarredMemos";
 import { handleError } from "@/lib/error";
 import { showErrorToast } from "@/lib/toast";
 import { type Memo, type Reaction, ReactionSchema } from "@/types/proto/api/memo_service_pb";
@@ -59,6 +60,8 @@ export function useToggleReaction(memo: Memo, creator: string | undefined) {
       void queryClient.invalidateQueries({ queryKey: memoKeys.lists() });
       void queryClient.invalidateQueries({ queryKey: sharedMemoKey });
       if (memo.parent) void queryClient.invalidateQueries({ queryKey: memoKeys.comments(memo.parent) });
+      // A star is a reaction: the sidebar's Starred view follows it.
+      void queryClient.invalidateQueries({ queryKey: starredMemoKeys.uids });
     },
   });
 

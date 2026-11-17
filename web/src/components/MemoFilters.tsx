@@ -23,6 +23,7 @@ import { useAppSidebar } from "@/contexts/AppSidebarContext";
 import { type FilterFactor, getMemoFilterKey, type MemoFilter, useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useMemoViews } from "@/hooks/useUserQueries";
+import { findBuiltinView } from "@/lib/builtin-views";
 import { getMemoViewId, isMemoCollectionRoute } from "@/lib/memo-views";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
@@ -165,6 +166,8 @@ const MemoFilters = ({ className }: { className?: string }) => {
 
   const viewChip = (() => {
     if (!viewApplies) return null;
+    const builtin = findBuiltinView(memoView);
+    if (builtin) return { customIcon: <builtin.icon className="mu-icon-sm text-mu-text-secondary" />, label: t(builtin.labelKey) };
     const view = memoViews.find((item) => getMemoViewId(item.name) === memoView);
     return view?.title
       ? {

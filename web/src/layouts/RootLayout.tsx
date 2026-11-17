@@ -9,6 +9,8 @@ import AppSidebar, {
   SidebarResizeHandle,
   useSidebarWidth,
 } from "@/components/AppSidebar";
+import NewMemoFab from "@/components/NewMemoFab";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
 import { GlobalMemoEditorProvider } from "@/contexts/GlobalMemoEditorContext";
 import { useInstance } from "@/contexts/InstanceContext";
@@ -102,6 +104,10 @@ const RootLayoutContent = () => {
         </div>
       )}
       <MobileAppSidebar />
+      {/* Pull down at the top of a page to refresh it; dialogs (the memo reader) pull on their own. */}
+      {!fullBleed && <PullToRefresh ignoreDialogs />}
+      {/* Write a memo from anywhere: the composer opens full screen with the keyboard up. */}
+      {!fullBleed && <NewMemoFab />}
       <main
         className={cn("flex w-full min-w-0 flex-col items-center md:ps-(--app-sidebar-width)", fullBleed ? "h-full min-h-0" : "min-h-full")}
       >

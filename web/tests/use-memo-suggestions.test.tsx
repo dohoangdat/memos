@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   memoView: undefined as string | undefined,
   views: [] as { name: string; filter: string }[],
 }));
+vi.mock("@/hooks/useStarredMemos", () => ({ useStarredMemoUids: () => ({ data: [] }), starredMemoKeys: { uids: ["starred-memo-uids"] } }));
 vi.mock("@/contexts/MemoFilterContext", () => ({ useMemoFilterContext: () => mocks }));
 vi.mock("@/hooks/useCurrentUser", () => ({ default: () => ({ name: "users/me" }) }));
 vi.mock("@/hooks/useUserQueries", () => ({ useMemoViews: () => ({ data: mocks.views }) }));

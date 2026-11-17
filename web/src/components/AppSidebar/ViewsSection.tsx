@@ -10,6 +10,7 @@ import { useAppSidebar } from "@/contexts/AppSidebarContext";
 import { useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useMemoViews, userKeys } from "@/hooks/useUserQueries";
+import { BUILTIN_VIEWS } from "@/lib/builtin-views";
 import { handleError } from "@/lib/error";
 import { getMemoViewId, isMemoCollectionRoute } from "@/lib/memo-views";
 import { showErrorToast, toast } from "@/lib/toast";
@@ -87,6 +88,15 @@ const ViewsSection = ({ manageActive = false }: { manageActive?: boolean }) => {
         )
       }
     >
+      {BUILTIN_VIEWS.map((view) => (
+        <SidebarRow
+          key={view.id}
+          icon={view.icon}
+          label={t(view.labelKey)}
+          state={!manageActive && selectedMemoView === view.id ? "checked" : "idle"}
+          onClick={() => handleView(view.id)}
+        />
+      ))}
       {!isPending && !isError && memoViews.length === 0 && (
         <SidebarRow icon={PlusIcon} label={t("setting.memo-view.create")} onClick={handleCreate} />
       )}

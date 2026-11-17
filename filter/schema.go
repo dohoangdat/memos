@@ -181,6 +181,19 @@ func NewSchema() Schema {
 				CompareNeq: true,
 			},
 		},
+		// Fork-only: select memos by their resource id, e.g. `uid in ["abc", "def"]` for the
+		// sidebar's Starred and Most opened views.
+		"uid": {
+			Name:        "uid",
+			Kind:        FieldKindScalar,
+			Type:        FieldTypeString,
+			Column:      Column{Table: "memo", Name: "uid"},
+			Expressions: map[DialectName]string{},
+			AllowedComparisonOps: map[ComparisonOperator]bool{
+				CompareEq:  true,
+				CompareNeq: true,
+			},
+		},
 		"visibility": {
 			Name:        "visibility",
 			Kind:        FieldKindScalar,
@@ -322,6 +335,7 @@ func NewSchema() Schema {
 		cel.Variable("created_ts", cel.TimestampType),
 		cel.Variable("updated_ts", cel.TimestampType),
 		cel.Variable("pinned", cel.BoolType),
+		cel.Variable("uid", cel.StringType),
 		cel.Variable("tag", cel.StringType),
 		cel.Variable("tags", cel.ListType(cel.StringType)),
 		cel.Variable("visibility", cel.StringType),

@@ -98,7 +98,7 @@ const TagCount = ({ subs, posts }: { subs: number; posts?: number }) => {
   return (
     <span title={label} className={cn(SIDEBAR_ROW_COUNT_RAIL_CLASSES, "inline-flex items-center justify-end gap-1.5 whitespace-nowrap")}>
       <span data-slot="tag-sub-count" className="inline-flex items-center gap-0.5 opacity-75">
-        <ListTreeIcon aria-hidden="true" className="size-3" />
+        <ListTreeIcon aria-hidden="true" className="mu-icon-xs" />
         {subs}
       </span>
       {posts !== undefined && <span data-slot="tag-post-count">{posts}</span>}

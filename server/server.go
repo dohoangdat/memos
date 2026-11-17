@@ -24,6 +24,7 @@ import (
 	"github.com/usememos/memos/server/frontend"
 	"github.com/usememos/memos/server/mcp"
 	"github.com/usememos/memos/server/revision"
+	"github.com/usememos/memos/server/starred"
 	"github.com/usememos/memos/store"
 )
 
@@ -101,6 +102,8 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	revisionService := revision.New(ctx, profile, store, s.Secret)
 	api.MemoRevisionRecorder = revisionService.Record
 	revisionService.RegisterRoutes(mux)
+	// Fork-only: the memos the current user starred (server/starred).
+	starred.New(store, s.Secret).RegisterRoutes(mux)
 
 	apiHandler, err := apiService.NewHandler(ctx)
 	if err != nil {

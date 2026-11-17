@@ -41,8 +41,7 @@ interface ClassicToolbarProps {
 const BLOCK_FORMATS = ["paragraph", "h1", "h2", "h3", "h4", "codeBlock"] as const;
 type BlockFormat = (typeof BLOCK_FORMATS)[number];
 
-const controlClass =
-  "h-8 rounded-mu-md border border-mu-line bg-mu-surface px-1.5 mu-body text-mu-text outline-none focus-visible:ring-2 focus-visible:ring-mu-accent/40";
+const controlClass = "h-8 rounded-mu-md border border-mu-line bg-mu-surface px-1.5 mu-body text-mu-text mu-focus";
 
 const ToolButton = (props: { label: string; active?: boolean; disabled?: boolean; onClick: () => void; children: ReactNode }) => (
   <button
@@ -106,7 +105,7 @@ const ColorPicker = (props: { editor: Editor; kind: "color" | "background"; labe
                 onClick={() => apply(color)}
                 className={cn(
                   "size-6 rounded-mu-sm border border-mu-line",
-                  props.current?.toLowerCase() === color && "ring-2 ring-mu-accent ring-offset-1",
+                  props.current?.toLowerCase() === color && "outline-2 outline-offset-1 outline-mu-accent",
                 )}
                 style={{ backgroundColor: color }}
               />

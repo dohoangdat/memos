@@ -3,6 +3,7 @@ import { Button } from "@usememos/ui";
 import { ArrowLeftIcon, PencilIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { MemoEditor } from "@/components/MemoEditor";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { useBackToClose } from "@/hooks/useBackToClose";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
@@ -28,6 +29,7 @@ interface MemoReaderDialogProps {
 export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoReaderDialogProps) => {
   const t = useTranslate();
   const viewRef = useRef<MemoViewHandle>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   // Android's Back closes the reader instead of leaving the app.
   useBackToClose(onClose);
   // Counted once per opening, on this device.
@@ -50,7 +52,11 @@ export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoRead
               </Button>
             )}
           </header>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pt-5">
+          <div
+            ref={scrollRef}
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pt-5"
+          >
+            <PullToRefresh scrollRef={scrollRef} />
             <div className="mx-auto w-full max-w-3xl">
               <MemoInfoSummary memo={memo} opens={opens} />
               <MemoView ref={viewRef} memo={memo} {...viewProps} compact={false} presentation="reader" />

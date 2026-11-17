@@ -2,12 +2,15 @@ import { useMemo } from "react";
 import { type MemoFilter, useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import { type MemoTimeBasis, useView } from "@/contexts/ViewContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { useStarredMemoUids } from "@/hooks/useStarredMemos";
 import { useMemoViews } from "@/hooks/useUserQueries";
+import { uidInFilter } from "@/lib/builtin-views";
 import { buildTimestampRangeFilter, getLocalDayTimestampRange, getTimeBasisField } from "@/lib/calendar-utils";
 import { combineCELFilters } from "@/lib/cel-filter";
 import { getMemoViewId } from "@/lib/memo-views";
 import { buildMemoCreatorFilter, getVisibilityName } from "@/lib/resource-names";
 import { Visibility } from "@/types/proto/api/memo_service_pb";
+import { topOpenedMemoUids } from "@/utils/memo-opens";
 
 const escapeFilterValue = (value: string): string => JSON.stringify(value);
 
@@ -88,14 +91,18 @@ export const buildMemoFilter = ({
   return combineCELFilters(...conditions);
 };
 
-/** Stored CEL filter of the saved View selected in the sidebar. */
+/** CEL filter of the View selected in the sidebar: a built-in one, or a saved one's stored filter. */
 export const useSelectedMemoViewFilter = (): string | undefined => {
   const currentUser = useCurrentUser();
   const { memoView } = useMemoFilterContext();
   const { data: memoViews = [] } = useMemoViews(currentUser?.name);
+  const { data: starredUids } = useStarredMemoUids(memoView === "builtin:starred");
   return useMemo(() => {
+    if (memoView === "builtin:pinned") return "pinned";
+    if (memoView === "builtin:starred") return uidInFilter(starredUids ?? []);
+    if (memoView === "builtin:top-opens") return uidInFilter(topOpenedMemoUids());
     return memoViews.find((view) => getMemoViewId(view.name) === memoView)?.filter;
-  }, [memoView, memoViews]);
+  }, [memoView, memoViews, starredUids]);
 };
 
 export const useMemoFilters = (options: UseMemoFiltersOptions = {}): string | undefined => {

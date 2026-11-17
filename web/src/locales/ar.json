@@ -1520,6 +1520,12 @@
     "restore-confirm": "Restore the version from {{time}}? The current text is kept as a version.",
     "restored": "Version restored",
     "view": "View",
-    "hide": "Hide"
+    "hide": "Hide",
+    "unchanged-lines": "{{n}} unchanged lines"
+  },
+  "builtin-view": {
+    "pinned": "Pinned",
+    "starred": "Starred",
+    "top-opens": "Most opened"
   }
 }

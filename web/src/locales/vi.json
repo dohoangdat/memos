@@ -1516,6 +1516,12 @@
     "restore-confirm": "Khôi phục phiên bản lúc {{time}}? Nội dung hiện tại sẽ được lưu lại thành một phiên bản.",
     "restored": "Đã khôi phục phiên bản",
     "view": "Xem",
-    "hide": "Ẩn"
+    "hide": "Ẩn",
+    "unchanged-lines": "{{n}} dòng không đổi"
+  },
+  "builtin-view": {
+    "pinned": "Đã ghim",
+    "starred": "Có sao",
+    "top-opens": "Mở nhiều nhất"
   }
 }
