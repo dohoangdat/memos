@@ -1,5 +1,4 @@
-import { Badge, Button, buttonClasses, Popover, Tooltip } from "@usememos/ui";
-import { SmilePlusIcon } from "lucide-react";
+import { Badge, buttonClasses, Popover, Tooltip } from "@usememos/ui";
 import { Link, useLocation } from "react-router-dom";
 import RelativeTime from "@/components/RelativeTime";
 import { useNewMemo } from "@/contexts/NewMemoContext";
@@ -11,13 +10,13 @@ import type { User } from "@/types/proto/api/user_service_pb";
 import { useTranslate } from "@/utils/i18n";
 import { getVisibilityOption } from "@/utils/memo";
 import MemoActionMenu from "../../MemoActionMenu";
-import { ReactionSelector } from "../../MemoReactionListView";
 import UserAvatar from "../../UserAvatar";
 import VisibilityIcon from "../../VisibilityIcon";
 import { MEMO_TIME_CONTROL_CLASSES } from "../constants";
 import { useMemoViewContext, useMemoViewDerived } from "../MemoViewContext";
 import { createMemoNavigationState, isMemoDetailPath } from "../navigation";
 import type { MemoHeaderProps } from "../types";
+import { MemoQuickActions } from "./MemoQuickActions";
 import MemoSpaceBadge from "./MemoSpaceBadge";
 
 /** The card's trailing actions are the package's 24px ghost squares (`sm`), whether or not they are package buttons. */
@@ -85,12 +84,8 @@ const MemoHeader: React.FC<MemoHeaderProps> = ({ timeDisplay = "relative", showC
       </div>
 
       <div data-slot="memo-header-actions" className="flex shrink-0 select-none flex-row items-center justify-end gap-1">
-        {currentUser && !isArchived && (
-          // On desktop the picker's trigger shows only while the card is engaged or the picker is open.
-          <span className="flex sm:hidden sm:group-hover:flex sm:group-focus-within:flex sm:has-[[data-popup-open]]:flex">
-            <ReactionSelector memo={memo} trigger={<Button variant="ghost" size="sm" icon={<SmilePlusIcon />} />} />
-          </span>
-        )}
+        {/* Pin and Star replace the reaction picker: an active one always shows, an inactive one on hover. */}
+        {currentUser && !isArchived && <MemoQuickActions memo={memo} canPin={!readonly} />}
 
         {showVisibility && memo.visibility !== Visibility.PRIVATE && (
           // The audience is information, not an action: a hover card that a click or tap also opens.

@@ -11,6 +11,7 @@ import {
   PaletteIcon,
   PaperclipIcon,
   PlusIcon,
+  TagsIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LinkMemoDialog, LocationDialog } from "@/components/MemoMetadata";
@@ -137,6 +138,7 @@ const InsertMenu = (props: InsertMenuProps) => {
   const insertItems = [
     { key: "attachment", label: t("editor.insert-menu.add-attachment"), icon: PaperclipIcon, onClick: handleAttachmentUploadClick },
     { key: "inline-image", label: t("editor.insert-menu.insert-image"), icon: ImageIcon, onClick: handleInlineImageUploadClick },
+    ...(props.onAddTags ? [{ key: "tags", label: t("editor.insert-menu.add-tags"), icon: TagsIcon, onClick: props.onAddTags }] : []),
     ...(props.onDrawingClick
       ? [{ key: "drawing", label: t("editor.insert-menu.drawing"), icon: PaletteIcon, onClick: props.onDrawingClick }]
       : []),

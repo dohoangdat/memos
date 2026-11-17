@@ -92,16 +92,18 @@ describe("TagTree rendering", () => {
     const branch = screen.getByText("a").closest('[role="treeitem"]') as HTMLElement;
     const branchLabelButton = screen.getByText("a").closest("button") as HTMLButtonElement;
     const disclosure = screen.getByLabelText("common.expand #a");
-    const branchCount = within(branch).getByText("tag-tree.subs-and-posts");
+    const branchCount = within(branch).getByTitle("tag-tree.subs-and-posts");
+    expect(within(branchCount).getByText("12")).toBeInTheDocument();
     expect(disclosure.compareDocumentPosition(branchLabelButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(branchLabelButton).toHaveClass("text-start");
-    expect(branchLabelButton.querySelector("svg")).not.toBeInTheDocument();
+    // The branch carries no # mark: its chevron says it is a branch.
+    expect(branchLabelButton.querySelector(".lucide-hash")).toBeNull();
 
-    // A branch reads as a plain tag at rest: the slot holds the # mark and only swaps in the
-    // chevron while the row is hovered or holds focus.
-    const [restMark, hoverChevron] = Array.from(disclosure.querySelectorAll("svg"));
-    expect(restMark).toHaveClass("group-hover:hidden", "group-has-[:focus-visible]:hidden");
-    expect(hoverChevron).toHaveClass("hidden", "group-hover:block", "group-has-[:focus-visible]:block");
+    // A branch always shows its disclosure chevron, pointing down once open.
+    const chevrons = Array.from(disclosure.querySelectorAll("svg"));
+    expect(chevrons).toHaveLength(1);
+    expect(chevrons[0]).toHaveClass("lucide-chevron-right");
+    expect(chevrons[0]).not.toHaveClass("rotate-90");
 
     fireEvent.click(disclosure);
     expect(onTagClick).not.toHaveBeenCalled();

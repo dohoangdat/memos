@@ -175,7 +175,8 @@
       "keep-as-attachments": "Giữ nguyên dưới dạng tệp đính kèm",
       "retry-image-upload": "Thử lại",
       "uploading-inline-image": "Đang tải nội dung lên",
-      "uploading-images": "Đang tải ảnh {{completed}}/{{total}}"
+      "uploading-images": "Đang tải ảnh {{completed}}/{{total}}",
+      "add-tags": "Thêm tag"
     },
     "drawing": {
       "edit": "Sửa chú thích",
@@ -373,6 +374,11 @@
       "column-count": "{{n}} cột",
       "remove-columns": "Bỏ chia cột",
       "clear-formatting": "Xoá định dạng"
+    },
+    "tag-picker": {
+      "search": "Tìm hoặc tạo tag",
+      "create": "Tạo #{{tag}}",
+      "empty": "Chưa có tag nào"
     }
   },
   "inbox": {
@@ -488,7 +494,9 @@
     "view-options": "Tùy chọn xem",
     "add-reaction": "Thêm biểu tượng cảm xúc",
     "remove-reaction": "Xóa phản ứng",
-    "read-memo": "Đọc ghi chú"
+    "read-memo": "Đọc ghi chú",
+    "star": "Gắn sao",
+    "unstar": "Bỏ sao"
   },
   "message": {
     "archived-successfully": "Lưu trữ thành công",
@@ -1474,9 +1482,40 @@
     "subs-and-posts": "{{subs}} nhánh · {{posts}} bài"
   },
   "share-target": {
-    "saving": "Đang lưu vào Memos…",
     "saved": "Đã lưu vào Memos",
-    "failed": "Không lưu được nội dung bạn chia sẻ.",
-    "retry": "Thử lại"
+    "title": "Lưu vào Memos",
+    "new-memo": "Tạo bài mới",
+    "append": "Thêm vào bài cũ"
+  },
+  "memo-info": {
+    "title": "Thông tin bài",
+    "tags": "Tag",
+    "stats": "Thống kê",
+    "words": "{{n}} chữ",
+    "reading-time": "{{n}} phút đọc",
+    "images-count": "{{n}} ảnh",
+    "opens-count": "{{n}} lần mở",
+    "words-label": "Số chữ",
+    "characters": "Ký tự",
+    "sentences": "Câu",
+    "paragraphs": "Đoạn",
+    "headings": "Tiêu đề",
+    "images": "Ảnh",
+    "links": "Liên kết",
+    "tasks": "Việc đã xong",
+    "code-blocks": "Khối code",
+    "reading-time-label": "Thời gian đọc",
+    "size": "Kích thước",
+    "opens": "Lượt mở (thiết bị này)",
+    "created": "Tạo lúc",
+    "updated": "Sửa lần cuối",
+    "history": "Lịch sử phiên bản",
+    "history-empty": "Chưa có phiên bản cũ. Từ giờ mỗi lần sửa bài, bản trước đó sẽ được lưu lại.",
+    "history-note": "Hiện 3 phiên bản gần nhất; giữ tối đa 20. Khôi phục cũng lưu lại nội dung hiện tại thành một phiên bản.",
+    "restore": "Khôi phục",
+    "restore-confirm": "Khôi phục phiên bản lúc {{time}}? Nội dung hiện tại sẽ được lưu lại thành một phiên bản.",
+    "restored": "Đã khôi phục phiên bản",
+    "view": "Xem",
+    "hide": "Ẩn"
   }
 }

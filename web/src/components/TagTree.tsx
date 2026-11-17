@@ -1,9 +1,8 @@
-import { ChevronRightIcon, HashIcon } from "lucide-react";
+import { ChevronRightIcon, HashIcon, ListTreeIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import {
   SIDEBAR_ROW_BOX_CLASSES,
   SIDEBAR_ROW_COUNT_RAIL_CLASSES,
-  SIDEBAR_ROW_ICON_CLASSES,
   SIDEBAR_ROW_LABEL_CLASSES,
   SIDEBAR_ROW_SLOT_BUTTON_CLASSES,
   SIDEBAR_ROW_SLOT_CLASSES,
@@ -88,20 +87,24 @@ const parentPathsOf = (tag: string): string[] => {
   return segments.slice(0, -1).map((_, index) => segments.slice(0, index + 1).join("/"));
 };
 
-/** A row's counts: its direct sub-tags, when it has any, and the memos it tags. */
+/**
+ * A row's counts, compact: a small tree glyph with its direct sub-tags when it has any, then the
+ * memos it tags. The full wording is the tooltip.
+ */
 const TagCount = ({ subs, posts }: { subs: number; posts?: number }) => {
   const t = useTranslate();
   if (!subs) return <span className={SIDEBAR_ROW_COUNT_RAIL_CLASSES}>{posts}</span>;
+  const label = posts === undefined ? t("tag-tree.subs", { n: subs }) : t("tag-tree.subs-and-posts", { subs, posts });
   return (
-    <span className={cn(SIDEBAR_ROW_COUNT_RAIL_CLASSES, "whitespace-nowrap")}>
-      {posts === undefined ? t("tag-tree.subs", { n: subs }) : t("tag-tree.subs-and-posts", { subs, posts })}
+    <span title={label} className={cn(SIDEBAR_ROW_COUNT_RAIL_CLASSES, "inline-flex items-center justify-end gap-1.5 whitespace-nowrap")}>
+      <span data-slot="tag-sub-count" className="inline-flex items-center gap-0.5 opacity-75">
+        <ListTreeIcon aria-hidden="true" className="size-3" />
+        {subs}
+      </span>
+      {posts !== undefined && <span data-slot="tag-post-count">{posts}</span>}
     </span>
   );
 };
-
-const TagMark = ({ className }: { className?: string }) => (
-  <HashIcon aria-hidden="true" className={cn(SIDEBAR_ROW_ICON_CLASSES, className)} />
-);
 
 const Chevron = ({ open, className }: { open: boolean; className?: string }) => (
   <ChevronRightIcon
@@ -153,9 +156,8 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
         style={{ paddingInlineStart: 8 + depth * INDENT_STEP }}
       >
         {isTag && hasSubTags && (
-          // At rest the slot holds the row's # mark like any other tag; pointing at the row
-          // (or tabbing into it) swaps in the chevron, so branches only look different while
-          // the disclosure is actually reachable.
+          // A branch always shows its disclosure: › while closed, ⌄ while open, so the tree
+          // says at a glance which tags hold sub-tags and which are expanded.
           <button
             type="button"
             aria-label={`${open ? t("common.collapse") : t("common.expand")} #${tag.text}`}
@@ -163,8 +165,7 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
             className={SIDEBAR_ROW_SLOT_BUTTON_CLASSES}
             onClick={() => onToggle(tag.text)}
           >
-            <TagMark className="group-hover:hidden group-has-[:focus-visible]:hidden" />
-            <Chevron open={open} className="hidden group-hover:block group-has-[:focus-visible]:block" />
+            <Chevron open={open} />
           </button>
         )}
         {isTag ? (

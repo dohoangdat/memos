@@ -58,7 +58,16 @@ const setup = (memo = reactionMemo(), trigger?: ReactElement) => {
   client.setQueryData(memoKeys.detail(memo.name), memo);
   const Surface = () => {
     const data = useMemoRecord(memo.name) as Memo;
-    return trigger ? <ReactionSelector memo={data} trigger={trigger} /> : <MemoReactionListView memo={data} reactions={data.reactions} />;
+    // The reaction strip no longer carries the picker (Pin and Star took its place in the header),
+    // so the picker renders beside the strip with its own default trigger.
+    return trigger ? (
+      <ReactionSelector memo={data} trigger={trigger} />
+    ) : (
+      <>
+        <MemoReactionListView memo={data} reactions={data.reactions} />
+        <ReactionSelector memo={data} />
+      </>
+    );
   };
   return render(
     <QueryClientProvider client={client}>

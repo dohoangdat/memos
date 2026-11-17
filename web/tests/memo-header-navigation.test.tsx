@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import MemoHeader from "@/components/MemoView/components/MemoHeader";
@@ -23,10 +22,12 @@ vi.mock("@/components/MemoActionMenu", () => ({
   ),
 }));
 
-vi.mock("@/components/MemoReactionListView", () => ({
-  // The header supplies the picker's trigger; the mock renders it with the picker's label.
-  ReactionSelector: ({ trigger }: { trigger: React.ReactElement<{ "aria-label"?: string }> }) =>
-    React.cloneElement(trigger, { "aria-label": "add-reaction" }),
+vi.mock("@/components/MemoReactionListView/hooks", () => ({
+  useReactionActions: () => ({ hasReacted: () => false, handleReactionClick: vi.fn(), canReact: true, isPending: false }),
+}));
+
+vi.mock("@/hooks/useMemoQueries", () => ({
+  useUpdateMemo: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@/components/UserAvatar", () => ({
@@ -110,16 +111,21 @@ describe("MemoHeader navigation", () => {
       </MemoryRouter>,
     );
 
-    const reaction = screen.getByRole("button", { name: "add-reaction" });
+    const pin = screen.getByRole("button", { name: "common.pin" });
+    const star = screen.getByRole("button", { name: "memo.star" });
     const actions = screen.getByRole("button", { name: "memo-actions" });
     const actionRail = actions.closest('[data-slot="memo-header-actions"]');
 
     expect(actionRail).toHaveClass("items-center", "gap-1");
-    // The header shows the picker only while the card is engaged or the picker is open, and its
-    // trigger is the same 24px quiet square as the other header actions.
-    expect(reaction.parentElement).toHaveClass("sm:group-focus-within:flex", "sm:has-[[data-popup-open]]:flex");
-    expect(reaction).toHaveClass("mu-button", "mu-button-ghost", "mu-button-icon", "mu-s-sm");
-    expect(reaction.className).not.toMatch(/border-none|rounded-full|ring-/);
+    expect(screen.queryByRole("button", { name: "add-reaction" })).toBeNull();
+    // Pin and Star replace the reaction picker. Inactive, they show on desktop only while the card
+    // is engaged, and they are the same 24px quiet squares as the other header actions.
+    for (const action of [pin, star]) {
+      expect(action).toHaveAttribute("aria-pressed", "false");
+      expect(action).toHaveClass("sm:hidden", "sm:group-hover/memo:inline-flex", "sm:group-focus-within/memo:inline-flex");
+      expect(action).toHaveClass("mu-button", "mu-button-ghost", "mu-button-icon", "mu-s-sm");
+      expect(action.className).not.toMatch(/border-none|rounded-full|ring-/);
+    }
   });
 
   it.each([false, true])("links the timestamp to the memo and preserves origin when showCreator=%s", (showCreator) => {

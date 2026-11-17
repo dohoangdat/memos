@@ -93,6 +93,8 @@ export interface EditorToolbarProps {
   onInsertImages: (files: File[]) => void;
   /** Opens the drawing sheet for a new drawing. */
   onDrawingClick?: () => void;
+  /** Opens the tag picker. */
+  onAddTags?: () => void;
 }
 
 export interface EditorMetadataProps {
@@ -142,6 +144,8 @@ export interface InsertMenuProps {
   sourceMode: EditorSourceModeToggle;
   onInsertImages: (files: File[]) => void;
   onDrawingClick?: () => void;
+  /** Opens the tag picker. */
+  onAddTags?: () => void;
 }
 
 export interface AudienceMenuProps {

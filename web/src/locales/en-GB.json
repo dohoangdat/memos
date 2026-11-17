@@ -173,7 +173,8 @@
       "keep-as-attachments": "Keep as attachments",
       "retry-image-upload": "Retry",
       "uploading-inline-image": "Uploading to content",
-      "uploading-images": "Uploading images {{completed}}/{{total}}"
+      "uploading-images": "Uploading images {{completed}}/{{total}}",
+      "add-tags": "Add tags"
     },
     "drawing": {
       "edit": "Edit markup",
@@ -373,6 +374,11 @@
       "column-count": "{{n}} columns",
       "remove-columns": "Remove columns",
       "clear-formatting": "Clear formatting"
+    },
+    "tag-picker": {
+      "search": "Search or create a tag",
+      "create": "Create #{{tag}}",
+      "empty": "No tags yet"
     }
   },
   "inbox": {
@@ -493,7 +499,9 @@
     "view-options": "View options",
     "add-reaction": "Add reaction",
     "remove-reaction": "Remove reaction",
-    "read-memo": "Read memo"
+    "read-memo": "Read memo",
+    "star": "Star",
+    "unstar": "Remove star"
   },
   "message": {
     "archived-successfully": "Archived successfully",
@@ -1474,9 +1482,40 @@
     "subs-and-posts": "{{subs}} subs · {{posts}} posts"
   },
   "share-target": {
-    "saving": "Saving to Memos…",
     "saved": "Saved to Memos",
-    "failed": "Could not save what you shared.",
-    "retry": "Try again"
+    "title": "Save to Memos",
+    "new-memo": "New memo",
+    "append": "Add to an existing memo"
+  },
+  "memo-info": {
+    "title": "Memo info",
+    "tags": "Tags",
+    "stats": "Statistics",
+    "words": "{{n}} words",
+    "reading-time": "{{n}} min read",
+    "images-count": "{{n}} images",
+    "opens-count": "{{n}} opens",
+    "words-label": "Words",
+    "characters": "Characters",
+    "sentences": "Sentences",
+    "paragraphs": "Paragraphs",
+    "headings": "Headings",
+    "images": "Images",
+    "links": "Links",
+    "tasks": "Tasks done",
+    "code-blocks": "Code blocks",
+    "reading-time-label": "Reading time",
+    "size": "Size",
+    "opens": "Opens (this device)",
+    "created": "Created",
+    "updated": "Last updated",
+    "history": "Version history",
+    "history-empty": "No earlier versions yet. Versions are kept from now on, each time the memo is edited.",
+    "history-note": "The 3 latest versions; the last 20 are kept. Restoring keeps the current text as a version too.",
+    "restore": "Restore",
+    "restore-confirm": "Restore the version from {{time}}? The current text is kept as a version.",
+    "restored": "Version restored",
+    "view": "View",
+    "hide": "Hide"
   }
 }

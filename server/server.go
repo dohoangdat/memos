@@ -23,6 +23,7 @@ import (
 	"github.com/usememos/memos/server/fileserver"
 	"github.com/usememos/memos/server/frontend"
 	"github.com/usememos/memos/server/mcp"
+	"github.com/usememos/memos/server/revision"
 	"github.com/usememos/memos/store"
 )
 
@@ -95,6 +96,11 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 
 	apiService := api.NewAPIService(s.Secret, profile, store)
 	s.apiService = apiService
+
+	// Fork-only: keep earlier versions of memo content (server/revision).
+	revisionService := revision.New(ctx, profile, store, s.Secret)
+	api.MemoRevisionRecorder = revisionService.Record
+	revisionService.RegisterRoutes(mux)
 
 	apiHandler, err := apiService.NewHandler(ctx)
 	if err != nil {

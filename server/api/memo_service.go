@@ -473,6 +473,9 @@ func (s *APIService) UpdateMemo(ctx context.Context, request *apipb.UpdateMemoRe
 	} else if err = s.Store.UpdateMemo(ctx, update); err != nil {
 		return nil, mapMemoWriteError(err, "failed to update memo")
 	}
+	if contentUpdated && previousContent != nextMemo.Content && MemoRevisionRecorder != nil {
+		MemoRevisionRecorder(ctx, memoUID, previousContent)
+	}
 
 	memo, commentContext, memoMessage, err := s.buildUpdatedMemoState(ctx, memo.ID)
 	if err != nil {

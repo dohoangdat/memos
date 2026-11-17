@@ -13,6 +13,7 @@ import { convertVisibilityFromString } from "@/utils/memo";
 
 import { AudioRecorderPanel, EditorContent, EditorMetadata, FocusModeExitButton, FocusModeOverlay, TimestampPopover } from "./components";
 import { EditorSuggestions } from "./components/EditorSuggestions";
+import { TagPickerDialog } from "./components/TagPickerDialog";
 import { FOCUS_MODE_STYLES } from "./constants";
 import type { EditorFileOrigin } from "./extensions";
 import {
@@ -28,6 +29,7 @@ import {
   useMemoInit,
   useMemoSave,
 } from "./hooks";
+import { useKeyboardInset } from "./hooks/useKeyboardInset";
 import { canChooseSpaceFor } from "./initialState";
 import { cacheService, errorService, transcriptionService } from "./services";
 import { useEditorContext, useEditorSelector } from "./state";
@@ -79,6 +81,9 @@ export const EditSession: React.FC<EditSessionProps> = ({
   const { userGeneralSetting } = useAuth();
   const { aiSetting, fetchSetting } = useInstance();
   const [isAudioRecorderOpen, setIsAudioRecorderOpen] = useState(false);
+  const [isTagPickerOpen, setIsTagPickerOpen] = useState(false);
+  const getDraftMarkdown = useCallback(() => editorRef.current?.getMarkdown() ?? getState().content, [getState]);
+  const setDraftMarkdown = useCallback((markdown: string) => editorRef.current?.setMarkdown(markdown), []);
   const [isTranscribingAudio, setIsTranscribingAudio] = useState(false);
   const { createBlobUrl } = useBlobUrls();
   const saveMediaMetadata = userGeneralSetting?.saveMediaMetadata ?? false;
@@ -133,6 +138,7 @@ export const EditSession: React.FC<EditSessionProps> = ({
   const { discardDraft } = useAutoSave(draftKey, isInitialized && isDraftCacheEnabled);
 
   const { containerRef: editorContainerRef, placeholderHeight, animateFocusMode } = useFocusMode(isFocusMode);
+  useKeyboardInset(editorContainerRef, isFocusMode);
 
   // Live-sync the draft's createTime/updateTime to the calendar-derived prop.
   // Only applies in create mode; edit mode owns its own timestamps. Runs after
@@ -402,7 +408,8 @@ export const EditSession: React.FC<EditSessionProps> = ({
           />
         )}
 
-        {/* Metadata and toolbar grouped together at bottom */}
+        {/* Metadata at the bottom of the text; the toolbar follows as its own child of the frame,
+            so in full screen it can stick to the frame's bottom. */}
         <div className="w-full flex flex-col gap-2">
           <EditorMetadata
             memoName={memoName}
@@ -418,6 +425,16 @@ export const EditSession: React.FC<EditSessionProps> = ({
           {!memo && !parentMemoName && isInitialized && suggestions.length > 0 && (
             <EditorSuggestions suggestions={suggestions} controllerRef={editorRef} space={editorSpace} />
           )}
+        </div>
+        {/* In full screen the toolbar (audience, ＋, Cancel, Save) sticks to the frame's bottom,
+              just above the keyboard, instead of scrolling away with a long memo. */}
+        <div
+          className={cn(
+            "w-full",
+            isFocusMode &&
+              "sticky bottom-0 z-10 -mx-4 w-[calc(100%+2rem)] border-t border-mu-line/70 bg-mu-surface px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6",
+          )}
+        >
           <EditorToolbar
             onSave={handleSave}
             onCancel={onCancel ? handleCancel : undefined}
@@ -430,9 +447,17 @@ export const EditSession: React.FC<EditSessionProps> = ({
             sourceMode={sourceMode}
             onInsertImages={handleInsertImages}
             onDrawingClick={drawing.openNew}
+            onAddTags={() => setIsTagPickerOpen(true)}
           />
         </div>
       </div>
+
+      <TagPickerDialog
+        open={isTagPickerOpen}
+        onOpenChange={setIsTagPickerOpen}
+        getMarkdown={getDraftMarkdown}
+        setMarkdown={setDraftMarkdown}
+      />
 
       {drawing.session && (
         <Suspense fallback={null}>

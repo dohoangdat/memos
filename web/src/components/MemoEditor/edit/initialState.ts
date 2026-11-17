@@ -34,7 +34,15 @@ export interface InitialEditorStateOptions {
   defaultLocation?: Location;
   /** Whether the draft may carry a Space of its own; a comment's Space is its parent's. */
   canChooseSpace?: boolean;
+  /** Text to start with (shared from another app): a new memo's content, or appended to an edited memo's. */
+  seedContent?: string;
 }
+
+/** `addition` as a new block after `content`. */
+const appendBlock = (content: string, addition: string) => {
+  const head = content.replace(/\s+$/, "");
+  return head ? `${head}\n\n${addition}` : addition;
+};
 
 /**
  * The draft store's first state, computed once when editing starts: the memo's own
@@ -50,17 +58,19 @@ export function initialEditorState({
   defaultCreateTime,
   defaultLocation,
   canChooseSpace = false,
+  seedContent,
 }: InitialEditorStateOptions): EditorState {
   const base = createInitialState(initialFocusMode);
   if (memo) {
     cacheService.clear(draftKey);
-    return { ...base, ...memoService.fromMemo(memo) };
+    const state = { ...base, ...memoService.fromMemo(memo) };
+    return seedContent ? { ...state, content: appendBlock(state.content, seedContent) } : state;
   }
   const draft = cacheService.loadDraft(draftKey);
   const visibility = draft.visibility ?? defaultVisibility ?? base.metadata.visibility;
   return {
     ...base,
-    content: draft.content,
+    content: seedContent ?? draft.content,
     metadata: {
       ...base.metadata,
       attachments: draft.attachments.length > 0 ? draft.attachments : base.metadata.attachments,

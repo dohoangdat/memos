@@ -1,10 +1,12 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { Button } from "@usememos/ui";
 import { ArrowLeftIcon, PencilIcon } from "lucide-react";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { MemoEditor } from "@/components/MemoEditor";
+import { useBackToClose } from "@/hooks/useBackToClose";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
+import { countMemoOpen, MemoInfoPanel, MemoInfoSummary } from "./MemoInfo";
 import MemoView from "./MemoView";
 import type { MemoViewHandle, MemoViewProps } from "./types";
 
@@ -26,6 +28,10 @@ interface MemoReaderDialogProps {
 export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoReaderDialogProps) => {
   const t = useTranslate();
   const viewRef = useRef<MemoViewHandle>(null);
+  // Android's Back closes the reader instead of leaving the app.
+  useBackToClose(onClose);
+  // Counted once per opening, on this device.
+  const [opens] = useState(() => countMemoOpen(memo.name));
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
@@ -46,7 +52,9 @@ export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoRead
           </header>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pt-5">
             <div className="mx-auto w-full max-w-3xl">
+              <MemoInfoSummary memo={memo} opens={opens} />
               <MemoView ref={viewRef} memo={memo} {...viewProps} compact={false} presentation="reader" />
+              <MemoInfoPanel memo={memo} opens={opens} canEdit={canEdit} />
             </div>
           </div>
         </Dialog.Popup>
@@ -71,6 +79,8 @@ export const MemoEditDialog = ({ name, onClose }: MemoEditDialogProps) => {
   const requestClose = useCallback(() => {
     if (!savingRef.current) onClose();
   }, [onClose]);
+  // Back closes the editor like its own close button (never mid-save).
+  useBackToClose(requestClose);
 
   return (
     <Dialog.Root

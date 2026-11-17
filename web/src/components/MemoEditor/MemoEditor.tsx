@@ -91,6 +91,11 @@ export interface MemoEditingProps {
   onCancel?: () => void;
   /** Reports save activity so a host can keep itself open mid-transaction. */
   onSavingChange?: (isSaving: boolean) => void;
+  /**
+   * Text to start with, read once: a new memo's content (over a restored draft's), or added
+   * after an edited memo's own text. Used for what another app shared.
+   */
+  seedContent?: string;
 }
 
 /** Editing an existing memo by name. */
@@ -208,6 +213,7 @@ const EditingSession = ({
   defaultSpace,
   defaultLocation,
   defaultCreateTime,
+  seedContent,
   ...editing
 }: EditingSessionProps) => {
   const currentUser = useCurrentUser();
@@ -225,6 +231,7 @@ const EditingSession = ({
       defaultCreateTime,
       defaultLocation,
       canChooseSpace: canChooseSpaceFor({ memo, currentUser, parentMemoName, defaultSpace }),
+      seedContent,
     });
   });
   const EditSession = loadedEditSession ?? LazyEditSession;
