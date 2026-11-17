@@ -54,7 +54,8 @@ describe("MemoDisplaySettingMenu", () => {
     expect(screen.getByRole("combobox", { name: "Order by" })).toHaveTextContent("Created");
     expect(screen.getByRole("combobox", { name: "Direction" })).toHaveTextContent("Newest first");
     const compactMode = screen.getByRole("switch", { name: "Compact mode" });
-    expect(compactMode).not.toBeChecked();
+    // The Timeline opens memos as previews by default.
+    expect(compactMode).toBeChecked();
     expect(compactMode).toBeEnabled();
 
     fireEvent.click(screen.getByRole("button", { name: "2 columns" }));

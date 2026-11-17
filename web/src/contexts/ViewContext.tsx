@@ -32,6 +32,8 @@ const ViewContext = createContext<ViewContextValue | null>(null);
 const LOCAL_STORAGE_KEY = "memos-view-setting";
 
 const DEFAULT_VIEW_STATE: ViewState = { orderByTimeAsc: false, compactMode: false, maxColumns: 1 };
+/** The Timeline before anything is saved: memos open as previews, Show more reads the rest. Other views keep DEFAULT_VIEW_STATE. */
+const TIMELINE_DEFAULT_STATE: ViewState = { ...DEFAULT_VIEW_STATE, compactMode: true };
 
 export function ViewProvider({ children, enabled = true }: { children: ReactNode; enabled?: boolean }) {
   const getInitialState = (): ViewState => {
@@ -47,14 +49,14 @@ export function ViewProvider({ children, enabled = true }: { children: ReactNode
         return {
           orderByTimeAsc: Boolean(data.orderByTimeAsc ?? DEFAULT_VIEW_STATE.orderByTimeAsc),
           timeBasis,
-          compactMode: Boolean(data.compactMode ?? DEFAULT_VIEW_STATE.compactMode),
+          compactMode: Boolean(data.compactMode ?? TIMELINE_DEFAULT_STATE.compactMode),
           maxColumns,
         };
       }
     } catch (error) {
       console.warn("Failed to load view settings from localStorage:", error);
     }
-    return { ...DEFAULT_VIEW_STATE };
+    return { ...TIMELINE_DEFAULT_STATE };
   };
 
   const [viewState, setViewState] = useState(getInitialState);

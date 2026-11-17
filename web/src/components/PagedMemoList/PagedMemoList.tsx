@@ -12,7 +12,6 @@ import { useInfiniteMemos } from "@/hooks/useMemoQueries";
 import { hoistMemoToFront } from "@/hooks/useMemoSorting";
 import { combineCELFilters } from "@/lib/cel-filter";
 import { DEFAULT_LIST_MEMOS_PAGE_SIZE, LOADING_INDICATOR_DELAY_MS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import { State } from "@/types/proto/api/common_pb";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
@@ -28,10 +27,6 @@ import { estimateMemoCardHeight } from "./memoCardHeight";
 // so flow-list and grid identity can never drift apart. Deliberately name-only: content updates
 // reconcile in place (updateTime is a protobuf Timestamp object, not usable in a template string).
 export const getMemoKey = (memo: Memo) => memo.name;
-
-// Columns never stretch past this, so 2 columns on a wide monitor stay readable and the
-// grid centers in the leftover space instead of filling it.
-const MAX_COLUMN_WIDTH = 420;
 
 /** Memos still loading: skeleton cards in the shape of the memos about to appear. */
 const Loader = ({ count = 3 }: { count?: number }) => {
@@ -297,7 +292,7 @@ const PagedMemoList = (props: Props) => {
   const children = (
     <MentionResolutionProvider contents={contents} userNames={userNames}>
       <div ref={layoutMeasureRef} className="w-full">
-        <div className={cn("flex flex-col justify-start w-full mx-auto", useGrid ? "max-w-none" : "max-w-2xl")}>
+        <div className="flex flex-col justify-start w-full mx-auto max-w-none">
           {useGrid ? (
             <>
               <ColumnGridUntrappedProvider>
@@ -310,7 +305,6 @@ const PagedMemoList = (props: Props) => {
                   leading={gridLeading}
                   priorityKey={priorityKey}
                   maxColumns={maxColumns}
-                  maxColumnWidth={MAX_COLUMN_WIDTH}
                 />
               </ColumnGridUntrappedProvider>
               {!isDisplayPending && footer}

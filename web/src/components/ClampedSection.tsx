@@ -5,10 +5,10 @@ import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 
 // A collapsed section shows this much content; anything taller folds behind a fade.
-export const CLAMP_PREVIEW_HEIGHT_PX = 360;
+export const CLAMP_PREVIEW_HEIGHT_PX = 240;
 // Only fold when content is taller than this, so cards barely over the preview aren't
 // clamped for the sake of a few hidden pixels.
-export const CLAMP_TRIGGER_HEIGHT_PX = 420;
+export const CLAMP_TRIGGER_HEIGHT_PX = 288;
 
 interface ClampedSectionProps {
   /** When false, children render untouched with no measurement. */
@@ -54,7 +54,14 @@ const ClampedSection = ({ enabled, children }: ClampedSectionProps) => {
           {children}
         </div>
         {collapsed && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-mu-surface from-0% via-mu-surface/60 via-40% to-transparent to-100%" />
+          // The fade is part of the preview: clicking it reads the whole memo, like Show more.
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden
+            onClick={() => setExpanded(true)}
+            className="absolute inset-x-0 bottom-0 h-16 cursor-pointer bg-linear-to-t from-mu-surface from-0% via-mu-surface/60 via-40% to-transparent to-100%"
+          />
         )}
       </div>
       {clamped && (
