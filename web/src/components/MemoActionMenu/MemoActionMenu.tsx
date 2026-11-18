@@ -7,22 +7,30 @@ import {
   BookmarkMinusIcon,
   BookmarkPlusIcon,
   CheckCheckIcon,
-  CopyIcon,
   Edit3Icon,
+  EyeIcon,
+  EyeOffIcon,
   FileTextIcon,
   LinkIcon,
   ListRestartIcon,
+  LockKeyholeIcon,
+  LockKeyholeOpenIcon,
   MoreVerticalIcon,
+  StarIcon,
   TrashIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useReactionActions } from "@/components/MemoReactionListView/hooks";
+import { STAR_REACTION } from "@/lib/star";
+import { cn } from "@/lib/utils";
 import { State } from "@/types/proto/api/common_pb";
 import { useTranslate } from "@/utils/i18n";
 import { createMemoNavigationState } from "../MemoView/navigation";
 import { useMemoActionHandlers } from "./hooks";
 import type { MemoActionMenuProps } from "./types";
+import { useMemoProtectActions } from "./useMemoProtectActions";
 
 /**
  * The memo's action menu, grouped by what each action does to the card:
@@ -66,6 +74,10 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
     setDeleteDialogOpen,
   });
 
+  const { hasReacted, handleReactionClick, canReact } = useReactionActions({ memo });
+  const starred = hasReacted(STAR_REACTION);
+  const canStar = !isArchived && (canReact || starred);
+
   // A comment opens in the context of its parent memo, never on its own.
   const openItem = !isComment && !isInMemoDetailPage && (
     <MenuPrimitive.LinkItem
@@ -80,18 +92,46 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
     </MenuPrimitive.LinkItem>
   );
 
+  // Copy actions sit flat in the menu, one tap each, instead of behind a submenu.
   const copySubmenu = (
-    <Menu.SubmenuRoot>
-      <Menu.SubmenuTrigger icon={<CopyIcon />}>{t("common.copy")}</Menu.SubmenuTrigger>
-      <Menu.Popup>
-        <Menu.Item onClick={handleCopyLink} icon={<LinkIcon />}>
-          {t("memo.copy-link")}
-        </Menu.Item>
-        <Menu.Item onClick={handleCopyContent} icon={<FileTextIcon />}>
-          {t("memo.copy-content")}
-        </Menu.Item>
-      </Menu.Popup>
-    </Menu.SubmenuRoot>
+    <>
+      <Menu.Item onClick={handleCopyLink} icon={<LinkIcon />}>
+        {t("memo.copy-link")}
+      </Menu.Item>
+      <Menu.Item onClick={handleCopyContent} icon={<FileTextIcon />}>
+        {t("memo.copy-content")}
+      </Menu.Item>
+    </>
+  );
+
+  // Fork-only: hide the body in lists (blur), or encrypt it behind the passkey (lock).
+  const protect = useMemoProtectActions(memo);
+  const protectItems = (
+    <>
+      <Menu.Item
+        onClick={() => void protect.toggleBlur()}
+        disabled={protect.busy || protect.locked}
+        icon={protect.blurred ? <EyeIcon /> : <EyeOffIcon />}
+      >
+        {protect.blurred ? t("protect.unblur") : t("protect.blur")}
+      </Menu.Item>
+      <Menu.Item
+        onClick={() => void protect.toggleLock()}
+        disabled={protect.busy}
+        icon={protect.locked ? <LockKeyholeOpenIcon /> : <LockKeyholeIcon />}
+      >
+        {protect.locked ? t("protect.unlock") : t("protect.lock")}
+      </Menu.Item>
+    </>
+  );
+
+  const starItem = canStar && (
+    <Menu.Item
+      onClick={() => handleReactionClick(STAR_REACTION)}
+      icon={<StarIcon className={cn(starred && "fill-amber-400 text-amber-500")} />}
+    >
+      {starred ? t("memo.unstar") : t("memo.star")}
+    </Menu.Item>
   );
 
   const deleteItem = (
@@ -104,6 +144,7 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
     if (readonly) {
       return (
         <>
+          {starItem}
           {openItem}
           {copySubmenu}
         </>
@@ -146,9 +187,12 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
             <Menu.Item onClick={handleTogglePinMemoBtnClick} icon={memo.pinned ? <BookmarkMinusIcon /> : <BookmarkPlusIcon />}>
               {memo.pinned ? t("common.unpin") : t("common.pin")}
             </Menu.Item>
+            {starItem}
             <Menu.Item onClick={handleToggleMemoStatusClick} icon={<ArchiveIcon />}>
               {t("common.archive")}
             </Menu.Item>
+            <Menu.Separator />
+            {protectItems}
           </>
         )}
 

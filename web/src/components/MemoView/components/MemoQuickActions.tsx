@@ -2,12 +2,12 @@ import { Button } from "@usememos/ui";
 import { PinIcon, StarIcon } from "lucide-react";
 import { useReactionActions } from "@/components/MemoReactionListView/hooks";
 import { useUpdateMemo } from "@/hooks/useMemoQueries";
+import { STAR_REACTION } from "@/lib/star";
 import { cn } from "@/lib/utils";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
 
-/** A star is the viewer's own ⭐ reaction, so it uses the reactions memos already keeps. */
-export const STAR_REACTION = "⭐";
+export { STAR_REACTION } from "@/lib/star";
 
 /** On desktop an inactive action shows only while the card is engaged; an active one always shows. */
 const restClasses = (active: boolean) => (active ? "" : "sm:hidden sm:group-hover/memo:inline-flex sm:group-focus-within/memo:inline-flex");

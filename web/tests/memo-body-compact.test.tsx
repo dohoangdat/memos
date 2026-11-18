@@ -10,13 +10,25 @@ const mockState = vi.hoisted(() => ({
     relations: [],
     attachments: [],
     reactions: [] as Array<{ reactionType: string; creator: string }>,
+    tags: [] as string[],
   },
   blurred: false,
   showBlurredContent: false,
   toggleBlurVisibility: vi.fn(),
   reactionClick: vi.fn(),
+  protection: undefined as "blur" | "lock" | undefined,
+  decrypted: { locked: false, plain: null as string | null },
 }));
 
+vi.mock("@/components/MemoEditor/view/MemoContentView", () => ({
+  MemoContentView: ({ content }: { content: string }) => <div>{content}</div>,
+}));
+vi.mock("@/hooks/useMemoProtection", () => ({
+  useMemoProtectionMode: () => mockState.protection,
+  useDecryptedContent: (content: string) =>
+    mockState.decrypted.locked ? { ...mockState.decrypted, failed: false } : { locked: false, plain: content, failed: false },
+}));
+vi.mock("@/components/Passkey/passkeyPrompt", () => ({ ensurePasskey: vi.fn() }));
 vi.mock("@/utils/i18n", () => ({
   findNearestMatchedLanguage: (language: string) => language || "en",
   useTranslate: () => (key: string) => key,
@@ -76,6 +88,7 @@ const createMemo = (content: string, reactions: Array<{ reactionType: string; cr
   relations: [],
   attachments: [],
   reactions,
+  tags: [] as string[],
 });
 
 afterEach(() => {
@@ -84,6 +97,61 @@ afterEach(() => {
   mockState.toggleBlurVisibility.mockReset();
   mockState.reactionClick.mockReset();
   vi.restoreAllMocks();
+});
+
+describe("<MemoBody /> protected memos", () => {
+  afterEach(() => {
+    mockState.protection = undefined;
+    mockState.decrypted = { locked: false, plain: null };
+  });
+
+  it("shows only the title of a blurred memo in a list", () => {
+    mockState.protection = "blur";
+    mockState.memo = createMemo("# Plans\n\nsecret body");
+    render(<MemoBody compact={true} />);
+    expect(screen.getByText("# Plans")).toBeInTheDocument();
+    expect(screen.queryByText(/secret body/)).toBeNull();
+    expect(screen.getByText("protect.blurred-hint")).toBeInTheDocument();
+  });
+
+  it("keeps a locked memo's tags readable in its preview", () => {
+    mockState.memo = {
+      ...createMemo("# Bank\n\n🔒 #tai-chinh/ngan-hang\n\n```memos-lock\nabc\n```"),
+      tags: ["tai-chinh", "tai-chinh/ngan-hang"],
+    };
+    mockState.decrypted = { locked: true, plain: null };
+    render(<MemoBody compact={true} />);
+    expect(screen.getByText("tai-chinh/ngan-hang")).toBeInTheDocument();
+    expect(screen.queryByText("tai-chinh")).toBeNull();
+  });
+
+  it("shows a blurred memo in full outside lists", () => {
+    mockState.protection = "blur";
+    mockState.memo = createMemo("# Plans\n\nsecret body");
+    render(<MemoBody compact={false} />);
+    expect(screen.queryByText("protect.blurred-hint")).toBeNull();
+  });
+
+  it("asks for the passkey before showing a locked memo, then shows its plaintext", () => {
+    mockState.memo = createMemo("# Bank\n\n🔒\n\n```memos-lock\nabc\n```");
+    mockState.decrypted = { locked: true, plain: null };
+    const { rerender } = render(<MemoBody compact={false} />);
+    expect(screen.getByText("# Bank")).toBeInTheDocument();
+    expect(screen.getByText("protect.locked-hint")).toBeInTheDocument();
+    expect(screen.queryByText(/memos-lock/)).toBeNull();
+
+    mockState.decrypted = { locked: true, plain: "# Bank\n\nTK 123" };
+    rerender(<MemoBody compact={false} />);
+    expect(screen.getByText(/TK 123/)).toBeInTheDocument();
+  });
+
+  it("keeps a locked memo closed in lists even when this tab is unlocked", () => {
+    mockState.memo = createMemo("# Bank\n\n```memos-lock\nabc\n```");
+    mockState.decrypted = { locked: true, plain: "# Bank\n\nTK 123" };
+    render(<MemoBody compact={true} />);
+    expect(screen.queryByText(/TK 123/)).toBeNull();
+    expect(screen.getByText("protect.locked-hint")).toBeInTheDocument();
+  });
 });
 
 describe("<MemoBody /> compact body clamp", () => {

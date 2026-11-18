@@ -73,6 +73,7 @@ const ViewsSection = ({ manageActive = false }: { manageActive?: boolean }) => {
 
   return (
     <SidebarSection
+      collapseId="views"
       label={t("common.views")}
       action={
         !manageActive &&

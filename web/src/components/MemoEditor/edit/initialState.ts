@@ -36,6 +36,8 @@ export interface InitialEditorStateOptions {
   canChooseSpace?: boolean;
   /** Text to start with (shared from another app): a new memo's content, or appended to an edited memo's. */
   seedContent?: string;
+  /** An edited memo's text to start from instead of its stored content (a decrypted locked memo). */
+  replaceContent?: string;
 }
 
 /** `addition` as a new block after `content`. */
@@ -59,11 +61,13 @@ export function initialEditorState({
   defaultLocation,
   canChooseSpace = false,
   seedContent,
+  replaceContent,
 }: InitialEditorStateOptions): EditorState {
   const base = createInitialState(initialFocusMode);
   if (memo) {
     cacheService.clear(draftKey);
-    const state = { ...base, ...memoService.fromMemo(memo) };
+    const fromMemo = memoService.fromMemo(memo);
+    const state = { ...base, ...fromMemo, content: replaceContent ?? fromMemo.content };
     return seedContent ? { ...state, content: appendBlock(state.content, seedContent) } : state;
   }
   const draft = cacheService.loadDraft(draftKey);

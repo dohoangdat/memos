@@ -94,6 +94,7 @@ const TagsSection = ({ tagCount, onSelect, scope }: Props) => {
 
   return (
     <SidebarSection
+      collapseId="tags"
       label={t("common.tags")}
       action={
         <Menu.Root modal={false} size="md">

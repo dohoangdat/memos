@@ -7,6 +7,7 @@ import {
   AlignRightIcon,
   BaselineIcon,
   BoldIcon,
+  ChevronDownIcon,
   CodeIcon,
   Columns2Icon,
   HighlighterIcon,
@@ -27,6 +28,7 @@ import {
   UnlinkIcon,
 } from "lucide-react";
 import { type ReactNode, useRef } from "react";
+import { useLocalStorage } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import { MAX_COLUMNS, MIN_COLUMNS } from "./columns";
@@ -134,10 +136,15 @@ const ColorPicker = (props: { editor: Editor; kind: "color" | "background"; labe
   );
 };
 
-/** The classic editor's fixed toolbar, in the order WordPress's classic editor lays it out. */
+/**
+ * The classic editor's fixed toolbar, laid out like WordPress's classic editor: one line of
+ * everyday tools, and a toggle that shows a second row with the rest.
+ */
 export const ClassicToolbar = ({ editor, onPickImages }: ClassicToolbarProps) => {
   const t = useTranslate();
   const imageInputRef = useRef<HTMLInputElement>(null);
+  // Whether the second row of less used tools shows; remembered on this device.
+  const [expanded, setExpanded] = useLocalStorage<boolean>("classic-toolbar-expanded", false);
 
   const state = useEditorState({
     editor,
@@ -210,246 +217,255 @@ export const ClassicToolbar = ({ editor, onPickImages }: ClassicToolbarProps) =>
     <div
       role="toolbar"
       aria-label={t("editor.classic.toolbar")}
-      className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-0.5 rounded-mu-md border border-mu-line bg-mu-surface/95 p-1 backdrop-blur"
+      className="sticky top-0 z-10 -mx-1 flex flex-col gap-0.5 rounded-mu-md border border-mu-line bg-mu-surface/95 p-1 backdrop-blur"
     >
-      <ToolButton label={t("editor.classic.undo")} disabled={!state.canUndo} onClick={() => editor.chain().focus().undo().run()}>
-        <Undo2Icon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.redo")} disabled={!state.canRedo} onClick={() => editor.chain().focus().redo().run()}>
-        <Redo2Icon />
-      </ToolButton>
-      <Divider />
-
-      <select
-        aria-label={t("editor.classic.block-format")}
-        title={t("editor.classic.block-format")}
-        className={cn(controlClass, "w-32")}
-        value={state.format}
-        onChange={(event) => setFormat(event.target.value as BlockFormat)}
-      >
-        <option value="paragraph">{t("editor.classic.paragraph")}</option>
-        <option value="h1">{t("editor.classic.heading", { level: 1 })}</option>
-        <option value="h2">{t("editor.classic.heading", { level: 2 })}</option>
-        <option value="h3">{t("editor.classic.heading", { level: 3 })}</option>
-        <option value="h4">{t("editor.classic.heading", { level: 4 })}</option>
-        <option value="codeBlock">{t("editor.classic.code-block")}</option>
-      </select>
-      <select
-        aria-label={t("editor.classic.font-family")}
-        title={t("editor.classic.font-family")}
-        className={cn(controlClass, "w-36")}
-        value={FONT_FAMILIES.find((font) => primaryFamily(font.value) === state.fontFamily)?.value ?? ""}
-        onChange={(event) => setFontFamily(event.target.value)}
-      >
-        <option value="">{t("editor.classic.default-font")}</option>
-        {FONT_FAMILIES.map((font) => (
-          <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-            {font.label}
-          </option>
-        ))}
-      </select>
-      <select
-        aria-label={t("editor.classic.font-size")}
-        title={t("editor.classic.font-size")}
-        className={cn(controlClass, "w-24")}
-        value={FONT_SIZES.includes(state.fontSize) ? state.fontSize : ""}
-        onChange={(event) => setFontSize(event.target.value)}
-      >
-        <option value="">{t("editor.classic.default-size")}</option>
-        {FONT_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {size}
-          </option>
-        ))}
-      </select>
-      <Divider />
-
-      <ToolButton label={t("editor.classic.bold")} active={state.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
-        <BoldIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.italic")} active={state.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
-        <ItalicIcon />
-      </ToolButton>
-      <ToolButton
-        label={t("editor.classic.underline")}
-        active={state.underline}
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-      >
-        <UnderlineIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.strike")} active={state.strike} onClick={() => editor.chain().focus().toggleStrike().run()}>
-        <StrikethroughIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.inline-code")} active={state.code} onClick={() => editor.chain().focus().toggleCode().run()}>
-        <CodeIcon />
-      </ToolButton>
-      <ColorPicker editor={editor} kind="color" label={t("editor.classic.text-color")} current={state.color} icon={<BaselineIcon />} />
-      <ColorPicker
-        editor={editor}
-        kind="background"
-        label={t("editor.classic.highlight")}
-        current={state.backgroundColor}
-        icon={<HighlighterIcon />}
-      />
-      <Divider />
-
-      <ToolButton label={t("editor.classic.align-left")} active={state.align === "left"} onClick={() => align("left")}>
-        <AlignLeftIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.align-center")} active={state.align === "center"} onClick={() => align("center")}>
-        <AlignCenterIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.align-right")} active={state.align === "right"} onClick={() => align("right")}>
-        <AlignRightIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.align-justify")} active={state.align === "justify"} onClick={() => align("justify")}>
-        <AlignJustifyIcon />
-      </ToolButton>
-      <Divider />
-
-      <ToolButton
-        label={t("editor.classic.bullet-list")}
-        active={state.bulletList}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-      >
-        <ListIcon />
-      </ToolButton>
-      <ToolButton
-        label={t("editor.classic.ordered-list")}
-        active={state.orderedList}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-      >
-        <ListOrderedIcon />
-      </ToolButton>
-      <ToolButton
-        label={t("editor.classic.task-list")}
-        active={state.taskList}
-        onClick={() => editor.chain().focus().toggleTaskList().run()}
-      >
-        <ListChecksIcon />
-      </ToolButton>
-      <ToolButton
-        label={t("editor.classic.blockquote")}
-        active={state.blockquote}
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-      >
-        <QuoteIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.divider")} onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-        <MinusIcon />
-      </ToolButton>
-      <Divider />
-
-      <ToolButton label={t("editor.classic.link")} active={state.link} onClick={editLink}>
-        <LinkIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.unlink")} disabled={!state.link} onClick={() => editor.chain().focus().unsetLink().run()}>
-        <UnlinkIcon />
-      </ToolButton>
-      <ToolButton label={t("editor.classic.image")} onClick={() => imageInputRef.current?.click()}>
-        <ImageIcon />
-      </ToolButton>
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(event) => {
-          const files = Array.from(event.target.files ?? []);
-          event.target.value = "";
-          if (files.length) onPickImages(files);
-        }}
-      />
-
-      <Menu.Root modal={false} size="md">
-        <Menu.Trigger
-          render={
-            <button
-              type="button"
-              title={t("editor.classic.table")}
-              aria-label={t("editor.classic.table")}
-              onMouseDown={(event) => event.preventDefault()}
-              className={cn(
-                "inline-flex size-8 shrink-0 items-center justify-center rounded-mu-md text-mu-text-secondary hover:bg-mu-well hover:text-mu-text [&_svg]:size-4",
-                state.inTable && "bg-mu-well text-mu-text",
-              )}
-            />
-          }
-        >
-          <TableIcon />
-        </Menu.Trigger>
-        <Menu.Popup align="start">
-          <Menu.Item
-            disabled={state.inTable}
-            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+      {/* The tools used every day, on one line; the toggle shows the rest, as in WordPress. */}
+      <div className="flex items-center gap-0.5">
+        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none]">
+          <select
+            aria-label={t("editor.classic.block-format")}
+            title={t("editor.classic.block-format")}
+            className={cn(controlClass, "w-32")}
+            value={state.format}
+            onChange={(event) => setFormat(event.target.value as BlockFormat)}
           >
-            {t("editor.classic.insert-table")}
-          </Menu.Item>
-          <Menu.Separator />
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().addRowAfter().run()}>
-            {t("editor.classic.add-row")}
-          </Menu.Item>
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().addColumnAfter().run()}>
-            {t("editor.classic.add-column")}
-          </Menu.Item>
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteRow().run()}>
-            {t("editor.classic.delete-row")}
-          </Menu.Item>
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteColumn().run()}>
-            {t("editor.classic.delete-column")}
-          </Menu.Item>
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().mergeOrSplit().run()}>
-            {t("editor.classic.merge-cells")}
-          </Menu.Item>
-          <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteTable().run()}>
-            {t("editor.classic.delete-table")}
-          </Menu.Item>
-        </Menu.Popup>
-      </Menu.Root>
+            <option value="paragraph">{t("editor.classic.paragraph")}</option>
+            <option value="h1">{t("editor.classic.heading", { level: 1 })}</option>
+            <option value="h2">{t("editor.classic.heading", { level: 2 })}</option>
+            <option value="h3">{t("editor.classic.heading", { level: 3 })}</option>
+            <option value="h4">{t("editor.classic.heading", { level: 4 })}</option>
+            <option value="codeBlock">{t("editor.classic.code-block")}</option>
+          </select>
+          <ToolButton label={t("editor.classic.bold")} active={state.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
+            <BoldIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.italic")} active={state.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+            <ItalicIcon />
+          </ToolButton>
+          <ToolButton
+            label={t("editor.classic.underline")}
+            active={state.underline}
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+          >
+            <UnderlineIcon />
+          </ToolButton>
+          <Divider />
+          <ToolButton
+            label={t("editor.classic.bullet-list")}
+            active={state.bulletList}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          >
+            <ListIcon />
+          </ToolButton>
+          <ToolButton
+            label={t("editor.classic.ordered-list")}
+            active={state.orderedList}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          >
+            <ListOrderedIcon />
+          </ToolButton>
+          <ToolButton
+            label={t("editor.classic.task-list")}
+            active={state.taskList}
+            onClick={() => editor.chain().focus().toggleTaskList().run()}
+          >
+            <ListChecksIcon />
+          </ToolButton>
+          <Divider />
+          <ToolButton label={t("editor.classic.link")} active={state.link} onClick={editLink}>
+            <LinkIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.image")} onClick={() => imageInputRef.current?.click()}>
+            <ImageIcon />
+          </ToolButton>
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(event) => {
+              const files = Array.from(event.target.files ?? []);
+              event.target.value = "";
+              if (files.length) onPickImages(files);
+            }}
+          />
+        </div>
+        <ToolButton label={expanded ? t("common.collapse") : t("common.expand")} active={expanded} onClick={() => setExpanded(!expanded)}>
+          <ChevronDownIcon className={cn("transition-transform", expanded && "rotate-180")} />
+        </ToolButton>
+      </div>
 
-      <Menu.Root modal={false} size="md">
-        <Menu.Trigger
-          render={
-            <button
-              type="button"
-              title={t("editor.classic.columns")}
-              aria-label={t("editor.classic.columns")}
-              onMouseDown={(event) => event.preventDefault()}
-              className={cn(
-                "inline-flex size-8 shrink-0 items-center justify-center rounded-mu-md text-mu-text-secondary hover:bg-mu-well hover:text-mu-text [&_svg]:size-4",
-                state.inColumns && "bg-mu-well text-mu-text",
-              )}
-            />
-          }
-        >
-          <Columns2Icon />
-        </Menu.Trigger>
-        <Menu.Popup align="start">
-          {Array.from({ length: MAX_COLUMNS - MIN_COLUMNS + 1 }, (_, index) => MIN_COLUMNS + index).map((count) => (
-            <Menu.Item
-              key={count}
-              onClick={() =>
-                state.inColumns ? editor.chain().focus().setColumnCount(count).run() : editor.chain().focus().setColumns(count).run()
+      {expanded && (
+        <div className="flex flex-wrap items-center gap-0.5 border-t border-mu-line pt-1">
+          <ToolButton label={t("editor.classic.undo")} disabled={!state.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+            <Undo2Icon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.redo")} disabled={!state.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+            <Redo2Icon />
+          </ToolButton>
+          <Divider />
+          <select
+            aria-label={t("editor.classic.font-family")}
+            title={t("editor.classic.font-family")}
+            className={cn(controlClass, "w-36")}
+            value={FONT_FAMILIES.find((font) => primaryFamily(font.value) === state.fontFamily)?.value ?? ""}
+            onChange={(event) => setFontFamily(event.target.value)}
+          >
+            <option value="">{t("editor.classic.default-font")}</option>
+            {FONT_FAMILIES.map((font) => (
+              <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                {font.label}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label={t("editor.classic.font-size")}
+            title={t("editor.classic.font-size")}
+            className={cn(controlClass, "w-24")}
+            value={FONT_SIZES.includes(state.fontSize) ? state.fontSize : ""}
+            onChange={(event) => setFontSize(event.target.value)}
+          >
+            <option value="">{t("editor.classic.default-size")}</option>
+            {FONT_SIZES.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <Divider />
+          <ToolButton label={t("editor.classic.strike")} active={state.strike} onClick={() => editor.chain().focus().toggleStrike().run()}>
+            <StrikethroughIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.inline-code")} active={state.code} onClick={() => editor.chain().focus().toggleCode().run()}>
+            <CodeIcon />
+          </ToolButton>
+          <ColorPicker editor={editor} kind="color" label={t("editor.classic.text-color")} current={state.color} icon={<BaselineIcon />} />
+          <ColorPicker
+            editor={editor}
+            kind="background"
+            label={t("editor.classic.highlight")}
+            current={state.backgroundColor}
+            icon={<HighlighterIcon />}
+          />
+          <Divider />
+          <ToolButton label={t("editor.classic.align-left")} active={state.align === "left"} onClick={() => align("left")}>
+            <AlignLeftIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.align-center")} active={state.align === "center"} onClick={() => align("center")}>
+            <AlignCenterIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.align-right")} active={state.align === "right"} onClick={() => align("right")}>
+            <AlignRightIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.align-justify")} active={state.align === "justify"} onClick={() => align("justify")}>
+            <AlignJustifyIcon />
+          </ToolButton>
+          <Divider />
+          <ToolButton
+            label={t("editor.classic.blockquote")}
+            active={state.blockquote}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          >
+            <QuoteIcon />
+          </ToolButton>
+          <ToolButton label={t("editor.classic.divider")} onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+            <MinusIcon />
+          </ToolButton>
+          <Divider />
+          <ToolButton label={t("editor.classic.unlink")} disabled={!state.link} onClick={() => editor.chain().focus().unsetLink().run()}>
+            <UnlinkIcon />
+          </ToolButton>
+          <Menu.Root modal={false} size="md">
+            <Menu.Trigger
+              render={
+                <button
+                  type="button"
+                  title={t("editor.classic.table")}
+                  aria-label={t("editor.classic.table")}
+                  onMouseDown={(event) => event.preventDefault()}
+                  className={cn(
+                    "inline-flex size-8 shrink-0 items-center justify-center rounded-mu-md text-mu-text-secondary hover:bg-mu-well hover:text-mu-text [&_svg]:size-4",
+                    state.inTable && "bg-mu-well text-mu-text",
+                  )}
+                />
               }
             >
-              {t("editor.classic.column-count", { n: count })}
-            </Menu.Item>
-          ))}
-          <Menu.Separator />
-          <Menu.Item disabled={!state.inColumns} onClick={() => editor.chain().focus().unsetColumns().run()}>
-            {t("editor.classic.remove-columns")}
-          </Menu.Item>
-        </Menu.Popup>
-      </Menu.Root>
-      <Divider />
+              <TableIcon />
+            </Menu.Trigger>
+            <Menu.Popup align="start">
+              <Menu.Item
+                disabled={state.inTable}
+                onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+              >
+                {t("editor.classic.insert-table")}
+              </Menu.Item>
+              <Menu.Separator />
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().addRowAfter().run()}>
+                {t("editor.classic.add-row")}
+              </Menu.Item>
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().addColumnAfter().run()}>
+                {t("editor.classic.add-column")}
+              </Menu.Item>
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteRow().run()}>
+                {t("editor.classic.delete-row")}
+              </Menu.Item>
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteColumn().run()}>
+                {t("editor.classic.delete-column")}
+              </Menu.Item>
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().mergeOrSplit().run()}>
+                {t("editor.classic.merge-cells")}
+              </Menu.Item>
+              <Menu.Item disabled={!state.inTable} onClick={() => editor.chain().focus().deleteTable().run()}>
+                {t("editor.classic.delete-table")}
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Root>
 
-      <ToolButton
-        label={t("editor.classic.clear-formatting")}
-        onClick={() => editor.chain().focus().unsetAllMarks().unsetTextAlign().run()}
-      >
-        <RemoveFormattingIcon />
-      </ToolButton>
+          <Menu.Root modal={false} size="md">
+            <Menu.Trigger
+              render={
+                <button
+                  type="button"
+                  title={t("editor.classic.columns")}
+                  aria-label={t("editor.classic.columns")}
+                  onMouseDown={(event) => event.preventDefault()}
+                  className={cn(
+                    "inline-flex size-8 shrink-0 items-center justify-center rounded-mu-md text-mu-text-secondary hover:bg-mu-well hover:text-mu-text [&_svg]:size-4",
+                    state.inColumns && "bg-mu-well text-mu-text",
+                  )}
+                />
+              }
+            >
+              <Columns2Icon />
+            </Menu.Trigger>
+            <Menu.Popup align="start">
+              {Array.from({ length: MAX_COLUMNS - MIN_COLUMNS + 1 }, (_, index) => MIN_COLUMNS + index).map((count) => (
+                <Menu.Item
+                  key={count}
+                  onClick={() =>
+                    state.inColumns ? editor.chain().focus().setColumnCount(count).run() : editor.chain().focus().setColumns(count).run()
+                  }
+                >
+                  {t("editor.classic.column-count", { n: count })}
+                </Menu.Item>
+              ))}
+              <Menu.Separator />
+              <Menu.Item disabled={!state.inColumns} onClick={() => editor.chain().focus().unsetColumns().run()}>
+                {t("editor.classic.remove-columns")}
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Root>
+          <Divider />
+
+          <ToolButton
+            label={t("editor.classic.clear-formatting")}
+            onClick={() => editor.chain().focus().unsetAllMarks().unsetTextAlign().run()}
+          >
+            <RemoveFormattingIcon />
+          </ToolButton>
+        </div>
+      )}
     </div>
   );
 };

@@ -1217,6 +1217,9 @@
       "last-updated": "Cập nhật lần cuối {{ago}}",
       "refresh": "Làm mới",
       "load-error": "Không thể tải số liệu thống kê"
+    },
+    "passkey": {
+      "label": "Passkey"
     }
   },
   "tooltip": {
@@ -1523,5 +1526,45 @@
     "pinned": "Đã ghim",
     "starred": "Có sao",
     "top-opens": "Mở nhiều nhất"
+  },
+  "passkey": {
+    "section-description": "Passkey 6 số dùng để khóa ghi chú. Ghi chú bị khóa được mã hóa ngay trên trình duyệt; máy chủ chỉ lưu bản mã.",
+    "status": "Passkey",
+    "status-on": "Đã thiết lập. Ghi chú bị khóa cần passkey để mở.",
+    "status-off": "Chưa thiết lập.",
+    "lock-now": "Khóa ngay",
+    "locked": "Đang khóa",
+    "setup": "Thiết lập passkey",
+    "change": "Đổi passkey",
+    "current": "Passkey hiện tại",
+    "new": "Passkey mới (6 số)",
+    "confirm": "Nhập lại passkey mới",
+    "mismatch": "Passkey phải gồm 6 số và nhập giống nhau 2 lần.",
+    "reencrypting": "Đang mã hóa lại ghi chú bị khóa {{done}}/{{total}}…",
+    "created": "Đã thiết lập passkey",
+    "changed": "Đã đổi passkey",
+    "strength-note": "Máy chủ kiểm tra passkey và bắt chờ lâu dần sau mỗi lần nhập sai, nên không thể dò qua ứng dụng. Người lấy được toàn bộ database vẫn có thể thử hết các mã. Quên passkey thì không đọc lại được ghi chú đã khóa.",
+    "unlock-title": "Nhập passkey",
+    "unlock-description": "Nhập passkey 6 số để mở ghi chú bị khóa.",
+    "not-configured": "Bạn chưa thiết lập passkey. Hãy thiết lập trong Cài đặt → Passkey trước.",
+    "label": "Passkey",
+    "session-note": "Giữ mở khóa trong tab này cho tới khi tải lại trang hoặc bấm khóa.",
+    "unlock": "Mở khóa",
+    "wrong-left": "Sai passkey. Còn {{n}} lần thử trước khi phải chờ.",
+    "wait": "Nhập sai quá nhiều lần. Thử lại sau {{time}}."
+  },
+  "protect": {
+    "blur": "Làm mờ trong danh sách",
+    "unblur": "Bỏ làm mờ",
+    "lock": "Khóa bằng passkey",
+    "unlock": "Gỡ khóa",
+    "blurred": "Đã làm mờ ghi chú",
+    "unblurred": "Đã bỏ làm mờ",
+    "locked": "Đã khóa và mã hóa ghi chú",
+    "unlocked": "Đã gỡ khóa",
+    "lock-reason": "Nhập passkey để khóa ghi chú này.",
+    "unlock-reason": "Nhập passkey để gỡ khóa.",
+    "locked-hint": "Đã khóa · chạm để mở",
+    "blurred-hint": "Đã làm mờ · chạm để xem"
   }
 }

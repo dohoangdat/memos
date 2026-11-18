@@ -157,3 +157,13 @@ func (s *Service) serveRevisions(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Cache-Control", "private, no-store")
 	return httphandler.JSON(w, http.StatusOK, map[string]any{"revisions": revisions})
 }
+
+// Purge deletes every kept version of a memo. Locking a memo calls it, so no
+// earlier plaintext outlives the encryption.
+func (s *Service) Purge(ctx context.Context, memoUID string) error {
+	if !s.enabled {
+		return nil
+	}
+	_, err := s.db.ExecContext(ctx, "DELETE FROM memo_revision WHERE memo_uid = ?", memoUID)
+	return err
+}

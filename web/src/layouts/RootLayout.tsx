@@ -10,6 +10,7 @@ import AppSidebar, {
   useSidebarWidth,
 } from "@/components/AppSidebar";
 import NewMemoFab from "@/components/NewMemoFab";
+import { PasskeyPromptHost } from "@/components/Passkey/PasskeyPromptHost";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
 import { GlobalMemoEditorProvider } from "@/contexts/GlobalMemoEditorContext";
@@ -108,6 +109,8 @@ const RootLayoutContent = () => {
       {!fullBleed && <PullToRefresh ignoreDialogs />}
       {/* Write a memo from anywhere: the composer opens full screen with the keyboard up. */}
       {!fullBleed && <NewMemoFab />}
+      {/* Asks for the passkey whenever a locked memo is opened, edited or locked. */}
+      <PasskeyPromptHost />
       <main
         className={cn("flex w-full min-w-0 flex-col items-center md:ps-(--app-sidebar-width)", fullBleed ? "h-full min-h-0" : "min-h-full")}
       >

@@ -1261,6 +1261,9 @@
       "you": "Jūs",
       "your-access": "Jūsu piekļuve",
       "your-spaces": "Jūsu telpas"
+    },
+    "passkey": {
+      "label": "Passkey"
     }
   },
   "tooltip": {
@@ -1524,5 +1527,45 @@
     "pinned": "Pinned",
     "starred": "Starred",
     "top-opens": "Most opened"
+  },
+  "passkey": {
+    "section-description": "A 6-digit passkey that locks memos. Locked memos are encrypted in this browser; the server only stores ciphertext.",
+    "status": "Passkey",
+    "status-on": "Set up. Locked memos need it to open.",
+    "status-off": "Not set up yet.",
+    "lock-now": "Lock now",
+    "locked": "Locked",
+    "setup": "Set up passkey",
+    "change": "Change passkey",
+    "current": "Current passkey",
+    "new": "New passkey (6 digits)",
+    "confirm": "Repeat the new passkey",
+    "mismatch": "The passkey must be 6 digits, entered the same twice.",
+    "reencrypting": "Re-encrypting locked memos {{done}}/{{total}}…",
+    "created": "Passkey set up",
+    "changed": "Passkey changed",
+    "strength-note": "The server checks the passkey and makes you wait longer after each wrong try, so it cannot be guessed through the app. Someone who has the whole database could still try every code. Forgetting it makes locked memos unreadable.",
+    "unlock-title": "Enter passkey",
+    "unlock-description": "Enter your 6-digit passkey to open locked memos.",
+    "not-configured": "You have not set up a passkey yet. Set one up in Settings → Passkey first.",
+    "label": "Passkey",
+    "session-note": "Stays unlocked in this tab until you reload or lock it.",
+    "unlock": "Unlock",
+    "wrong-left": "Wrong passkey. {{n}} more tries before you have to wait.",
+    "wait": "Too many wrong tries. Try again in {{time}}."
+  },
+  "protect": {
+    "blur": "Blur in lists",
+    "unblur": "Stop blurring",
+    "lock": "Lock with passkey",
+    "unlock": "Remove lock",
+    "blurred": "Memo blurred",
+    "unblurred": "Memo no longer blurred",
+    "locked": "Memo locked and encrypted",
+    "unlocked": "Lock removed",
+    "lock-reason": "Enter your passkey to lock this memo.",
+    "unlock-reason": "Enter your passkey to remove the lock.",
+    "locked-hint": "Locked · tap to open",
+    "blurred-hint": "Blurred · tap to read"
   }
 }

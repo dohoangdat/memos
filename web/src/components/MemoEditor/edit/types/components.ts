@@ -9,6 +9,8 @@ import type { DrawingSource, LocalFile } from "./attachment";
 /** What MemoEditor hands an editing session: its subject, the host's defaults, and where the draft lives. */
 export interface EditSessionProps {
   className?: string;
+  /** Rewrites the content right before it is saved (a locked memo is encrypted). */
+  transformContent?: (content: string) => Promise<string>;
   /** The draft and caret storage key, derived from what is edited; see `draftKeyFor`. */
   draftKey: string;
   /** Inside a card that is the frame already: no background, border or padding of its own outside focus mode. */

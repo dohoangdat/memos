@@ -28,6 +28,8 @@ interface UseMemoSaveOptions {
   discardDraft: () => void;
   onConfirm?: (memoName: string) => void;
   onCancel?: () => void;
+  /** Rewrites the content right before it is sent, e.g. encrypting a locked memo. */
+  transformContent?: (content: string) => Promise<string>;
 }
 
 /**
@@ -45,6 +47,7 @@ export function useMemoSave({
   discardDraft,
   onConfirm,
   onCancel,
+  transformContent,
 }: UseMemoSaveOptions): () => Promise<void> {
   const t = useTranslate();
   const queryClient = useQueryClient();
@@ -109,8 +112,9 @@ export function useMemoSave({
             createTime: restampDefaultCreateTime(state.timestamps.createTime, defaultCreateTime, now),
             updateTime: restampDefaultCreateTime(state.timestamps.updateTime, defaultCreateTime, now),
           };
+      const content = transformContent ? await transformContent(state.content) : state.content;
       const result = await memoService.save(
-        { ...state, timestamps },
+        { ...state, content, timestamps },
         {
           memoName,
           parentMemoName,
@@ -205,6 +209,7 @@ export function useMemoSave({
     parentMemoName,
     queryClient,
     t,
+    transformContent,
     updateMemo,
   ]);
 }

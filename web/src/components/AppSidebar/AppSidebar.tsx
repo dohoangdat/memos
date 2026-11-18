@@ -101,7 +101,7 @@ const CollectionSidebarContent = ({
   return (
     <div className={SIDEBAR_SECTION_STACK_CLASSES}>
       {showStatistics && (
-        <SidebarSection ariaLabel={t("common.statistics")}>
+        <SidebarSection label={t("common.calendar")} ariaLabel={t("common.statistics")} collapseId="calendar">
           <StatisticsView statisticsData={statistics} onDateSelect={() => setMobileOpen(false)} />
         </SidebarSection>
       )}

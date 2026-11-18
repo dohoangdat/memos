@@ -63,6 +63,7 @@ export const EditSession: React.FC<EditSessionProps> = ({
   onConfirm,
   onCancel,
   onSavingChange,
+  transformContent,
 }) => {
   const t = useTranslate();
   const currentUser = useCurrentUser();
@@ -343,6 +344,7 @@ export const EditSession: React.FC<EditSessionProps> = ({
     discardDraft,
     onConfirm,
     onCancel: onCancel ? handleCancel : undefined,
+    transformContent,
   });
 
   return (

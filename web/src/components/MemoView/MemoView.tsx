@@ -1,8 +1,10 @@
 import { forwardRef, memo, Suspense, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { ensurePasskey } from "@/components/Passkey/passkeyPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { useResolvedUser } from "@/contexts/MentionResolutionContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { isLockedContent } from "@/lib/memo-crypto";
 import { isMemoBlurred } from "@/lib/tag";
 import { cn } from "@/lib/utils";
 import { State } from "@/types/proto/api/common_pb";
@@ -85,7 +87,19 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
 
   const { previewState, openPreview, setPreviewOpen } = useImagePreview();
 
-  const openEditor = useCallback(() => setOverlay("edit"), []);
+  // A locked memo opens (to read or edit) only once this tab holds the passkey's key.
+  const locked = isLockedContent(memoData.content);
+  const openOverlay = useCallback(
+    (next: "read" | "edit") => {
+      if (!locked) {
+        setOverlay(next);
+        return;
+      }
+      void ensurePasskey().then((key) => key && setOverlay(next));
+    },
+    [locked],
+  );
+  const openEditor = useCallback(() => openOverlay("edit"), [openOverlay]);
   const closeEditor = useCallback(() => setOverlay(null), []);
   const handleFocusModeChange = useCallback(() => {}, []);
 
@@ -101,12 +115,12 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
       if (window.getSelection()?.toString()) return;
       window.clearTimeout(clickTimerRef.current);
       if (readonly || pointerTypeRef.current !== "mouse") {
-        setOverlay("read");
+        openOverlay("read");
         return;
       }
-      clickTimerRef.current = window.setTimeout(() => setOverlay("read"), DOUBLE_CLICK_WAIT_MS);
+      clickTimerRef.current = window.setTimeout(() => openOverlay("read"), DOUBLE_CLICK_WAIT_MS);
     },
-    [readerEnabled, readonly],
+    [readerEnabled, readonly, openOverlay],
   );
   const handleCardDoubleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -114,18 +128,18 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
       window.clearTimeout(clickTimerRef.current);
       event.preventDefault();
       window.getSelection()?.removeAllRanges();
-      setOverlay("edit");
+      openOverlay("edit");
     },
-    [readonly],
+    [readonly, openOverlay],
   );
   const handleCardKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLElement>) => {
       if (readerEnabled && event.key === "Enter" && event.target === event.currentTarget) {
         event.preventDefault();
-        setOverlay("read");
+        openOverlay("read");
       }
     },
-    [readerEnabled],
+    [readerEnabled, openOverlay],
   );
 
   useImperativeHandle(ref, () => ({ openEditor }), [openEditor]);
@@ -271,7 +285,7 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
       )}
       {overlay === "edit" && (
         <Suspense fallback={null}>
-          <MemoEditDialog name={memoData.name} onClose={closeEditor} />
+          <MemoEditDialog name={memoData.name} lockedContent={locked ? memoData.content : undefined} onClose={closeEditor} />
         </Suspense>
       )}
     </MemoViewContext.Provider>

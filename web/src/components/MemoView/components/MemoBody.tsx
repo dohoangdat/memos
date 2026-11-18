@@ -3,10 +3,13 @@ import { EyeIcon } from "lucide-react";
 import { useMemo } from "react";
 import ClampedSection from "@/components/ClampedSection";
 import { MemoEditor } from "@/components/MemoEditor/MemoEditor";
+import { MemoContentView } from "@/components/MemoEditor/view/MemoContentView";
 import { AttachmentGallery, MemoMetadataRows } from "@/components/MemoMetadata";
 import { separateAttachments } from "@/components/MemoMetadata/Attachment/attachmentHelpers";
 import { isReferenceRelation } from "@/components/MemoMetadata/Relation/relationHelpers";
+import { ensurePasskey } from "@/components/Passkey/passkeyPrompt";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { useDecryptedContent, useMemoProtectionMode } from "@/hooks/useMemoProtection";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import { filterInlineManagedAttachments } from "@/utils/managed-attachment";
@@ -16,6 +19,7 @@ import { useMemoHandlers } from "../hooks";
 import { useMemoViewContext } from "../MemoViewContext";
 import type { MemoBodyProps } from "../types";
 import { CreatorDisplay } from "./MemoHeader";
+import ProtectedPreview from "./ProtectedPreview";
 
 const BlurOverlay: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
   const t = useTranslate();
@@ -45,6 +49,10 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
   } = useMemoViewContext();
 
   const { handleMemoContentClick, handleMemoContentDoubleClick } = useMemoHandlers({ readonly, openEditor, openPreview });
+  // Blurred or passkey-locked memos (fork-only): lists show only the title; a locked memo
+  // shows its decrypted text once this tab holds the key.
+  const protection = useMemoProtectionMode(memo.name);
+  const { locked, plain } = useDecryptedContent(memo.content);
 
   const referencedMemos = memo.relations.filter(isReferenceRelation);
   const hasText = memo.content.trim() !== "";
@@ -77,6 +85,21 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
     );
   }
 
+  if (compact && (locked || protection === "blur")) {
+    return (
+      <div data-slot="memo-body" className="w-full">
+        <ProtectedPreview memo={memo} mode={locked ? "lock" : "blur"} />
+      </div>
+    );
+  }
+  if (locked && plain === null) {
+    return (
+      <div data-slot="memo-body" className="w-full">
+        <ProtectedPreview memo={memo} mode="lock" onUnlock={() => void ensurePasskey()} />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col justify-start items-start gap-2">
       <div data-slot="memo-body" className="relative w-full">
@@ -90,15 +113,24 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
               Reactions stay outside so they never hide under the fade. */}
           <ClampedSection enabled={Boolean(compact)}>
             {/* A memo of attachments alone has no text: an empty editor would still take a line and a gap. */}
-            {hasText && (
-              <MemoEditor
-                name={memo.name}
-                parentPage={parentPage}
-                compact={Boolean(compact)}
-                onClick={handleMemoContentClick}
-                onDoubleClick={handleMemoContentDoubleClick}
-              />
-            )}
+            {hasText &&
+              (locked && plain !== null ? (
+                <MemoContentView
+                  content={plain}
+                  memoName={memo.name}
+                  attachments={memo.attachments}
+                  parentPage={parentPage}
+                  onClick={handleMemoContentClick}
+                />
+              ) : (
+                <MemoEditor
+                  name={memo.name}
+                  parentPage={parentPage}
+                  compact={Boolean(compact)}
+                  onClick={handleMemoContentClick}
+                  onDoubleClick={handleMemoContentDoubleClick}
+                />
+              ))}
             <AttachmentGallery
               visual={visual}
               onImagePreview={openPreview}

@@ -5,6 +5,8 @@ import { useCallback, useRef, useState } from "react";
 import { MemoEditor } from "@/components/MemoEditor";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { useBackToClose } from "@/hooks/useBackToClose";
+import { useDecryptedContent } from "@/hooks/useMemoProtection";
+import { encryptMemoContent, getSessionKey } from "@/lib/memo-crypto";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
 import { countMemoOpen, MemoInfoPanel, MemoInfoSummary } from "./MemoInfo";
@@ -34,6 +36,9 @@ export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoRead
   useBackToClose(onClose);
   // Counted once per opening, on this device.
   const [opens] = useState(() => countMemoOpen(memo.name));
+  // A locked memo's statistics count its plaintext; its versions are not offered (they are ciphertext).
+  const reader = useDecryptedContent(memo.content);
+  const infoMemo = reader.locked && reader.plain !== null ? { ...memo, content: reader.plain } : memo;
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
@@ -58,9 +63,9 @@ export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoRead
           >
             <PullToRefresh scrollRef={scrollRef} />
             <div className="mx-auto w-full max-w-3xl">
-              <MemoInfoSummary memo={memo} opens={opens} />
+              <MemoInfoSummary memo={infoMemo} opens={opens} />
               <MemoView ref={viewRef} memo={memo} {...viewProps} compact={false} presentation="reader" />
-              <MemoInfoPanel memo={memo} opens={opens} canEdit={canEdit} />
+              <MemoInfoPanel memo={infoMemo} opens={opens} canEdit={canEdit && !reader.locked} />
             </div>
           </div>
         </Dialog.Popup>
@@ -71,6 +76,8 @@ export const MemoReaderDialog = ({ memo, viewProps, canEdit, onClose }: MemoRead
 
 interface MemoEditDialogProps {
   name: string;
+  /** A locked memo's stored (encrypted) content: the editor opens on its plaintext and saves it encrypted again. */
+  lockedContent?: string;
   onClose: () => void;
 }
 
@@ -79,12 +86,18 @@ interface MemoEditDialogProps {
  * modal like the new-memo composer. An edit keeps no draft, so Escape and a press outside
  * do not dismiss it; only Save, Cancel or the editor's close button do, and never mid-save.
  */
-export const MemoEditDialog = ({ name, onClose }: MemoEditDialogProps) => {
+export const MemoEditDialog = ({ name, lockedContent, onClose }: MemoEditDialogProps) => {
   const t = useTranslate();
   const savingRef = useRef(false);
   const requestClose = useCallback(() => {
     if (!savingRef.current) onClose();
   }, [onClose]);
+  const decrypted = useDecryptedContent(lockedContent ?? "");
+  const encryptLocked = useCallback(async (content: string) => {
+    const key = getSessionKey();
+    if (!key) throw new Error("Locked memo: the passkey is no longer unlocked");
+    return encryptMemoContent(content, key);
+  }, []);
   // Back closes the editor like its own close button (never mid-save).
   useBackToClose(requestClose);
 
@@ -104,18 +117,22 @@ export const MemoEditDialog = ({ name, onClose }: MemoEditDialogProps) => {
         <Dialog.Backdrop className="fixed inset-0 z-(--mu-layer-overlay) bg-transparent" />
         <Dialog.Popup className="fixed inset-0 z-(--mu-layer-overlay) outline-none" initialFocus aria-modal="true">
           <Dialog.Title className="mu-visually-hidden">{t("common.edit")}</Dialog.Title>
-          <MemoEditor
-            mode="edit"
-            name={name}
-            autoFocus
-            onConfirm={onClose}
-            onCancel={onClose}
-            // Mounts in focus mode; leaving it closes this dialog.
-            onFocusModeExit={requestClose}
-            onSavingChange={(saving) => {
-              savingRef.current = saving;
-            }}
-          />
+          {lockedContent !== undefined && decrypted.plain === null ? null : (
+            <MemoEditor
+              mode="edit"
+              name={name}
+              replaceContent={lockedContent !== undefined ? (decrypted.plain ?? undefined) : undefined}
+              transformContent={lockedContent !== undefined ? encryptLocked : undefined}
+              autoFocus
+              onConfirm={onClose}
+              onCancel={onClose}
+              // Mounts in focus mode; leaving it closes this dialog.
+              onFocusModeExit={requestClose}
+              onSavingChange={(saving) => {
+                savingRef.current = saving;
+              }}
+            />
+          )}
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

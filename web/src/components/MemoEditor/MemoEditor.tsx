@@ -96,6 +96,10 @@ export interface MemoEditingProps {
    * after an edited memo's own text. Used for what another app shared.
    */
   seedContent?: string;
+  /** An edited memo starts from this text instead of its stored content (a decrypted locked memo). */
+  replaceContent?: string;
+  /** Rewrites the content right before it is saved (encrypts a locked memo again). */
+  transformContent?: (content: string) => Promise<string>;
 }
 
 /** Editing an existing memo by name. */
@@ -214,6 +218,7 @@ const EditingSession = ({
   defaultLocation,
   defaultCreateTime,
   seedContent,
+  replaceContent,
   ...editing
 }: EditingSessionProps) => {
   const currentUser = useCurrentUser();
@@ -232,6 +237,7 @@ const EditingSession = ({
       defaultLocation,
       canChooseSpace: canChooseSpaceFor({ memo, currentUser, parentMemoName, defaultSpace }),
       seedContent,
+      replaceContent,
     });
   });
   const EditSession = loadedEditSession ?? LazyEditSession;

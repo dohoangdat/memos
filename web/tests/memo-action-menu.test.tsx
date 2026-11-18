@@ -19,6 +19,12 @@ const handlers = vi.hoisted(() => ({
   confirmDeleteMemo: vi.fn(),
 }));
 
+vi.mock("@/components/MemoReactionListView/hooks", () => ({
+  useReactionActions: () => ({ hasReacted: () => false, handleReactionClick: vi.fn(), canReact: true, isPending: false }),
+}));
+vi.mock("@/components/MemoActionMenu/useMemoProtectActions", () => ({
+  useMemoProtectActions: () => ({ locked: false, blurred: false, busy: false, toggleBlur: vi.fn(), toggleLock: vi.fn() }),
+}));
 vi.mock("@/components/ConfirmDialog", () => ({
   default: () => null,
 }));
@@ -48,7 +54,7 @@ const openMenu = async (memo: Memo, props: { readonly?: boolean; parentPage?: st
     </MemoryRouter>,
   );
   fireEvent.click(screen.getByRole("button", { name: "common.more" }));
-  await screen.findByRole("menuitem", { name: "common.copy" });
+  await screen.findByRole("menuitem", { name: "memo.copy-link" });
 };
 
 const menuItemLabels = () => screen.getAllByRole("menuitem").map((item) => item.textContent);
@@ -64,7 +70,18 @@ describe("MemoActionMenu", () => {
 
   it("groups an owner's memo actions by what they do to the card and puts Delete last, with no Move entry", async () => {
     await openMenu(memoOf({ space: "spaces/work" }));
-    expect(menuItemLabels()).toEqual(["common.edit", "common.pin", "common.archive", "common.open", "common.copy", "common.delete"]);
+    expect(menuItemLabels()).toEqual([
+      "common.edit",
+      "common.pin",
+      "memo.star",
+      "common.archive",
+      "protect.blur",
+      "protect.lock",
+      "common.open",
+      "memo.copy-link",
+      "memo.copy-content",
+      "common.delete",
+    ]);
     const separators = screen.getAllByRole("separator");
     expect(separators[separators.length - 1].nextElementSibling).toBe(screen.getByRole("menuitem", { name: "common.delete" }));
   });
@@ -88,7 +105,17 @@ describe("MemoActionMenu", () => {
   it("hides Open on the memo's own page", async () => {
     handlers.isInMemoDetailPage = true;
     await openMenu(memoOf());
-    expect(menuItemLabels()).toEqual(["common.edit", "common.pin", "common.archive", "common.copy", "common.delete"]);
+    expect(menuItemLabels()).toEqual([
+      "common.edit",
+      "common.pin",
+      "memo.star",
+      "common.archive",
+      "protect.blur",
+      "protect.lock",
+      "memo.copy-link",
+      "memo.copy-content",
+      "common.delete",
+    ]);
   });
 
   it.each([
@@ -104,10 +131,9 @@ describe("MemoActionMenu", () => {
   it.each([
     ["memo.copy-link", "handleCopyLink"],
     ["memo.copy-content", "handleCopyContent"],
-  ] as const)("runs %s from the Copy submenu", async (label, handler) => {
+  ] as const)("runs %s straight from the menu", async (label, handler) => {
     await openMenu(memoOf());
-    fireEvent.click(screen.getByRole("menuitem", { name: "common.copy" }));
-    fireEvent.click(await screen.findByRole("menuitem", { name: label }));
+    fireEvent.click(screen.getByRole("menuitem", { name: label }));
     expect(handlers[handler]).toHaveBeenCalledOnce();
   });
 
@@ -122,14 +148,14 @@ describe("MemoActionMenu", () => {
     expect(menuItemLabels()).toEqual(["common.restore", "common.delete"]);
   });
 
-  it("gives a viewer Open and Copy only", async () => {
+  it("gives a viewer Star, Open and Copy only", async () => {
     await openMenu(memoOf(), { readonly: true });
-    expect(menuItemLabels()).toEqual(["common.open", "common.copy"]);
+    expect(menuItemLabels()).toEqual(["memo.star", "common.open", "memo.copy-link", "memo.copy-content"]);
   });
 
   it.each([
-    [false, ["common.edit", "common.copy", "common.delete"]],
-    [true, ["common.edit", "memo.task-actions.check-all", "common.copy", "common.delete"]],
+    [false, ["common.edit", "memo.copy-link", "memo.copy-content", "common.delete"]],
+    [true, ["common.edit", "memo.task-actions.check-all", "memo.copy-link", "memo.copy-content", "common.delete"]],
   ] as const)("shows comment actions without Open, Pin, Archive or More (tasks: %s)", async (hasTaskList, labels) => {
     await openMenu(memoOf({ name: "memos/2", parent: "memos/1", property: { hasTaskList, hasIncompleteTasks: hasTaskList } }));
     expect(menuItemLabels()).toEqual(labels);
@@ -139,9 +165,9 @@ describe("MemoActionMenu", () => {
     expect(handlers.confirmDeleteMemo).not.toHaveBeenCalled();
   });
 
-  it("gives a read-only comment only Copy", async () => {
+  it("gives a read-only comment only Star and Copy", async () => {
     await openMenu(memoOf({ name: "memos/2", parent: "memos/1" }), { readonly: true });
-    expect(menuItemLabels()).toEqual(["common.copy"]);
+    expect(menuItemLabels()).toEqual(["memo.star", "memo.copy-link", "memo.copy-content"]);
   });
 
   it("is a quiet compact control that takes the accent fill while open", async () => {

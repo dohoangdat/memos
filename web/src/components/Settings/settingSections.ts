@@ -9,6 +9,7 @@ import {
   HeartHandshakeIcon,
   KeyIcon,
   KeyRoundIcon,
+  LockKeyholeIcon,
   type LucideIcon,
   MailIcon,
   Settings2Icon,
@@ -28,6 +29,7 @@ import MemberSection from "@/components/Settings/MemberSection";
 import MemoExportSection from "@/components/Settings/MemoExportSection";
 import MyAccountSection from "@/components/Settings/MyAccountSection";
 import NotificationSection from "@/components/Settings/NotificationSection";
+import PasskeySection from "@/components/Settings/PasskeySection";
 import PreferencesSection from "@/components/Settings/PreferencesSection";
 import ResourceStatsSection from "@/components/Settings/ResourceStatsSection";
 import SpacesSection from "@/components/Settings/SpacesSection";
@@ -43,6 +45,7 @@ export type SettingSectionKey =
   | "memo-export"
   | "spaces"
   | "access-token"
+  | "passkey"
   | "preference"
   | "editor"
   | "webhook"
@@ -89,6 +92,13 @@ export const SETTINGS_SECTIONS: SettingSectionDefinition[] = [
     labelKey: "setting.access-token.label",
     icon: KeyRoundIcon,
     component: AccessTokenSection,
+  },
+  {
+    key: "passkey",
+    scope: "basic",
+    labelKey: "setting.passkey.label",
+    icon: LockKeyholeIcon,
+    component: PasskeySection,
   },
   {
     key: "preference",
