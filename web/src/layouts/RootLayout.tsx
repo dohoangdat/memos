@@ -9,6 +9,7 @@ import AppSidebar, {
   SidebarResizeHandle,
   useSidebarWidth,
 } from "@/components/AppSidebar";
+import BlurAllFab from "@/components/BlurAllFab";
 import NewMemoFab from "@/components/NewMemoFab";
 import { PasskeyPromptHost } from "@/components/Passkey/PasskeyPromptHost";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -108,6 +109,7 @@ const RootLayoutContent = () => {
       {/* Pull down at the top of a page to refresh it; dialogs (the memo reader) pull on their own. */}
       {!fullBleed && <PullToRefresh ignoreDialogs />}
       {/* Write a memo from anywhere: the composer opens full screen with the keyboard up. */}
+      {!fullBleed && <BlurAllFab />}
       {!fullBleed && <NewMemoFab />}
       {/* Asks for the passkey whenever a locked memo is opened, edited or locked. */}
       <PasskeyPromptHost />

@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CLAMP_PREVIEW_HEIGHT_PX, CLAMP_TRIGGER_HEIGHT_PX } from "@/components/ClampedSection";
 import MemoBody from "@/components/MemoView/components/MemoBody";
+import { setBlurAll } from "@/lib/blur-all";
 
 const mockState = vi.hoisted(() => ({
   memo: {
@@ -28,7 +29,7 @@ vi.mock("@/hooks/useMemoProtection", () => ({
   useDecryptedContent: (content: string) =>
     mockState.decrypted.locked ? { ...mockState.decrypted, failed: false } : { locked: false, plain: content, failed: false },
 }));
-vi.mock("@/components/Passkey/passkeyPrompt", () => ({ ensurePasskey: vi.fn() }));
+vi.mock("@/components/Passkey/passkeyPrompt", () => ({ ensurePasskey: vi.fn(), requestPasskey: vi.fn() }));
 vi.mock("@/utils/i18n", () => ({
   findNearestMatchedLanguage: (language: string) => language || "en",
   useTranslate: () => (key: string) => key,
@@ -103,6 +104,17 @@ describe("<MemoBody /> protected memos", () => {
   afterEach(() => {
     mockState.protection = undefined;
     mockState.decrypted = { locked: false, plain: null };
+    act(() => setBlurAll(false));
+  });
+
+  it("blurs every memo in lists while Blur all is on", () => {
+    mockState.memo = createMemo("# Plans\n\nsecret body #private");
+    render(<MemoBody compact={true} />);
+    expect(screen.getByText(/secret body/)).toBeInTheDocument();
+    act(() => setBlurAll(true));
+    expect(screen.getByText("# Plans")).toBeInTheDocument();
+    expect(screen.queryByText(/secret body/)).toBeNull();
+    expect(screen.getByText("protect.blurred-hint")).toBeInTheDocument();
   });
 
   it("shows only the title of a blurred memo in a list", () => {
@@ -114,15 +126,15 @@ describe("<MemoBody /> protected memos", () => {
     expect(screen.getByText("protect.blurred-hint")).toBeInTheDocument();
   });
 
-  it("keeps a locked memo's tags readable in its preview", () => {
+  it("hides a locked memo's tags in its preview", () => {
     mockState.memo = {
       ...createMemo("# Bank\n\n🔒 #tai-chinh/ngan-hang\n\n```memos-lock\nabc\n```"),
       tags: ["tai-chinh", "tai-chinh/ngan-hang"],
     };
     mockState.decrypted = { locked: true, plain: null };
     render(<MemoBody compact={true} />);
-    expect(screen.getByText("tai-chinh/ngan-hang")).toBeInTheDocument();
-    expect(screen.queryByText("tai-chinh")).toBeNull();
+    expect(screen.getByText("# Bank")).toBeInTheDocument();
+    expect(screen.queryByText(/tai-chinh/)).toBeNull();
   });
 
   it("shows a blurred memo in full outside lists", () => {

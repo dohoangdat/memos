@@ -1,4 +1,4 @@
-import { ChevronRightIcon, HashIcon, ListTreeIcon } from "lucide-react";
+import { ChevronRightIcon, HashIcon, ListTreeIcon, PencilIcon } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import {
   SIDEBAR_ROW_BOX_CLASSES,
@@ -6,7 +6,9 @@ import {
   SIDEBAR_ROW_LABEL_CLASSES,
   SIDEBAR_ROW_SLOT_BUTTON_CLASSES,
   SIDEBAR_ROW_SLOT_CLASSES,
+  SIDEBAR_TAG_SELECTED_CLASSES,
   SidebarRowIconSlot,
+  sidebarRowEditButtonClasses,
   sidebarRowStateAttributes,
   sidebarRowStateClasses,
 } from "@/components/AppSidebar/SidebarRow";
@@ -30,6 +32,8 @@ interface Props {
   /** Identifies whose tags these are, so expansion persists per tenant rather than per browser. */
   scope: string;
   onTagClick: (tag: string) => void;
+  /** Offers a rename on each tag row when set (the current user's own tags). */
+  onRename?: (tag: string) => void;
 }
 
 /** Persisted per scope: which branches are open, and the selection already revealed. */
@@ -125,9 +129,10 @@ interface TagItemProps {
   expanded: ReadonlySet<string>;
   onTagClick: (tag: string) => void;
   onToggle: (path: string) => void;
+  onRename?: (tag: string) => void;
 }
 
-const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagItemProps) => {
+const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle, onRename }: TagItemProps) => {
   const t = useTranslate();
   const isTag = tag.amount !== undefined;
   const isActive = activeTag === tag.text;
@@ -149,6 +154,7 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
         className={cn(
           SIDEBAR_ROW_BOX_CLASSES,
           isTag ? sidebarRowStateClasses(state) : STRUCTURAL_ROW_CLASSES,
+          isActive && SIDEBAR_TAG_SELECTED_CLASSES,
           isAncestorOfActiveTag && !isActive && "text-mu-text/75",
         )}
         // Overrides the start half of the box's `px-2`, leaving the trailing 8px intact.
@@ -203,6 +209,17 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
             <TagCount subs={tag.subTags.length} />
           </button>
         )}
+        {onRename && (
+          <button
+            type="button"
+            aria-label={`${t("tag-rename.action")} #${tag.text}`}
+            title={t("tag-rename.action")}
+            className={sidebarRowEditButtonClasses(isActive)}
+            onClick={() => onRename(tag.text)}
+          >
+            <PencilIcon className="mu-icon-xs" />
+          </button>
+        )}
       </div>
 
       {open && (
@@ -216,6 +233,7 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
               expanded={expanded}
               onTagClick={onTagClick}
               onToggle={onToggle}
+              onRename={onRename}
             />
           ))}
         </div>
@@ -224,7 +242,7 @@ const TagItem = ({ tag, depth, activeTag, expanded, onTagClick, onToggle }: TagI
   );
 };
 
-const TagTree = ({ tagAmounts, activeTag, scope, onTagClick }: Props) => {
+const TagTree = ({ tagAmounts, activeTag, scope, onTagClick, onRename }: Props) => {
   const t = useTranslate();
   const tags = useMemo(() => buildTagTree(tagAmounts), [tagAmounts]);
   // Scoped per tenant: the paths are one account's tag names, so another user's profile tree
@@ -266,6 +284,7 @@ const TagTree = ({ tagAmounts, activeTag, scope, onTagClick }: Props) => {
           expanded={expanded}
           onTagClick={onTagClick}
           onToggle={handleToggle}
+          onRename={onRename}
         />
       ))}
     </div>

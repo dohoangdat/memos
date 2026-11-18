@@ -1,15 +1,19 @@
 import { Button, Menu, Tooltip } from "@usememos/ui";
-import { HashIcon, ListTreeIcon, MoreHorizontalIcon } from "lucide-react";
-import { forwardRef, useMemo } from "react";
+import { HashIcon, ListTreeIcon, MoreHorizontalIcon, PencilIcon } from "lucide-react";
+import { forwardRef, useMemo, useState } from "react";
+import { TagRenameDialog } from "@/components/TagRename/TagRenameDialog";
 import { useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import { useLocalStorage, useOverflowTitle } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import TagTree, { tagRowAriaLabel } from "../TagTree";
 import {
-  SIDEBAR_ROW_CLASSES,
+  SIDEBAR_ROW_BOX_CLASSES,
   SIDEBAR_ROW_COUNT_RAIL_CLASSES,
+  SIDEBAR_ROW_LABEL_CLASSES,
+  SIDEBAR_TAG_SELECTED_CLASSES,
   SidebarRowIconSlot,
+  sidebarRowEditButtonClasses,
   sidebarRowStateAttributes,
   sidebarRowStateClasses,
 } from "./SidebarRow";
@@ -20,6 +24,8 @@ interface Props {
   onSelect?: () => void;
   /** Whose tags these are; keeps tree expansion state from bleeding between users and views. */
   scope: string;
+  /** Offers a quick rename on each tag (the current user's own tags). */
+  canRename?: boolean;
 }
 
 const TagPath = forwardRef<HTMLSpanElement, { tag: string }>(({ tag }, ref) => {
@@ -44,33 +50,52 @@ interface FlatTagRowProps {
   active: boolean;
   /** Computed by the parent, which already holds the translator — rows stay subscription-free. */
   ariaLabel: string;
+  renameLabel?: string;
   onClick: () => void;
+  onRename?: () => void;
 }
 
-const FlatTagRow = ({ tag, amount, active, ariaLabel, onClick }: FlatTagRowProps) => {
+const FlatTagRow = ({ tag, amount, active, ariaLabel, renameLabel, onClick, onRename }: FlatTagRowProps) => {
   const { ref, title } = useOverflowTitle<HTMLSpanElement>(`#${tag}`);
   const state = active ? "checked" : "idle";
 
   return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      aria-pressed={active || undefined}
-      title={title}
+    <div
       {...sidebarRowStateAttributes(state)}
-      className={cn(SIDEBAR_ROW_CLASSES, sidebarRowStateClasses(state))}
-      onClick={onClick}
+      className={cn(SIDEBAR_ROW_BOX_CLASSES, sidebarRowStateClasses(state), active && SIDEBAR_TAG_SELECTED_CLASSES)}
     >
-      {/* Same leading slot as the tree, so the # marks hold their line when switching modes. */}
-      <SidebarRowIconSlot icon={HashIcon} />
-      <TagPath ref={ref} tag={tag} />
-      <span className={SIDEBAR_ROW_COUNT_RAIL_CLASSES}>{amount}</span>
-    </button>
+      <button
+        type="button"
+        aria-label={ariaLabel}
+        aria-pressed={active || undefined}
+        title={title}
+        className={SIDEBAR_ROW_LABEL_CLASSES}
+        onClick={onClick}
+      >
+        {/* Same leading slot as the tree, so the # marks hold their line when switching modes. */}
+        <SidebarRowIconSlot icon={HashIcon} />
+        <TagPath ref={ref} tag={tag} />
+        <span className={SIDEBAR_ROW_COUNT_RAIL_CLASSES}>{amount}</span>
+      </button>
+      {onRename && (
+        <button
+          type="button"
+          aria-label={`${renameLabel} #${tag}`}
+          title={renameLabel}
+          className={sidebarRowEditButtonClasses(active)}
+          onClick={onRename}
+        >
+          <PencilIcon className="mu-icon-xs" />
+        </button>
+      )}
+    </div>
   );
 };
 
-const TagsSection = ({ tagCount, onSelect, scope }: Props) => {
+const TagsSection = ({ tagCount, onSelect, scope, canRename = false }: Props) => {
   const t = useTranslate();
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const handleRename = canRename ? (tag: string) => setRenaming(tag) : undefined;
   const { getFiltersByFactor, addFilter, removeFilter } = useMemoFilterContext();
   const [treeMode, setTreeMode] = useLocalStorage<boolean>("tag-view-as-tree", false);
   const activeTags = new Set(getFiltersByFactor("tagSearch").map((filter) => filter.value));
@@ -121,7 +146,7 @@ const TagsSection = ({ tagCount, onSelect, scope }: Props) => {
       }
     >
       {treeMode ? (
-        <TagTree key={scope} tagAmounts={tags} activeTag={activeTag} scope={scope} onTagClick={handleTagClick} />
+        <TagTree key={scope} tagAmounts={tags} activeTag={activeTag} scope={scope} onTagClick={handleTagClick} onRename={handleRename} />
       ) : (
         <>
           {tags.map(([tag, amount]) => (
@@ -131,11 +156,14 @@ const TagsSection = ({ tagCount, onSelect, scope }: Props) => {
               amount={amount}
               active={activeTags.has(tag)}
               ariaLabel={tagRowAriaLabel(t, tag, amount)}
+              renameLabel={t("tag-rename.action")}
               onClick={() => handleTagClick(tag)}
+              onRename={handleRename && (() => handleRename(tag))}
             />
           ))}
         </>
       )}
+      {canRename && <TagRenameDialog tag={renaming} onClose={() => setRenaming(null)} />}
     </SidebarSection>
   );
 };

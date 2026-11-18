@@ -15,6 +15,8 @@
  * offline; the rate limit protects against guessing through the app.
  */
 
+import { findTagMatches } from "@/utils/tag-grammar";
+
 export const PASSKEY_PATTERN = /^\d{6}$/;
 const PBKDF2_ROUNDS = 600_000;
 const HKDF_INFO = "memos-lock:v2";
@@ -94,20 +96,34 @@ export const isLockedContent = (content: string): boolean => LOCK_BLOCK.test(con
 /** The title of a memo's content, readable whether or not it is locked. */
 export const lockedTitle = (content: string): string => memoTitle(content);
 
-/** Fenced and inline code: `#words` there are not tags. */
-const stripCode = (content: string) => content.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[^\S\n]*$/gm, "").replace(/`[^`\n]*`/g, "");
+/** The text with fenced and inline code blanked out (same length): `#words` there are not tags. */
+const maskCode = (content: string) => {
+  const blank = (match: string) => match.replace(/[^\n]/g, " ");
+  return content.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1[^\S\n]*$/gm, blank).replace(/`[^`\n]*`/g, blank);
+};
+
+const tagMatches = (content: string) => findTagMatches(maskCode(content));
 
 /**
  * The `#tags` a memo's text holds, in order and without repeats, so that a locked memo keeps them
- * readable. A close match of the server's rules; the server parses the tag line again itself.
+ * readable. Read with the same tag grammar as the server.
  */
 export function memoTags(content: string): string[] {
-  const tags = new Set<string>();
-  for (const match of stripCode(content).matchAll(/(?<=^|\s)#([\p{L}\p{N}\p{M}_&+-]+(?:\/[\p{L}\p{N}\p{M}_&+-]+)*)/gmu)) {
-    tags.add(match[1]);
-  }
+  const tags = new Set(tagMatches(content).map((match) => match.value));
   // `#a/b` already stands for `#a`.
   return [...tags].filter((tag) => ![...tags].some((other) => other.startsWith(`${tag}/`)));
+}
+
+/** Renames `#from` and the tags under it (`#from/x` → `#to/x`) in the text, outside code. */
+export function renameTagInText(content: string, from: string, to: string): string {
+  let output = "";
+  let cursor = 0;
+  for (const match of tagMatches(content)) {
+    if (match.value !== from && !match.value.startsWith(`${from}/`)) continue;
+    output += `${content.slice(cursor, match.from)}#${to}${match.value.slice(from.length)}`;
+    cursor = match.to;
+  }
+  return output + content.slice(cursor);
 }
 
 /** The readable tags of a locked memo's content (the line next to the lock). */

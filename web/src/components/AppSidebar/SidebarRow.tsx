@@ -76,6 +76,16 @@ export const sidebarRowStateClasses = (state: SidebarRowState = "idle") => {
   return `text-mu-text-secondary ${SIDEBAR_ROW_HOVER_CLASSES}`;
 };
 
+/** A selected tag row also takes a light accent fill across the whole line. */
+export const SIDEBAR_TAG_SELECTED_CLASSES = "bg-mu-primary/10 hover:bg-mu-primary/15";
+
+/**
+ * A row's trailing edit control: shown on hover or focus, and always on the selected row so a
+ * touch screen reaches it by selecting the tag first.
+ */
+export const sidebarRowEditButtonClasses = (visible: boolean) =>
+  `${SIDEBAR_ROW_SLOT_CLASSES} shrink-0 rounded text-mu-text-secondary hover:bg-mu-hover hover:text-mu-text border border-transparent mu-focus focus-visible:border-mu-focus focus-visible:opacity-100 ${visible ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`;
+
 /** Goes on the row box so the icon slot and count rail inside it can take the checked colour. */
 export const sidebarRowStateAttributes = (state: SidebarRowState) => ({
   "data-checked": state === "checked" ? "" : undefined,

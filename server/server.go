@@ -26,6 +26,7 @@ import (
 	"github.com/usememos/memos/server/protection"
 	"github.com/usememos/memos/server/revision"
 	"github.com/usememos/memos/server/starred"
+	"github.com/usememos/memos/server/tagrename"
 	"github.com/usememos/memos/store"
 )
 
@@ -107,6 +108,8 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	starred.New(store, s.Secret).RegisterRoutes(mux)
 	// Fork-only: blur and passkey lock per memo (server/protection).
 	protection.New(ctx, profile, store, s.Secret, revisionService).RegisterRoutes(mux)
+	// Fork-only: rename a tag across the user's memos (server/tagrename).
+	tagrename.New(store, s.Secret, apiService).RegisterRoutes(mux)
 
 	apiHandler, err := apiService.NewHandler(ctx)
 	if err != nil {

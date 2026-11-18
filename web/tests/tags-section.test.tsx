@@ -6,6 +6,8 @@ import TagsSection from "@/components/AppSidebar/TagsSection";
 import { MemoFilterProvider } from "@/contexts/MemoFilterContext";
 
 vi.mock("@/utils/i18n", () => ({ useTranslate: () => (key: string) => key }));
+// The rename dialog's data hooks; the dialog stays closed in these tests.
+vi.mock("@/components/TagRename/TagRenameDialog", () => ({ TagRenameDialog: () => null }));
 
 describe("TagsSection", () => {
   beforeEach(() => {
@@ -78,6 +80,25 @@ describe("TagsSection", () => {
     expect(await screen.findByRole("menuitemcheckbox", { name: "common.tree-mode" })).toHaveAttribute("aria-checked", "true");
   });
 
+  it("offers a rename on your own tags only", () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <MemoFilterProvider>
+          <TagsSection tagCount={{ alpha: 2 }} scope="home" />
+        </MemoFilterProvider>
+      </MemoryRouter>,
+    );
+    expect(screen.queryByRole("button", { name: "tag-rename.action #alpha" })).toBeNull();
+    rerender(
+      <MemoryRouter>
+        <MemoFilterProvider>
+          <TagsSection tagCount={{ alpha: 2 }} scope="home" canRename />
+        </MemoFilterProvider>
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("button", { name: "tag-rename.action #alpha" })).toBeInTheDocument();
+  });
+
   it("keeps flat rows on the shared row grammar with a trailing count rail", () => {
     render(
       <MemoryRouter>
@@ -92,7 +113,7 @@ describe("TagsSection", () => {
     const path = alpha.parentElement?.parentElement as HTMLSpanElement;
     const count = screen.getByText("2");
 
-    expect(alphaButton).toHaveClass(...SIDEBAR_ROW_BOX_CLASSES.split(" "));
+    expect(alphaButton.parentElement).toHaveClass(...SIDEBAR_ROW_BOX_CLASSES.split(" "));
     // The # sits in the same fixed slot the tree uses, so switching modes keeps it in place.
     expect(alphaButton.firstElementChild).toHaveClass(...SIDEBAR_ROW_SLOT_CLASSES.split(" "));
     expect(path).toHaveClass("truncate", "text-start");

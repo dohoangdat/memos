@@ -45,7 +45,7 @@ describe("sidebar selected grammar", () => {
     expect(screen.getByText("4")).toHaveClass("group-data-checked:text-mu-primary");
   });
 
-  it("checks a tag row instead of filling it", () => {
+  it("checks a tag row and gives the whole line a light accent fill", () => {
     render(
       <MemoryRouter>
         <MemoFilterProvider>
@@ -54,10 +54,13 @@ describe("sidebar selected grammar", () => {
       </MemoryRouter>,
     );
 
-    const row = screen.getByRole("button", { name: "#work, setting.tags.used-count" });
+    const button = screen.getByRole("button", { name: "#work, setting.tags.used-count" });
+    const row = button.parentElement as HTMLElement;
     expect(row).not.toHaveAttribute("data-checked");
-    fireEvent.click(row);
+    expect(row).not.toHaveClass("bg-mu-primary/10");
+    fireEvent.click(button);
     expect(row).toHaveAttribute("data-checked");
+    expect(row).toHaveClass("bg-mu-primary/10");
     expect(row).not.toHaveClass("bg-mu-hover");
   });
 });

@@ -7,9 +7,10 @@ import { MemoContentView } from "@/components/MemoEditor/view/MemoContentView";
 import { AttachmentGallery, MemoMetadataRows } from "@/components/MemoMetadata";
 import { separateAttachments } from "@/components/MemoMetadata/Attachment/attachmentHelpers";
 import { isReferenceRelation } from "@/components/MemoMetadata/Relation/relationHelpers";
-import { ensurePasskey } from "@/components/Passkey/passkeyPrompt";
+import { requestPasskey } from "@/components/Passkey/passkeyPrompt";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useDecryptedContent, useMemoProtectionMode } from "@/hooks/useMemoProtection";
+import { useBlurAll } from "@/lib/blur-all";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import { filterInlineManagedAttachments } from "@/utils/managed-attachment";
@@ -52,6 +53,8 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
   // Blurred or passkey-locked memos (fork-only): lists show only the title; a locked memo
   // shows its decrypted text once this tab holds the key.
   const protection = useMemoProtectionMode(memo.name);
+  // The quick "blur all" switch shows every memo in lists as a blurred title.
+  const blurAll = useBlurAll();
   const { locked, plain } = useDecryptedContent(memo.content);
 
   const referencedMemos = memo.relations.filter(isReferenceRelation);
@@ -85,7 +88,7 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
     );
   }
 
-  if (compact && (locked || protection === "blur")) {
+  if (compact && (locked || protection === "blur" || blurAll)) {
     return (
       <div data-slot="memo-body" className="w-full">
         <ProtectedPreview memo={memo} mode={locked ? "lock" : "blur"} />
@@ -95,7 +98,7 @@ const MemoBody: React.FC<MemoBodyProps> = ({ compact, showCreator }) => {
   if (locked && plain === null) {
     return (
       <div data-slot="memo-body" className="w-full">
-        <ProtectedPreview memo={memo} mode="lock" onUnlock={() => void ensurePasskey()} />
+        <ProtectedPreview memo={memo} mode="lock" onUnlock={() => void requestPasskey()} />
       </div>
     );
   }

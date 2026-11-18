@@ -107,7 +107,13 @@ const CollectionSidebarContent = ({
       )}
       {/* Every collection route narrows the same way: views (yours, so signed-in only), days, tags. */}
       {currentUser && <ViewsSection />}
-      <TagsSection tagCount={tags} scope={tagStateScope} onSelect={() => setMobileOpen(false)} />
+      <TagsSection
+        tagCount={tags}
+        scope={tagStateScope}
+        // Renaming changes your own memos, so it is offered on your own tags.
+        canRename={Boolean(currentUser) && (!creatorUsername || creatorUsername === currentUser?.username)}
+        onSelect={() => setMobileOpen(false)}
+      />
     </div>
   );
 };

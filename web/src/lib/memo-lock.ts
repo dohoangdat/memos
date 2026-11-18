@@ -2,7 +2,7 @@ import { create } from "@bufbuild/protobuf";
 import { FieldMaskSchema } from "@bufbuild/protobuf/wkt";
 import { memoServiceClient } from "@/connect";
 import { forkFetch } from "@/lib/fork-api";
-import { decryptMemoContent, encryptMemoContent, isLockedContent } from "@/lib/memo-crypto";
+import { decryptMemoContent, encryptMemoContent, isLockedContent, renameTagInText } from "@/lib/memo-crypto";
 import { MemoSchema } from "@/types/proto/api/memo_service_pb";
 
 const setProtection = (memoName: string, mode: "blur" | "lock" | "none") =>
@@ -47,6 +47,17 @@ export async function reencryptMemos(memoNames: readonly string[], from: CryptoK
       await setProtection(name, "lock");
     }
     onProgress?.(++done);
+  }
+}
+
+/** Renames a tag inside locked memos too: the server could only rename it on their readable line. */
+export async function renameTagInLockedMemos(memoNames: readonly string[], from: string, to: string, key: CryptoKey) {
+  for (const name of memoNames) {
+    const memo = await memoServiceClient.getMemo({ name });
+    if (!isLockedContent(memo.content)) continue;
+    const plain = await decryptMemoContent(memo.content, key);
+    const renamed = renameTagInText(plain, from, to);
+    if (renamed !== plain) await saveContent(name, await encryptMemoContent(renamed, key));
   }
 }
 

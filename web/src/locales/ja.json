@@ -1315,7 +1315,10 @@
     "load-error": "メモを読み込めませんでした",
     "mode": "検索モード",
     "syntax-help": "検索構文",
-    "text": "テキスト"
+    "text": "テキスト",
+    "recent": "Recent searches",
+    "clear-history": "Clear",
+    "remove-history": "Remove from history"
   },
   "map": {
     "selection": "選択されたメモ",
@@ -1565,6 +1568,19 @@
     "lock-reason": "Enter your passkey to lock this memo.",
     "unlock-reason": "Enter your passkey to remove the lock.",
     "locked-hint": "Locked · tap to open",
-    "blurred-hint": "Blurred · tap to read"
+    "blurred-hint": "Blurred · tap to read",
+    "blur-all": "Blur all memos",
+    "unblur-all": "Stop blurring all memos"
+  },
+  "tag-rename": {
+    "action": "Rename tag",
+    "title": "Rename #{{tag}}",
+    "label": "New name",
+    "hint": "Updates the {{n}} memos tagged with it. Sub-tags move along: #{{from}}/… becomes #{{to}}/….",
+    "merge": "#{{tag}} already exists: the two tags will be merged.",
+    "invalid": "Not a valid tag name (no spaces).",
+    "done": "Tag renamed in {{n}} memos",
+    "locked-reason": "Some locked memos use this tag. Enter your passkey to rename it inside them too.",
+    "locked-pending": "{{n}} locked memos still hold the old tag inside. Rename again with the passkey to update them."
   }
 }

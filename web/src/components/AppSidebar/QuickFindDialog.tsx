@@ -1,5 +1,5 @@
 import { Button, Dialog, Input, Textarea, Toggle, ToggleGroup, Tooltip } from "@usememos/ui";
-import { CornerDownLeftIcon, SearchIcon } from "lucide-react";
+import { CornerDownLeftIcon, HistoryIcon, SearchIcon, XIcon } from "lucide-react";
 import { type ChangeEvent, type FormEvent, type KeyboardEvent, useEffect, useId, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSidebar } from "@/contexts/AppSidebarContext";
@@ -8,7 +8,9 @@ import { useSpaceContext } from "@/contexts/SpaceContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { useMemoViews } from "@/hooks/useUserQueries";
 import { getMemoViewId, isMemoCollectionRoute } from "@/lib/memo-views";
+import { type SearchHistoryEntry, useSearchHistory } from "@/lib/search-history";
 import { extractSpaceUidFromName, formatSpaceUidForDisplay } from "@/lib/space-display";
+import { cn } from "@/lib/utils";
 import { getCollectionCreator, withCollectionCreator } from "@/router/routes";
 import { useTranslate } from "@/utils/i18n";
 import { getRouteActionPolicy, getSidebarRouteKind } from "./routes";
@@ -73,6 +75,67 @@ const getScopeLabel = (pathname: string, t: ReturnType<typeof useTranslate>) => 
   return t("common.memos");
 };
 
+/**
+ * Recent searches under the field, newest first: the ones that contain what is typed, or all of
+ * them while the field is empty. Picking one searches it again.
+ */
+const RecentSearches = ({
+  entries,
+  query,
+  onPick,
+  onRemove,
+  onClear,
+}: {
+  entries: SearchHistoryEntry[];
+  query: string;
+  onPick: (entry: SearchHistoryEntry) => void;
+  onRemove: (entry: SearchHistoryEntry) => void;
+  onClear: () => void;
+}) => {
+  const t = useTranslate();
+  const needle = query.trim().toLowerCase();
+  const visible = needle ? entries.filter((entry) => entry.query.toLowerCase().includes(needle) && entry.query !== query.trim()) : entries;
+  if (visible.length === 0) return null;
+  return (
+    <div className="border-t border-mu-line/50 px-2 py-2">
+      <div className="flex items-center justify-between px-2 pb-1">
+        <span className="mu-caption text-mu-text-secondary">{t("search.recent")}</span>
+        <button
+          type="button"
+          onClick={onClear}
+          className="rounded-mu-sm border border-transparent px-1 mu-caption text-mu-text-secondary hover:text-mu-text mu-focus"
+        >
+          {t("search.clear-history")}
+        </button>
+      </div>
+      <ul className="flex max-h-[40dvh] flex-col overflow-y-auto">
+        {visible.map((entry) => (
+          <li key={`${entry.mode}:${entry.query}`} className="group flex items-center rounded-mu-md hover:bg-mu-hover">
+            <button
+              type="button"
+              onClick={() => onPick(entry)}
+              className="flex min-h-10 min-w-0 flex-1 items-center gap-2 rounded-mu-md border border-transparent px-2 text-start mu-body text-mu-text mu-focus"
+            >
+              <HistoryIcon className="mu-icon-sm shrink-0 text-mu-text-secondary" />
+              <span className={cn("min-w-0 flex-1 truncate", entry.mode === "cel" && "font-mono")}>{entry.query}</span>
+              {entry.mode === "cel" && <span className="shrink-0 mu-caption text-mu-text-secondary">{t("search.expression-mode")}</span>}
+            </button>
+            <button
+              type="button"
+              aria-label={`${t("search.remove-history")}: ${entry.query}`}
+              title={t("search.remove-history")}
+              onClick={() => onRemove(entry)}
+              className="me-1 flex size-8 shrink-0 items-center justify-center rounded-mu-md border border-transparent text-mu-text-secondary hover:text-mu-text mu-focus"
+            >
+              <XIcon className="mu-icon-sm" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const QuickFindDialog = () => {
   const t = useTranslate();
   const location = useLocation();
@@ -82,6 +145,7 @@ const QuickFindDialog = () => {
   const { filters, setFilters, setMemoView, memoView } = useMemoFilterContext();
   const { duplicateSpaceTitles, selectedSpace, selectedSpaceName } = useSpaceContext();
   const { quickFindOpen, setQuickFindOpen } = useAppSidebar();
+  const history = useSearchHistory(currentUser?.name ?? "guest");
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<QuickFindMode>("text");
   const [autoFocusField, setAutoFocusField] = useState(true);
@@ -109,8 +173,9 @@ const QuickFindDialog = () => {
     setQuery(active.query);
   }, [filters, quickFindOpen]);
 
-  const submitQuery = () => {
-    const submission = resolveQuickFindSubmission(location.pathname, query, filters, mode, location.search);
+  const submitQuery = (submittedQuery = query, submittedMode = mode) => {
+    const submission = resolveQuickFindSubmission(location.pathname, submittedQuery, filters, submittedMode, location.search);
+    history.add({ query: submittedQuery, mode: submittedMode });
 
     if (submission.destination) {
       setMemoView(undefined);
@@ -224,6 +289,17 @@ const QuickFindDialog = () => {
               />
             </div>
           )}
+          <RecentSearches
+            entries={history.entries}
+            query={query}
+            onPick={(entry) => {
+              setMode(entry.mode);
+              setQuery(entry.query);
+              submitQuery(entry.query, entry.mode);
+            }}
+            onRemove={history.remove}
+            onClear={history.clear}
+          />
         </form>
       </Dialog.Popup>
     </Dialog.Root>

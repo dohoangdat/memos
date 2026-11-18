@@ -9,6 +9,7 @@ import {
   lockedTitle,
   memoTags,
   newPasskeySalt,
+  renameTagInText,
 } from "@/lib/memo-crypto";
 
 const share = btoa("s".repeat(32));
@@ -52,7 +53,13 @@ describe("memo passkey encryption", () => {
   }, 60_000);
 
   it("finds tags the way a memo writes them", () => {
-    expect(memoTags("#a text #b/c, #b and #Tài-chính\n# Heading\nmail@x.com #d#e")).toEqual(["a", "b/c", "Tài-chính", "d"]);
+    expect(memoTags("#a text #b/c, #b and #Tài-chính\n# Heading\nmail@x.com #d#e")).toEqual(["a", "b/c", "Tài-chính", "d", "e"]);
+  });
+
+  it("renames a tag and the tags under it, outside code", () => {
+    expect(renameTagInText("#a, #a/x/y and #ab\n\n```\n#a\n```\n`#a` #a", "a", "b/c")).toBe(
+      "#b/c, #b/c/x/y and #ab\n\n```\n#a\n```\n`#a` #b/c",
+    );
   });
 
   it("handles a large memo", async () => {

@@ -1,10 +1,10 @@
 import { forwardRef, memo, Suspense, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { ensurePasskey } from "@/components/Passkey/passkeyPrompt";
+import { ensurePasskey, requestPasskey } from "@/components/Passkey/passkeyPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import { useResolvedUser } from "@/contexts/MentionResolutionContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { isLockedContent } from "@/lib/memo-crypto";
+import { isLockedContent, setSessionKey } from "@/lib/memo-crypto";
 import { isMemoBlurred } from "@/lib/tag";
 import { cn } from "@/lib/utils";
 import { State } from "@/types/proto/api/common_pb";
@@ -87,20 +87,26 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
 
   const { previewState, openPreview, setPreviewOpen } = useImagePreview();
 
-  // A locked memo opens (to read or edit) only once this tab holds the passkey's key.
+  // A locked memo asks for the passkey every time it is opened (to read or edit), and closing it
+  // forgets the key again, so an unattended screen never reopens it. Inside the reader the memo
+  // is already open: its Edit reuses the key, and the reader's own closing forgets it.
   const locked = isLockedContent(memoData.content);
+  const insideReader = presentation === "reader";
   const openOverlay = useCallback(
     (next: "read" | "edit") => {
       if (!locked) {
         setOverlay(next);
         return;
       }
-      void ensurePasskey().then((key) => key && setOverlay(next));
+      void (insideReader ? ensurePasskey() : requestPasskey()).then((key) => key && setOverlay(next));
     },
-    [locked],
+    [locked, insideReader],
   );
   const openEditor = useCallback(() => openOverlay("edit"), [openOverlay]);
-  const closeEditor = useCallback(() => setOverlay(null), []);
+  const closeEditor = useCallback(() => {
+    setOverlay(null);
+    if (locked && !insideReader) setSessionKey(null);
+  }, [locked, insideReader]);
   const handleFocusModeChange = useCallback(() => {}, []);
 
   // A click on a list's card reads the memo; a double click (or Edit) edits it. On a mouse the
