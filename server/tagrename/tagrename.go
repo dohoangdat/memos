@@ -69,7 +69,9 @@ func hasTagTree(tags []string, from string) bool {
 
 func (s *Service) rename(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	user, err := s.authenticator.AuthenticateToUser(ctx, r.Header.Get("Authorization"), r.Header.Get("Cookie"))
+	// Bearer token only: the refresh cookie also rides on requests from sibling
+	// subdomains (same-site under SameSite=Lax), which must not act for the user.
+	user, err := s.authenticator.AuthenticateToUser(ctx, r.Header.Get("Authorization"), "")
 	if err != nil || user == nil {
 		return &httphandler.Error{Code: http.StatusUnauthorized, Message: "authentication required"}
 	}

@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { Marked } from "marked";
 import TurndownService from "turndown";
 
@@ -12,6 +13,18 @@ import TurndownService from "turndown";
  */
 
 const marked = new Marked({ gfm: true, breaks: true });
+
+/**
+ * An element in a document of its own. Markdown may carry raw HTML (a shared link can put
+ * `<img onerror=…>` in a draft), and HTML set on an element of the page itself loads images and
+ * runs their handlers even while the element is detached. In a separate document nothing loads
+ * or runs.
+ */
+const inertRoot = (html: string): HTMLDivElement => {
+  const root = document.implementation.createHTMLDocument("").createElement("div");
+  root.innerHTML = html;
+  return root;
+};
 
 /** memos turns setext headings off: a line followed by `---` is a paragraph and a divider. */
 const separateSetextDividers = (markdown: string): string => markdown.replace(/^([^\n]*\S[^\n]*)\n(\s{0,3}-{3,}\s*)$/gm, "$1\n\n$2");
@@ -35,8 +48,8 @@ const toTaskLists = (root: HTMLElement) => {
 export function markdownToHtml(markdown: string): string {
   if (!markdown.trim()) return "";
   const html = marked.parse(separateSetextDividers(markdown), { async: false }) as string;
-  const root = document.createElement("div");
-  root.innerHTML = html;
+  // Event handlers, scripts and `javascript:` links never reach the editor.
+  const root = inertRoot(DOMPurify.sanitize(html, { FORBID_TAGS: ["style"] }));
   toTaskLists(root);
   return root.innerHTML;
 }
@@ -167,9 +180,8 @@ turndown.addRule("table", {
 });
 
 export function htmlToMarkdown(html: string): string {
-  const root = document.createElement("div");
+  const root = inertRoot(html);
   root.id = "classic-root";
-  root.innerHTML = html;
   // An editor with nothing typed holds one empty paragraph.
   if (!root.textContent?.trim() && !root.querySelector("img, hr, table, input, .wpc-columns")) return "";
   return turndown.turndown(root).trim();

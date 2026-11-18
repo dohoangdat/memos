@@ -13,7 +13,6 @@ export function useStarredMemoUids(enabled: boolean) {
       const token = await getRequestToken();
       const response = await fetch("/api/x/memos/starred", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        credentials: "include",
       });
       if (!response.ok) throw new Error(`Failed to load starred memos (HTTP ${response.status})`);
       return ((await response.json()) as { uids?: string[] }).uids ?? [];

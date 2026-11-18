@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { htmlToMarkdown, markdownToHtml } from "@/components/MemoEditor/edit/classic/markdown";
 import { allowedStyle } from "@/lib/html-sanitize-schema";
 import { sanitizeMemoHtml } from "@/lib/sanitized-html";
@@ -83,5 +83,25 @@ describe("memo view sanitization of classic formatting", () => {
     expect(allowedStyle("background-color: url(https://tracker.example/a.png)")).toBeNull();
     expect(allowedStyle("font-family: expression(alert(1))")).toBeNull();
     expect(allowedStyle("color: red\\;")).toBeNull();
+  });
+});
+
+describe("classic editor HTML safety", () => {
+  it("drops handlers, scripts and javascript: links from Markdown's raw HTML", () => {
+    const html = markdownToHtml(
+      '<img src="x" onerror="alert(1)">\n\n<script>alert(2)</script>\n\n[go](javascript:alert(3))\n\n<p style="text-align:center">ok</p>',
+    );
+    expect(html).not.toMatch(/onerror|<script|javascript:/i);
+    expect(html).toContain('<img src="x">');
+    expect(html).toContain("text-align:center");
+  });
+
+  it("never loads what the HTML points at while converting", () => {
+    const created = vi.spyOn(document, "createElement");
+    markdownToHtml('<img src="https://attacker.example/x.png" onerror="alert(1)">');
+    htmlToMarkdown('<p><img src="https://attacker.example/y.png"></p>');
+    // Every element is built in a separate document, never in the page's own.
+    expect(created).not.toHaveBeenCalled();
+    created.mockRestore();
   });
 });

@@ -17,7 +17,6 @@ export async function forkFetch<T>(path: string, init: { method?: string; body?:
   const token = await getRequestToken();
   const response = await fetch(path, {
     method: init.method ?? "GET",
-    credentials: "include",
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init.body !== undefined ? { "Content-Type": "application/json" } : {}),

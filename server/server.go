@@ -107,7 +107,7 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	// Fork-only: the memos the current user starred (server/starred).
 	starred.New(store, s.Secret).RegisterRoutes(mux)
 	// Fork-only: blur and passkey lock per memo (server/protection).
-	protection.New(ctx, profile, store, s.Secret, revisionService).RegisterRoutes(mux)
+	protection.New(ctx, profile, store, s.Secret, revisionService, os.Getenv("MEMOS_LOCK_PEPPER")).RegisterRoutes(mux)
 	// Fork-only: rename a tag across the user's memos (server/tagrename).
 	tagrename.New(store, s.Secret, apiService).RegisterRoutes(mux)
 

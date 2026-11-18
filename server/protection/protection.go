@@ -16,11 +16,8 @@ package protection
 import (
 	"context"
 	"crypto/rand"
-	"crypto/sha256"
-	"crypto/subtle"
 	"database/sql"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -84,11 +81,6 @@ func decodeBase64(value string, size int) ([]byte, bool) {
 	return decoded, err == nil && len(decoded) == size
 }
 
-func hashProof(proof []byte) string {
-	sum := sha256.Sum256(proof)
-	return hex.EncodeToString(sum[:])
-}
-
 // Purger removes a memo's kept versions when it is locked.
 type Purger interface {
 	Purge(ctx context.Context, memoUID string) error
@@ -101,24 +93,79 @@ type Service struct {
 	authenticator *auth.Authenticator
 	revisions     Purger
 	enabled       bool
+	pepper        *pepper
 	now           func() time.Time
 	// attempts serializes passkey checks so concurrent guesses cannot share one allowance.
 	attempts sync.Mutex
 }
 
 // New prepares the tables. A failure disables the feature instead of stopping the server.
-func New(ctx context.Context, p *profile.Profile, s *store.Store, secret string, revisions Purger) *Service {
+// pepperSecret is MEMOS_LOCK_PEPPER: when set, passkey shares and proofs are stored under it,
+// and shares stored before it are sealed now. An invalid pepper also disables the feature.
+func New(ctx context.Context, p *profile.Profile, s *store.Store, secret string, revisions Purger, pepperSecret string) *Service {
 	service := &Service{db: s.GetDriver().GetDB(), store: s, authenticator: auth.NewAuthenticator(s, secret), revisions: revisions, now: time.Now}
 	if p.Driver != "sqlite" {
 		slog.Info("memo protection is only available on sqlite; disabled", slog.String("driver", p.Driver))
 		return service
 	}
+	pepper, err := newPepper(pepperSecret)
+	if err != nil {
+		slog.Error("memo protection disabled: invalid passkey secret", slog.String("error", err.Error()))
+		return service
+	}
+	service.pepper = pepper
+	if pepper == nil {
+		slog.Warn("MEMOS_LOCK_PEPPER is not set: a copy of the database alone is enough to try passkeys offline")
+	}
 	if _, err := service.db.ExecContext(ctx, schema); err != nil {
 		slog.Warn("memo protection disabled: failed to prepare tables", slog.String("error", err.Error()))
 		return service
 	}
+	if err := service.sealStoredShares(ctx); err != nil {
+		slog.Error("memo protection disabled: failed to seal stored passkey shares", slog.String("error", err.Error()))
+		return service
+	}
 	service.enabled = true
 	return service
+}
+
+// sealStoredShares seals the shares stored before the pepper was configured.
+func (s *Service) sealStoredShares(ctx context.Context) error {
+	if s.pepper == nil {
+		return nil
+	}
+	rows, err := s.db.QueryContext(ctx, "SELECT user_id, share FROM memo_passkey WHERE share NOT LIKE ?", sealedPrefix+"%")
+	if err != nil {
+		return err
+	}
+	type pending struct {
+		userID int32
+		share  string
+	}
+	var plain []pending
+	for rows.Next() {
+		var row pending
+		if err := rows.Scan(&row.userID, &row.share); err != nil {
+			rows.Close()
+			return err
+		}
+		plain = append(plain, row)
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, row := range plain {
+		sealed, err := s.pepper.sealShare(row.userID, row.share)
+		if err != nil {
+			return err
+		}
+		if _, err := s.db.ExecContext(ctx, "UPDATE memo_passkey SET share = ? WHERE user_id = ?", sealed, row.userID); err != nil {
+			return err
+		}
+		slog.Info("sealed a stored passkey share", slog.Int("user", int(row.userID)))
+	}
+	return nil
 }
 
 // WithClock replaces the clock the rate limit reads; for tests.
@@ -140,7 +187,9 @@ func (s *Service) user(r *http.Request) (*store.User, error) {
 	if !s.enabled {
 		return nil, &httphandler.Error{Code: http.StatusNotImplemented, Message: "memo protection is not available"}
 	}
-	user, err := s.authenticator.AuthenticateToUser(r.Context(), r.Header.Get("Authorization"), r.Header.Get("Cookie"))
+	// Bearer token only: the refresh cookie also rides on requests from sibling
+	// subdomains (same-site under SameSite=Lax), which must not act for the user.
+	user, err := s.authenticator.AuthenticateToUser(r.Context(), r.Header.Get("Authorization"), "")
 	if err != nil || user == nil {
 		return nil, &httphandler.Error{Code: http.StatusUnauthorized, Message: "authentication required"}
 	}
@@ -258,9 +307,12 @@ func (s *Service) checkProof(w http.ResponseWriter, r *http.Request, userID int3
 		return false, httphandler.JSON(w, http.StatusTooManyRequests, map[string]any{"message": "too many wrong passkeys", "retryAfter": wait})
 	}
 	decoded, valid := decodeBase64(proof, 32)
-	if valid && subtle.ConstantTimeCompare([]byte(hashProof(decoded)), []byte(row.proofHash)) == 1 {
-		if row.failed != 0 {
-			if _, err := s.db.ExecContext(r.Context(), "UPDATE memo_passkey SET failed_count = 0, locked_until = 0 WHERE user_id = ?", userID); err != nil {
+	if valid && s.pepper.proofMatches(decoded, row.proofHash) {
+		// The right proof also upgrades a hash stored before the pepper.
+		proofHash := s.pepper.hashProof(decoded)
+		if row.failed != 0 || proofHash != row.proofHash {
+			if _, err := s.db.ExecContext(r.Context(), "UPDATE memo_passkey SET failed_count = 0, locked_until = 0, proof_hash = ? WHERE user_id = ?",
+				proofHash, userID); err != nil {
 				return false, &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to save passkey", Cause: err}
 			}
 		}
@@ -325,7 +377,11 @@ func (s *Service) unlockPasskey(w http.ResponseWriter, r *http.Request) error {
 	if ok, err := s.checkProof(w, r, user.ID, row, body.Proof); !ok {
 		return err
 	}
-	return httphandler.JSON(w, http.StatusOK, map[string]any{"share": row.share})
+	share, err := s.pepper.openShare(user.ID, row.share)
+	if err != nil {
+		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "the passkey cannot be opened on this server", Cause: err}
+	}
+	return httphandler.JSON(w, http.StatusOK, map[string]any{"share": share})
 }
 
 // setPasskey sets up the passkey ({salt, proof}) or changes it ({salt, proof, currentProof}).
@@ -361,7 +417,9 @@ func (s *Service) setPasskey(w http.ResponseWriter, r *http.Request) error {
 		if ok, err := s.checkProof(w, r, user.ID, row, body.CurrentProof); !ok {
 			return err
 		}
-		share = row.share
+		if share, err = s.pepper.openShare(user.ID, row.share); err != nil {
+			return &httphandler.Error{Code: http.StatusInternalServerError, Message: "the passkey cannot be opened on this server", Cause: err}
+		}
 	} else {
 		random := make([]byte, 32)
 		if _, err := rand.Read(random); err != nil {
@@ -369,11 +427,15 @@ func (s *Service) setPasskey(w http.ResponseWriter, r *http.Request) error {
 		}
 		share = base64.StdEncoding.EncodeToString(random)
 	}
+	stored, err := s.pepper.sealShare(user.ID, share)
+	if err != nil {
+		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to save passkey", Cause: err}
+	}
 	if _, err := s.db.ExecContext(ctx,
 		`INSERT INTO memo_passkey (user_id, salt, proof_hash, share, failed_count, locked_until, updated_ts) VALUES (?, ?, ?, ?, 0, 0, ?)
 		 ON CONFLICT(user_id) DO UPDATE SET salt = excluded.salt, proof_hash = excluded.proof_hash, share = excluded.share,
 		   failed_count = 0, locked_until = 0, updated_ts = excluded.updated_ts`,
-		user.ID, body.Salt, hashProof(proof), share, s.now().Unix()); err != nil {
+		user.ID, body.Salt, s.pepper.hashProof(proof), stored, s.now().Unix()); err != nil {
 		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to save passkey", Cause: err}
 	}
 	noStore(w)

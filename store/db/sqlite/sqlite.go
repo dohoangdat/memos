@@ -51,6 +51,9 @@ func NewDB(profile *profile.Profile) (store.Driver, error) {
 	//   at once, without consulting busy_timeout. Taking the write lock up front
 	//   makes those transactions queue behind the busy handler instead.
 	//
+	// - secure_delete(1) (fork): deleted and overwritten content is zeroed instead of lingering
+	//   in free pages, so a locked memo's earlier plaintext does not survive in the file.
+	//
 	// Notes:
 	// - When using the `modernc.org/sqlite` driver, each pragma must be prefixed with `_pragma=`.
 	//
@@ -58,7 +61,7 @@ func NewDB(profile *profile.Profile) (store.Driver, error) {
 	// - https://pkg.go.dev/modernc.org/sqlite#Driver.Open
 	// - https://www.sqlite.org/sharedcache.html
 	// - https://www.sqlite.org/pragma.html
-	sqliteDB, err := sql.Open("sqlite", profile.DSN+"?_pragma=foreign_keys(0)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)&_pragma=mmap_size(0)&_txlock=immediate")
+	sqliteDB, err := sql.Open("sqlite", profile.DSN+"?_pragma=foreign_keys(0)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)&_pragma=mmap_size(0)&_pragma=secure_delete(1)&_txlock=immediate")
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open db with dsn: %s", profile.DSN)
 	}

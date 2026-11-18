@@ -26,7 +26,6 @@ export function useMemoRevisions(memoName: string, enabled: boolean) {
       const token = await getRequestToken();
       const response = await fetch(`/api/x/memos/${encodeURIComponent(uid)}/revisions`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        credentials: "include",
       });
       if (response.status === 404 || response.status === 501) return [];
       if (!response.ok) throw new Error(`Failed to load revisions (HTTP ${response.status})`);
