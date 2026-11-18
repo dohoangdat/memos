@@ -101,6 +101,7 @@ export const useSelectedMemoViewFilter = (): string | undefined => {
     if (memoView === "builtin:pinned") return "pinned";
     if (memoView === "builtin:starred") return uidInFilter(starredUids ?? []);
     if (memoView === "builtin:top-opens") return uidInFilter(topOpenedMemoUids());
+    if (memoView === "builtin:untagged") return "size(tags) == 0";
     return memoViews.find((view) => getMemoViewId(view.name) === memoView)?.filter;
   }, [memoView, memoViews, starredUids]);
 };

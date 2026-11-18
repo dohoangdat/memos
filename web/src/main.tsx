@@ -13,6 +13,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { InstanceProvider, useInstance } from "@/contexts/InstanceContext";
 import { useLiveMemoRefresh } from "@/hooks/useLiveMemoRefresh";
 import { useTokenRefreshOnFocus } from "@/hooks/useTokenRefreshOnFocus";
+import { startOutboxSync } from "@/lib/offline/outbox";
+import { persistQueries, restoreQueries } from "@/lib/offline/query-persist";
 import { queryClient } from "@/lib/query-client";
 import { toast } from "@/lib/toast";
 import router from "./router";
@@ -88,4 +90,21 @@ function Main() {
 
 const container = document.getElementById("root");
 const root = createRoot(container as HTMLElement);
-root.render(<Main />);
+
+// Offline (lib/offline): show the last saved data at once, keep it saved, and sync what was
+// written offline. Restoring waits at most a moment so a slow disk never delays the app.
+const start = async () => {
+  await Promise.race([restoreQueries(queryClient), new Promise((resolve) => setTimeout(resolve, 1500))]);
+  persistQueries(queryClient);
+  startOutboxSync(queryClient);
+  root.render(<Main />);
+};
+void start();
+
+// The service worker keeps the app itself available offline (public/sw.js). Production only:
+// in development it would serve stale modules.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch((error) => console.warn("Service worker registration failed:", error));
+  });
+}

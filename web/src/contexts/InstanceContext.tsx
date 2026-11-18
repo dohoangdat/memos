@@ -2,6 +2,7 @@ import { create } from "@bufbuild/protobuf";
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { instanceServiceClient } from "@/connect";
 import { useAccessSetting, useUpdateInstanceSetting } from "@/hooks/useInstanceQueries";
+import { isNetworkError, loadOfflineProfile, saveOfflineProfile } from "@/lib/offline/query-persist";
 import {
   InstanceProfile,
   InstanceProfileSchema,
@@ -114,6 +115,7 @@ export function InstanceProvider({ children }: { children: ReactNode }) {
     const profileRequest = instanceServiceClient
       .getInstanceProfile({})
       .then((profile) => {
+        void saveOfflineProfile(profile);
         // Managed attachment URLs are resolved against the instance URL, and the
         // parser runs outside React (card layout estimation), so it reads the
         // value from module scope rather than from this context.
@@ -125,9 +127,12 @@ export function InstanceProvider({ children }: { children: ReactNode }) {
           profileLoaded: true,
         }));
       })
-      .catch((error) => {
+      .catch(async (error) => {
         console.error("Failed to initialize instance profile:", error);
-        setState((prev) => ({ ...prev, isProfileInitialized: true }));
+        // Offline: the profile the app last saw (lib/offline).
+        const saved = isNetworkError(error) ? await loadOfflineProfile<typeof state.profile>() : undefined;
+        if (saved) setManagedAttachmentInstanceUrl(saved.instanceUrl);
+        setState((prev) => ({ ...prev, ...(saved ? { profile: saved, profileLoaded: true } : {}), isProfileInitialized: true }));
       });
 
     const settingsRequest = instanceServiceClient

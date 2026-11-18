@@ -11,6 +11,7 @@ import AppSidebar, {
 } from "@/components/AppSidebar";
 import BlurAllFab from "@/components/BlurAllFab";
 import NewMemoFab from "@/components/NewMemoFab";
+import OfflineBar from "@/components/OfflineBar";
 import { PasskeyPromptHost } from "@/components/Passkey/PasskeyPromptHost";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
@@ -118,6 +119,10 @@ const RootLayoutContent = () => {
       >
         <MobileAppHeader />
         {profile.demo && <DemoBanner />}
+        {/* Offline, or with memos waiting to sync (lib/offline). */}
+        <div className="w-full">
+          <OfflineBar />
+        </div>
         <Outlet />
       </main>
       <QuickFindDialog />

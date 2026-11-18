@@ -1526,12 +1526,15 @@
     "restored": "Version restored",
     "view": "View",
     "hide": "Hide",
-    "unchanged-lines": "{{n}} unchanged lines"
+    "unchanged-lines": "{{n}} unchanged lines",
+    "edit-tags": "Edit tags",
+    "tags-saved": "Tags saved"
   },
   "builtin-view": {
     "pinned": "Pinned",
     "starred": "Starred",
-    "top-opens": "Most opened"
+    "top-opens": "Most opened",
+    "untagged": "Untagged"
   },
   "passkey": {
     "section-description": "A 6-digit passkey that locks memos. Locked memos are encrypted in this browser; the server only stores ciphertext.",
@@ -1585,5 +1588,13 @@
     "done": "Tag renamed in {{n}} memos",
     "locked-reason": "Some locked memos use this tag. Enter your passkey to rename it inside them too.",
     "locked-pending": "{{n}} locked memos still hold the old tag inside. Rename again with the passkey to update them."
+  },
+  "offline": {
+    "offline": "Offline",
+    "showing-saved": "showing data saved on this device",
+    "pending": "{{n}} changes waiting to sync",
+    "sync-now": "Sync now",
+    "saved-locally": "Saved on this device; it syncs when you are back online",
+    "attachments-need-connection": "Attaching files needs a connection."
   }
 }

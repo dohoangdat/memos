@@ -1,8 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { clearAccessToken, getAccessToken } from "@/auth-state";
 import { authServiceClient, refreshAccessToken, userServiceClient } from "@/connect";
 import { userKeys } from "@/hooks/useUserQueries";
+import { clearOutbox } from "@/lib/offline/outbox";
+import { isNetworkError, loadOfflineIdentity, saveOfflineIdentity } from "@/lib/offline/query-persist";
+import { offlineClear } from "@/lib/offline/store";
 import type {
   User,
   UserSetting_EditorSetting,
@@ -24,6 +27,12 @@ interface AuthState {
   isUserSettingsInitialized: boolean;
   isInitialized: boolean;
   isLoading: boolean;
+}
+
+/** What the app keeps to open offline as the last signed-in user (lib/offline). */
+interface OfflineIdentity {
+  currentUser: User;
+  settings: Pick<AuthState, "userGeneralSetting" | "userWebhooksSetting" | "userTagsSetting" | "userEditorSetting">;
 }
 
 interface AuthContextValue extends AuthState {
@@ -92,6 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return userSettings;
   }, []);
 
+  const initializeRef = useRef<(() => Promise<void>) | undefined>(undefined);
   const initialize = useCallback(async () => {
     // `initialize` also runs after sign-in, when the previous unauthenticated
     // state is already marked initialized. Reset the full-readiness flag so
@@ -102,17 +112,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // This handles PWA isolated storage scenarios (e.g., iOS Safari) where localStorage
     // may be empty but a valid HTTP-only refresh token cookie still exists.
     // getAccessToken() returns a cached token or loads from localStorage if valid.
+    // Offline, the app opens as the user it last signed in (lib/offline), with the data it
+    // last showed; the session is checked again once the server can be reached.
+    const openOffline = async (): Promise<boolean> => {
+      const identity = await loadOfflineIdentity<OfflineIdentity>();
+      if (!identity) return false;
+      queryClient.setQueryData(userKeys.currentUser(), identity.currentUser);
+      setState({
+        ...identity.settings,
+        currentUser: identity.currentUser,
+        isIdentityInitialized: true,
+        isUserSettingsInitialized: true,
+        isInitialized: true,
+        isLoading: false,
+      });
+      const recheck = () => {
+        window.removeEventListener("online", recheck);
+        void initializeRef.current?.();
+      };
+      window.addEventListener("online", recheck);
+      return true;
+    };
+
     if (!getAccessToken()) {
       try {
         await refreshAccessToken();
-      } catch {
-        // Refresh failed - no valid session
+      } catch (error) {
+        // Refresh failed - no valid session, unless the server just cannot be reached.
+        if (isNetworkError(error) && (await openOffline())) return;
       }
     }
 
     // If we still don't have a token after refresh attempt, skip getCurrentUser call
     // to avoid unnecessary network request for unauthenticated users.
     if (!getAccessToken()) {
+      if (typeof navigator !== "undefined" && !navigator.onLine && (await openOffline())) return;
       setState(UNAUTHENTICATED_STATE);
       return;
     }
@@ -138,6 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(userKeys.detail(currentUser.name), currentUser);
 
       const settings = await fetchUserSettings(currentUser.name);
+      void saveOfflineIdentity<OfflineIdentity>({ currentUser, settings });
 
       setState({
         currentUser,
@@ -149,10 +184,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (error) {
       console.error("Failed to initialize auth:", error);
+      if (isNetworkError(error) && (await openOffline())) return;
       clearAccessToken();
       setState(UNAUTHENTICATED_STATE);
     }
   }, [fetchUserSettings, queryClient]);
+  initializeRef.current = initialize;
 
   const logout = useCallback(async () => {
     try {
@@ -163,6 +200,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearAccessToken();
       setState(UNAUTHENTICATED_STATE);
       queryClient.clear();
+      // The offline copy and anything waiting to sync belong to the signed-out user.
+      await clearOutbox();
+      await offlineClear();
     }
   }, [queryClient]);
 

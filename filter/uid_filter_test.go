@@ -22,3 +22,12 @@ func TestCompileUIDInList(t *testing.T) {
 		require.NotEmpty(t, empty.SQL, dialect)
 	}
 }
+
+// Fork-only: the sidebar's Untagged view.
+func TestCompileUntagged(t *testing.T) {
+	engine, err := NewEngine(NewSchema())
+	require.NoError(t, err)
+	stmt, err := engine.CompileToStatement(context.Background(), `size(tags) == 0`, RenderOptions{Dialect: DialectSQLite})
+	require.NoError(t, err)
+	require.Contains(t, stmt.SQL, "JSON_ARRAY_LENGTH(COALESCE(")
+}

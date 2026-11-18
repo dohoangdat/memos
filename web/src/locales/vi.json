@@ -1523,12 +1523,15 @@
     "restored": "Đã khôi phục phiên bản",
     "view": "Xem",
     "hide": "Ẩn",
-    "unchanged-lines": "{{n}} dòng không đổi"
+    "unchanged-lines": "{{n}} dòng không đổi",
+    "edit-tags": "Sửa tags",
+    "tags-saved": "Đã lưu tags"
   },
   "builtin-view": {
     "pinned": "Đã ghim",
     "starred": "Có sao",
-    "top-opens": "Mở nhiều nhất"
+    "top-opens": "Mở nhiều nhất",
+    "untagged": "Chưa có tag"
   },
   "passkey": {
     "section-description": "Passkey 6 số dùng để khóa ghi chú. Ghi chú bị khóa được mã hóa ngay trên trình duyệt; máy chủ chỉ lưu bản mã.",
@@ -1582,5 +1585,13 @@
     "done": "Đã đổi tên tag trong {{n}} ghi chú",
     "locked-reason": "Có ghi chú đã khóa dùng tag này. Nhập passkey để đổi tên cả bên trong chúng.",
     "locked-pending": "{{n}} ghi chú đã khóa vẫn giữ tag cũ bên trong. Đổi tên lại kèm passkey để cập nhật."
+  },
+  "offline": {
+    "offline": "Đang offline",
+    "showing-saved": "đang hiện dữ liệu lưu trên máy",
+    "pending": "{{n}} thay đổi chờ đồng bộ",
+    "sync-now": "Đồng bộ ngay",
+    "saved-locally": "Đã lưu trên máy, sẽ đồng bộ khi có mạng",
+    "attachments-need-connection": "Cần có mạng để đính kèm tệp."
   }
 }

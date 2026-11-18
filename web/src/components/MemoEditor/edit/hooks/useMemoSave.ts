@@ -3,12 +3,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useNewMemo } from "@/contexts/NewMemoContext";
 import { attachmentKeys } from "@/hooks/useAttachmentQueries";
-import { memoDetailQueryOptions, useCreateMemo, useUpdateMemo } from "@/hooks/useMemoQueries";
+import { memoDetailQueryOptions, memoKeys, patchMemoInCollectionQueries, useCreateMemo, useUpdateMemo } from "@/hooks/useMemoQueries";
 import { userKeys } from "@/hooks/useUserQueries";
 import { handleError } from "@/lib/error";
+import { queueCreate, queueUpdate } from "@/lib/offline/outbox";
 import { showErrorToast, toast } from "@/lib/toast";
 import type { Attachment } from "@/types/proto/api/attachment_service_pb";
-import type { Visibility } from "@/types/proto/api/memo_service_pb";
+import type { Memo, Visibility } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
 import { errorService, memoService, validationService } from "../services";
 import { DrawingNotSavedError, DrawingSavedError, type MemoSaveOperations, mergeUploadedAttachments } from "../services/memoService";
@@ -91,16 +92,40 @@ export function useMemoSave({
       dispatch(actions.setAttachmentOrder(renameUploadedKeys(current.attachmentOrder, uploaded)));
     };
 
-    const operations: MemoSaveOperations = {
-      // The server's current copy, fetched afresh into the detail cache.
-      getMemo: async (name) => {
-        const memo = await queryClient.fetchQuery({ ...memoDetailQueryOptions(name), staleTime: 0 });
-        if (!memo) throw new ConnectError("memo not found", Code.NotFound);
-        return memo;
-      },
-      updateMemo: (update, updateMask) => updateMemo({ update, updateMask }),
-      createMemo: (memo, parent) => createMemo({ memo, parent }),
-    };
+    // Offline, the save goes to the outbox (lib/offline/outbox) and syncs when the server can be
+    // reached; the memo shows its new text at once from the caches.
+    const offline = typeof navigator !== "undefined" && !navigator.onLine;
+    if (offline && state.localFiles.length > 0) {
+      showErrorToast(t("offline.attachments-need-connection"));
+      dispatch(actions.setLoading("saving", false));
+      return;
+    }
+    const operations: MemoSaveOperations = offline
+      ? {
+          getMemo: async (name) => {
+            const memo = queryClient.getQueryData<Memo>(memoKeys.detail(name));
+            if (!memo) throw new ConnectError("memo not available offline", Code.Unavailable);
+            return memo;
+          },
+          updateMemo: async (update, updateMask) => {
+            const base = queryClient.getQueryData<Memo>(memoKeys.detail(update.name as string));
+            const memo = await queueUpdate(base, update, updateMask);
+            queryClient.setQueryData(memoKeys.detail(memo.name), memo);
+            patchMemoInCollectionQueries(queryClient, { ...update, name: memo.name });
+            return memo;
+          },
+          createMemo: (memo, parent) => queueCreate(memo, parent),
+        }
+      : {
+          // The server's current copy, fetched afresh into the detail cache.
+          getMemo: async (name) => {
+            const memo = await queryClient.fetchQuery({ ...memoDetailQueryOptions(name), staleTime: 0 });
+            if (!memo) throw new ConnectError("memo not found", Code.NotFound);
+            return memo;
+          },
+          updateMemo: (update, updateMask) => updateMemo({ update, updateMask }),
+          createMemo: (memo, parent) => createMemo({ memo, parent }),
+        };
 
     try {
       // A new memo composed on a selected day keeps the day but is stamped with
@@ -137,6 +162,9 @@ export function useMemoSave({
       // Prevent the autosave unmount flush from restoring the saved draft.
       discardDraft();
       // A moved memo may leave the feed it was edited in; say where it went.
+      if (offline) {
+        toast.add({ title: t("offline.saved-locally"), type: "success" });
+      }
       if (result.moved) {
         toast.add({ title: t("memo.moved"), type: "success" });
       }

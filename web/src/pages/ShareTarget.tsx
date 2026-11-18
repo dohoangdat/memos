@@ -6,6 +6,7 @@ import { MemoEditor } from "@/components/MemoEditor";
 import { useLinkMemo } from "@/components/MemoEditor/edit/hooks";
 import { LinkMemoDialog } from "@/components/MemoMetadata";
 import { useBackToClose } from "@/hooks/useBackToClose";
+import { OFFLINE_MEMO_PREFIX } from "@/lib/offline/outbox";
 import { toast } from "@/lib/toast";
 import { ROUTES } from "@/router/routes";
 import { useTranslate } from "@/utils/i18n";
@@ -53,8 +54,9 @@ const ShareTarget = () => {
   const backToChoice = () => setStep({ kind: "choose" });
   const saved = (memoName: string) => {
     toast.add({ title: t("share-target.saved"), type: "success" });
-    // Replace /share so Back never offers to share the same thing again.
-    navigate(`/${memoName}`, { replace: true });
+    // Replace /share so Back never offers to share the same thing again. A memo saved offline
+    // has no page until it syncs, so the feed shows it waiting instead.
+    navigate(memoName.startsWith(OFFLINE_MEMO_PREFIX) ? ROUTES.HOME : `/${memoName}`, { replace: true });
   };
 
   if (!content) return null;

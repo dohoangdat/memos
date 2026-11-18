@@ -70,7 +70,7 @@ function discardUnavailableMemo(client: QueryClient, name: string) {
   }
 }
 
-type MemoPatch = Partial<Memo> & Pick<Memo, "name">;
+export type MemoPatch = Partial<Memo> & Pick<Memo, "name">;
 
 // The shapes a memo query holds: a memo list response (`memos`), a comment list
 // response (`comments`), a bare array (the calendar month), the infinite-query
@@ -193,7 +193,7 @@ export function findMemoRecord(queryClient: QueryClient, name: string): Memo | n
   return found;
 }
 
-function patchMemoInCollectionQueries(queryClient: QueryClient, update: MemoPatch) {
+export function patchMemoInCollectionQueries(queryClient: QueryClient, update: MemoPatch) {
   queryClient.setQueriesData<unknown>({ queryKey: memoKeys.all }, (data: unknown) =>
     isMemo(data) ? data : mapMemoCollection(data, (memos) => patchMemos(memos, update)),
   );

@@ -9,10 +9,13 @@ import {
   HashIcon,
   HistoryIcon,
   ImageIcon,
+  PencilIcon,
   RotateCcwIcon,
 } from "lucide-react";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { TagPickerDialog } from "@/components/MemoEditor/edit/components/TagPickerDialog";
 import { useLocalStorage } from "@/hooks";
+import { useUpdateMemo } from "@/hooks/useMemoQueries";
 import { type MemoRevision, useMemoRevisions, useRestoreMemoRevision } from "@/hooks/useMemoRevisions";
 import { showErrorToast, toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -124,24 +127,14 @@ export const MemoInfoPanel = ({ memo, opens, canEdit }: { memo: Memo; opens: num
 
   return (
     <section aria-label={t("memo-info.title")} className="mt-4 flex flex-col border-t border-mu-line pt-2">
-      {tags.length > 0 && (
+      {(tags.length > 0 || canEdit) && (
         <Section
           id="tags"
           icon={<HashIcon className="mu-icon-sm text-mu-text-secondary" />}
           title={t("memo-info.tags")}
-          aside={tags.length}
+          aside={tags.length || undefined}
         >
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-0.5 rounded-mu-md bg-mu-well px-2 py-0.5 mu-caption text-mu-text-secondary"
-              >
-                <HashIcon className="mu-icon-xs opacity-60" />
-                {tag}
-              </span>
-            ))}
-          </div>
+          <MemoTagsEditor memo={memo} tags={tags} canEdit={canEdit} />
         </Section>
       )}
       <Section
@@ -169,6 +162,73 @@ export const MemoInfoPanel = ({ memo, opens, canEdit }: { memo: Memo; opens: num
       </Section>
       {canEdit && <MemoRevisionSection memo={memo} />}
     </section>
+  );
+};
+
+/**
+ * The memo's tags as chips. Its owner taps a chip, or Edit, to pick tags in the tag picker;
+ * the picked tags are written to the memo's tag line and saved when the picker closes.
+ */
+const MemoTagsEditor = ({ memo, tags, canEdit }: { memo: Memo; tags: string[]; canEdit: boolean }) => {
+  const t = useTranslate();
+  const { mutateAsync: updateMemo } = useUpdateMemo(memo.name);
+  const [open, setOpen] = useState(false);
+  const draft = useRef(memo.content);
+  const getMarkdown = useCallback(() => draft.current, []);
+  const setMarkdown = useCallback((markdown: string) => {
+    draft.current = markdown;
+  }, []);
+
+  const openPicker = () => {
+    draft.current = memo.content;
+    setOpen(true);
+  };
+  const close = async () => {
+    setOpen(false);
+    if (draft.current === memo.content) return;
+    try {
+      await updateMemo({ update: { name: memo.name, content: draft.current }, updateMask: ["content"] });
+      toast.add({ title: t("memo-info.tags-saved"), type: "success" });
+    } catch {
+      showErrorToast(t("common.error-occurred"));
+    }
+  };
+
+  const chipClass = "inline-flex items-center gap-0.5 rounded-mu-md bg-mu-well px-2 py-0.5 mu-caption text-mu-text-secondary";
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {tags.map((tag) =>
+        canEdit ? (
+          <button
+            key={tag}
+            type="button"
+            onClick={openPicker}
+            className={cn(chipClass, "border border-transparent hover:text-mu-text mu-focus")}
+          >
+            <HashIcon className="mu-icon-xs opacity-60" />
+            {tag}
+          </button>
+        ) : (
+          <span key={tag} className={chipClass}>
+            <HashIcon className="mu-icon-xs opacity-60" />
+            {tag}
+          </span>
+        ),
+      )}
+      {canEdit && (
+        <Button variant="ghost" size="sm" icon={<PencilIcon />} onClick={openPicker}>
+          {t("memo-info.edit-tags")}
+        </Button>
+      )}
+      {canEdit && (
+        <TagPickerDialog
+          open={open}
+          onOpenChange={(next) => (next ? setOpen(true) : void close())}
+          getMarkdown={getMarkdown}
+          setMarkdown={setMarkdown}
+        />
+      )}
+    </div>
   );
 };
 
