@@ -1,7 +1,17 @@
 import { buttonClasses, Field, Popover, Select, Toggle, ToggleGroup, Tooltip } from "@usememos/ui";
-import { ChevronDownIcon, Columns2Icon, Columns3Icon, InfinityIcon, type LucideIcon, Rows3Icon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  Columns2Icon,
+  Columns3Icon,
+  InfinityIcon,
+  LayoutGridIcon,
+  ListIcon,
+  type LucideIcon,
+  Rows3Icon,
+} from "lucide-react";
 import type { RefObject } from "react";
 import { MAX_COLUMNS_VALUES, type MemoMaxColumns, useView } from "@/contexts/ViewContext";
+import { setDenseList, useDenseList } from "@/lib/list-density";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 
@@ -19,6 +29,28 @@ const LAYOUT_OPTIONS: Record<MemoMaxColumns, { icon: LucideIcon; key: "layout-li
   0: { icon: InfinityIcon, key: "layout-auto" },
 };
 
+/** Cards, or compact two-line rows (fork, lib/list-density). */
+export function DensityToggle() {
+  const t = useTranslate();
+  const dense = useDenseList();
+  return (
+    <ToggleGroup
+      size="md"
+      fullWidth
+      aria-label={t("memo.density")}
+      value={[dense ? "dense" : "cards"]}
+      onValueChange={([next]) => next && setDenseList(next === "dense")}
+    >
+      <Toggle value="cards" icon={<LayoutGridIcon />}>
+        {t("memo.density-cards")}
+      </Toggle>
+      <Toggle value="dense" icon={<ListIcon />}>
+        {t("memo.density-compact")}
+      </Toggle>
+    </ToggleGroup>
+  );
+}
+
 function MemoDisplaySettingsContent() {
   const t = useTranslate();
   const { orderByTimeAsc, timeBasis, maxColumns, setTimeBasis, setOrderByTimeAsc, setMaxColumns } = useView();
@@ -28,6 +60,7 @@ function MemoDisplaySettingsContent() {
 
   return (
     <div className="flex flex-col gap-3">
+      <DensityToggle />
       <ToggleGroup
         size="md"
         fullWidth

@@ -501,7 +501,11 @@
     "remove-reaction": "反応を取り除く",
     "read-memo": "Read memo",
     "star": "Star",
-    "unstar": "Remove star"
+    "unstar": "Remove star",
+    "density": "Density",
+    "density-cards": "Cards",
+    "density-compact": "Compact",
+    "untitled": "Untitled"
   },
   "message": {
     "archived-successfully": "アーカイブが完了しました",

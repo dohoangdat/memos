@@ -501,7 +501,11 @@
     "remove-reaction": "Ta bort reaktionen",
     "read-memo": "Read memo",
     "star": "Star",
-    "unstar": "Remove star"
+    "unstar": "Remove star",
+    "density": "Density",
+    "density-cards": "Cards",
+    "density-compact": "Compact",
+    "untitled": "Untitled"
   },
   "message": {
     "archived-successfully": "Arkiverad framgångsrikt",

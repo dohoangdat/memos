@@ -1,3 +1,5 @@
+// Must run before the router reads the location (see lib/history-base).
+import "@/lib/history-base";
 import "@github/relative-time-element";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

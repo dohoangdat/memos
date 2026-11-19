@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Home from "@/pages/Home";
 
+// The inline composer is for wide screens; phones write with the floating ＋ button.
+vi.mock("@/hooks/useMediaQuery", () => ({ default: () => true }));
 vi.mock("@/hooks/useMemoSuggestions", () => ({
   useMemoSuggestions: () => [{ id: "tag:work" }],
 }));

@@ -502,7 +502,11 @@
     "remove-reaction": "Elimina la reacció",
     "read-memo": "Read memo",
     "star": "Star",
-    "unstar": "Remove star"
+    "unstar": "Remove star",
+    "density": "Density",
+    "density-cards": "Cards",
+    "density-compact": "Compact",
+    "untitled": "Untitled"
   },
   "message": {
     "archived-successfully": "Arxivat correctament",

@@ -496,7 +496,11 @@
     "remove-reaction": "प्रतिक्रिया काढून टाका",
     "read-memo": "Read memo",
     "star": "Star",
-    "unstar": "Remove star"
+    "unstar": "Remove star",
+    "density": "Density",
+    "density-cards": "Cards",
+    "density-compact": "Compact",
+    "untitled": "Untitled"
   },
   "message": {
     "archived-successfully": "यशस्वीरित्या संग्रहित केले",

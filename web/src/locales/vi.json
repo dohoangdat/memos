@@ -496,7 +496,11 @@
     "remove-reaction": "Xóa phản ứng",
     "read-memo": "Đọc ghi chú",
     "star": "Gắn sao",
-    "unstar": "Bỏ sao"
+    "unstar": "Bỏ sao",
+    "density": "Kiểu hiển thị",
+    "density-cards": "Thẻ",
+    "density-compact": "Gọn",
+    "untitled": "Không tiêu đề"
   },
   "message": {
     "archived-successfully": "Lưu trữ thành công",

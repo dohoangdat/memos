@@ -6,6 +6,7 @@ import { MemoEditor, preloadMemoEditing } from "@/components/MemoEditor";
 import { useAppSidebar } from "@/contexts/AppSidebarContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSpaceContext } from "@/contexts/SpaceContext";
+import { useBackToClose } from "@/hooks/useBackToClose";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { useMemoSuggestions } from "@/hooks/useMemoSuggestions";
@@ -36,6 +37,11 @@ const isVisibleFocusTarget = (element: HTMLElement | null): element is HTMLEleme
 
 const findVisibleFocusTarget = (selector: string): HTMLElement | null =>
   Array.from(document.querySelectorAll<HTMLElement>(selector)).find(isVisibleFocusTarget) ?? null;
+
+const BackToClose = ({ onClose }: { onClose: () => void }) => {
+  useBackToClose(onClose);
+  return null;
+};
 
 export function GlobalMemoEditorProvider({ children }: { children: ReactNode }) {
   const t = useTranslate();
@@ -157,6 +163,8 @@ export function GlobalMemoEditorProvider({ children }: { children: ReactNode }) 
               aria-modal="true"
             >
               <DialogPrimitive.Title className="mu-visually-hidden">{t("editor.new-memo")}</DialogPrimitive.Title>
+              {/* Android's Back closes the composer (its draft is kept) instead of leaving the app. */}
+              <BackToClose onClose={requestCloseEditor} />
               <MemoEditor
                 autoFocus
                 draft={{ scope: "global", space: opened?.space }}

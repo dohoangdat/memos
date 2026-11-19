@@ -4,6 +4,7 @@ import { ensurePasskey, requestPasskey } from "@/components/Passkey/passkeyPromp
 import { useAuth } from "@/contexts/AuthContext";
 import { useResolvedUser } from "@/contexts/MentionResolutionContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { useDenseList } from "@/lib/list-density";
 import { isLockedContent, setSessionKey } from "@/lib/memo-crypto";
 import { isMemoBlurred } from "@/lib/tag";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ import { State } from "@/types/proto/api/common_pb";
 import { lazyWithReload } from "@/utils/lazy";
 import { canManageMemo } from "@/utils/user";
 import { MemoBody, MemoCommentListView, MemoHeader } from "./components";
+import DenseMemoRow from "./components/DenseMemoRow";
 import MemoPinnedMark from "./components/MemoPinnedMark";
 import { MEMO_CARD_BASE_CLASSES } from "./constants";
 import { useImagePreview } from "./hooks";
@@ -112,6 +114,7 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
   // A click on a list's card reads the memo; a double click (or Edit) edits it. On a mouse the
   // first click waits briefly for a second; a tap opens the reader at once.
   const readerEnabled = presentation === "card" && Boolean(compact);
+  const denseList = useDenseList();
   const clickTimerRef = useRef<number | undefined>(undefined);
   const pointerTypeRef = useRef<string>("mouse");
   useEffect(() => () => window.clearTimeout(clickTimerRef.current), []);
@@ -223,12 +226,14 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     ],
   );
 
+  const dense = denseList && readerEnabled && !isEditing;
   const article = (
     <article
       className={cn(
         MEMO_CARD_BASE_CLASSES,
         "group/memo",
-        showCommentPreview ? "mb-0 rounded-b-none" : "mb-2",
+        dense && "py-2!",
+        showCommentPreview && !dense ? "mb-0 rounded-b-none" : dense ? "mb-1" : "mb-2",
         readerEnabled && "cursor-pointer",
         className,
       )}
@@ -241,11 +246,18 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
       onDoubleClick={handleCardDoubleClick}
       onKeyDown={handleCardKeyDown}
     >
-      {/* The pinned mark steps aside while the memo is edited in place. */}
-      {showPinned && memoData.pinned && !isEditing && <MemoPinnedMark />}
-      <MemoHeader timeDisplay={timeDisplay} showCreator={showCreator} showVisibility={showVisibility} showSpace={showSpace} />
+      {dense ? (
+        // Compact list (fork): two lines per memo; opening and editing work as on a card.
+        <DenseMemoRow memo={memoData} readonly={readonly} parentPage={parentPage} showPinned={showPinned} />
+      ) : (
+        <>
+          {/* The pinned mark steps aside while the memo is edited in place. */}
+          {showPinned && memoData.pinned && !isEditing && <MemoPinnedMark />}
+          <MemoHeader timeDisplay={timeDisplay} showCreator={showCreator} showVisibility={showVisibility} showSpace={showSpace} />
 
-      <MemoBody compact={compact} showCreator={showCreator} />
+          <MemoBody compact={compact} showCreator={showCreator} />
+        </>
+      )}
 
       {previewState.items.length > 0 && (
         <Suspense fallback={null}>
@@ -267,14 +279,15 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     </article>
   );
 
-  const memoDisplay = showCommentPreview ? (
-    <div className="w-full mb-2">
-      {article}
-      <MemoCommentListView />
-    </div>
-  ) : (
-    article
-  );
+  const memoDisplay =
+    showCommentPreview && !dense ? (
+      <div className="w-full mb-2">
+        {article}
+        <MemoCommentListView />
+      </div>
+    ) : (
+      article
+    );
 
   return (
     <MemoViewContext.Provider value={contextValue}>

@@ -11,6 +11,7 @@ import { NewMemoProvider } from "@/contexts/NewMemoContext";
 import { useSpaceContext } from "@/contexts/SpaceContext";
 import { useMemoFilters, useMemoSorting } from "@/hooks";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import useMediaQuery from "@/hooks/useMediaQuery";
 import { useMemoSuggestions } from "@/hooks/useMemoSuggestions";
 import { State } from "@/types/proto/api/common_pb";
 import { Memo } from "@/types/proto/api/memo_service_pb";
@@ -22,6 +23,7 @@ const Home = () => {
   const t = useTranslate();
   const { isUserSettingsInitialized } = useAuth();
   const { claimHomeAutoFocus } = useGlobalMemoEditor();
+  const wide = useMediaQuery("md");
   const { filters } = useMemoFilterContext();
   const { memoFilter: contextFilter, selectedSpaceName, creatorUsername } = useSpaceContext();
   const defaultCreateTime = useMemo(() => deriveDefaultCreateTimeFromFilters(filters), [filters]);
@@ -72,7 +74,8 @@ const Home = () => {
             />
           }
           renderLeading={({ useGrid }) => {
-            if (!isUserSettingsInitialized || !canComposeInScope) return null;
+            // Phones write with the floating ＋ button, which opens the composer full screen (fork).
+            if (!isUserSettingsInitialized || !canComposeInScope || !wide) return null;
 
             return (
               <MemoEditor
