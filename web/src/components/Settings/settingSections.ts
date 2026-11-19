@@ -1,4 +1,5 @@
 import {
+  AlarmClockIcon,
   ArrowLeftRightIcon,
   AstroidIcon,
   BarChart3Icon,
@@ -9,10 +10,12 @@ import {
   HeartHandshakeIcon,
   KeyIcon,
   KeyRoundIcon,
+  ListTreeIcon,
   LockKeyholeIcon,
   type LucideIcon,
   MailIcon,
   Settings2Icon,
+  SparklesIcon,
   SquarePenIcon,
   TagsIcon,
   UserIcon,
@@ -25,16 +28,19 @@ import AISection from "@/components/Settings/AISection";
 import ConfigurationSection from "@/components/Settings/ConfigurationSection";
 import EditorSection from "@/components/Settings/EditorSection";
 import InstanceSection from "@/components/Settings/InstanceSection";
+import LLMFeaturesSection from "@/components/Settings/LLMFeaturesSection";
 import MemberSection from "@/components/Settings/MemberSection";
 import MemoExportSection from "@/components/Settings/MemoExportSection";
 import MyAccountSection from "@/components/Settings/MyAccountSection";
 import NotificationSection from "@/components/Settings/NotificationSection";
 import PasskeySection from "@/components/Settings/PasskeySection";
 import PreferencesSection from "@/components/Settings/PreferencesSection";
+import RemindersSection from "@/components/Settings/RemindersSection";
 import ResourceStatsSection from "@/components/Settings/ResourceStatsSection";
 import SpacesSection from "@/components/Settings/SpacesSection";
 import SSOSection from "@/components/Settings/SSOSection";
 import StorageSection from "@/components/Settings/StorageSection";
+import TagManagerSection from "@/components/Settings/TagManagerSection";
 import TagsSection from "@/components/Settings/TagsSection";
 import UsageLimitsSection from "@/components/Settings/UsageLimitsSection";
 import WebhookSection from "@/components/Settings/WebhookSection";
@@ -56,6 +62,9 @@ export type SettingSectionKey =
   | "notification"
   | "sso"
   | "tags"
+  | "tag-manager"
+  | "reminders"
+  | "llm"
   | "ai"
   | "resource-stats"
   | "configuration";
@@ -92,6 +101,20 @@ export const SETTINGS_SECTIONS: SettingSectionDefinition[] = [
     labelKey: "setting.access-token.label",
     icon: KeyRoundIcon,
     component: AccessTokenSection,
+  },
+  {
+    key: "reminders",
+    scope: "basic",
+    labelKey: "setting.reminders.label",
+    icon: AlarmClockIcon,
+    component: RemindersSection,
+  },
+  {
+    key: "tag-manager",
+    scope: "basic",
+    labelKey: "setting.tag-manager.label",
+    icon: ListTreeIcon,
+    component: TagManagerSection,
   },
   {
     key: "passkey",
@@ -186,6 +209,13 @@ export const SETTINGS_SECTIONS: SettingSectionDefinition[] = [
     icon: HeartHandshakeIcon,
     component: AISection,
     preloadSettingKeys: [InstanceSetting_Key.AI],
+  },
+  {
+    key: "llm",
+    scope: "admin",
+    labelKey: "setting.llm.label",
+    icon: SparklesIcon,
+    component: LLMFeaturesSection,
   },
   {
     key: "resource-stats",

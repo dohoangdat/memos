@@ -22,8 +22,10 @@ import (
 	"github.com/usememos/memos/server/api"
 	"github.com/usememos/memos/server/fileserver"
 	"github.com/usememos/memos/server/frontend"
+	"github.com/usememos/memos/server/llm"
 	"github.com/usememos/memos/server/mcp"
 	"github.com/usememos/memos/server/protection"
+	"github.com/usememos/memos/server/reminder"
 	"github.com/usememos/memos/server/revision"
 	"github.com/usememos/memos/server/starred"
 	"github.com/usememos/memos/server/tagrename"
@@ -58,6 +60,9 @@ type Server struct {
 	// them, before the store closes.
 	backgroundCancel context.CancelFunc
 	backgroundJobs   sync.WaitGroup
+
+	// reminders sends memo reminders (fork, server/reminder); its scheduler is a background job.
+	reminders *reminder.Service
 }
 
 func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store) (*Server, error) {
@@ -110,6 +115,11 @@ func NewServer(ctx context.Context, profile *profile.Profile, store *store.Store
 	protection.New(ctx, profile, store, s.Secret, revisionService, os.Getenv("MEMOS_LOCK_PEPPER")).RegisterRoutes(mux)
 	// Fork-only: rename a tag across the user's memos (server/tagrename).
 	tagrename.New(store, s.Secret, apiService).RegisterRoutes(mux)
+	// Fork-only: LLM features on the instance's AI providers (server/llm).
+	llm.New(ctx, profile, store, s.Secret).RegisterRoutes(mux)
+	// Fork-only: memo reminders with push notifications (server/reminder).
+	s.reminders = reminder.New(ctx, profile, store, s.Secret)
+	s.reminders.RegisterRoutes(mux)
 
 	apiHandler, err := apiService.NewHandler(ctx)
 	if err != nil {
@@ -190,6 +200,9 @@ func (s *Server) startBackgroundJobs() {
 			slog.Error("failed to rebuild memo payloads; retrying on next start", slog.String("error", err.Error()))
 		}
 	})
+	if s.reminders != nil {
+		s.backgroundJobs.Go(func() { s.reminders.Run(ctx) })
+	}
 }
 
 func (s *Server) stopBackgroundJobs() {

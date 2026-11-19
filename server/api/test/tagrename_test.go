@@ -92,3 +92,41 @@ func TestTagRename(t *testing.T) {
 	}
 	require.ElementsMatch(t, []string{"work", "work/du-an", "khac"}, keys, "tag colors follow the rename")
 }
+
+func TestTagDeleteAndOrder(t *testing.T) {
+	ctx := context.Background()
+	ts := NewTestService(t)
+	defer ts.Cleanup()
+	mux := http.NewServeMux()
+	tagrename.New(ts.Store, ts.Secret, ts.Service).RegisterRoutes(mux)
+	owner, err := ts.CreateRegularUser(ctx, "order-owner")
+	require.NoError(t, err)
+	ownerCtx := ts.CreateUserContext(ctx, owner.ID)
+	token, err := ts.Service.CreatePersonalAccessToken(ownerCtx, &apipb.CreatePersonalAccessTokenRequest{Parent: "users/" + owner.Username, Description: "order"})
+	require.NoError(t, err)
+	call := func(method, path, body string) *httptest.ResponseRecorder {
+		request := httptest.NewRequest(method, path, strings.NewReader(body))
+		request.Header.Set("Authorization", "Bearer "+token.Token)
+		recorder := httptest.NewRecorder()
+		mux.ServeHTTP(recorder, request)
+		return recorder
+	}
+
+	// The order round-trips, without repeats or leading '#'.
+	require.Equal(t, http.StatusOK, call(http.MethodPut, "/api/x/tag-order", `{"tags":["#work","home","work","work/a","old","old/x"]}`).Code)
+	require.JSONEq(t, `{"tags":["work","home","work/a","old","old/x"]}`, call(http.MethodGet, "/api/x/tag-order", "").Body.String())
+	// A rename moves the tag and its children in the order.
+	require.Equal(t, http.StatusOK, call(http.MethodPost, "/api/x/tags/rename", `{"from":"work","to":"job"}`).Code)
+	require.JSONEq(t, `{"tags":["job","home","job/a","old","old/x"]}`, call(http.MethodGet, "/api/x/tag-order", "").Body.String())
+
+	// Deleting a tag takes it and its children out of the memos and the order.
+	memo, err := ts.Service.CreateMemo(ownerCtx, &apipb.CreateMemoRequest{Memo: &apipb.Memo{Content: "keep this #old and #old/x #home", Visibility: apipb.Visibility_PRIVATE}})
+	require.NoError(t, err)
+	response := call(http.MethodPost, "/api/x/tags/delete", `{"tag":"#old"}`)
+	require.Equal(t, http.StatusOK, response.Code, response.Body.String())
+	got, err := ts.Service.GetMemo(ownerCtx, &apipb.GetMemoRequest{Name: memo.Name})
+	require.NoError(t, err)
+	require.Equal(t, "keep this and #home", got.Content)
+	require.Equal(t, []string{"home"}, got.Tags)
+	require.JSONEq(t, `{"tags":["job","home","job/a"]}`, call(http.MethodGet, "/api/x/tag-order", "").Body.String())
+}

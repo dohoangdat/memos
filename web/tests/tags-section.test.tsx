@@ -5,6 +5,12 @@ import { SIDEBAR_ROW_BOX_CLASSES, SIDEBAR_ROW_COUNT_RAIL_CLASSES, SIDEBAR_ROW_SL
 import TagsSection from "@/components/AppSidebar/TagsSection";
 import { MemoFilterProvider } from "@/contexts/MemoFilterContext";
 
+// The user's tag order comes from the server; without one, tags come most used first.
+vi.mock("@/hooks/useTagOrder", async () => {
+  const actual = await vi.importActual<typeof import("@/hooks/useTagOrder")>("@/hooks/useTagOrder");
+  return { ...actual, useOrderedTags: (counts: Record<string, number>) => actual.orderTags(counts, []) };
+});
+
 vi.mock("@/utils/i18n", () => ({ useTranslate: () => (key: string) => key }));
 // The rename dialog's data hooks; the dialog stays closed in these tests.
 vi.mock("@/components/TagRename/TagRenameDialog", () => ({ TagRenameDialog: () => null }));

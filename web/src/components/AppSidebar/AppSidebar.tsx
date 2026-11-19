@@ -51,6 +51,7 @@ import {
   SIDEBAR_RAIL_CLASSES,
   sidebarSurfaceVariants,
 } from "./sidebar-layout";
+import TagFilterSheet from "./TagFilterSheet";
 import TagsSection from "./TagsSection";
 import ViewsSection from "./ViewsSection";
 
@@ -455,6 +456,8 @@ export const MobileAppHeader = () => {
         <Tooltip.Popup side="bottom">{t("common.open-navigation")}</Tooltip.Popup>
       </Tooltip.Root>
       <SpaceSwitcher className="max-w-[12rem]" size="md" />
+      {/* Filter by tag without opening the sidebar (fork). */}
+      <TagFilterSheet />
     </header>
   );
 };

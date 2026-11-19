@@ -1273,6 +1273,15 @@
     },
     "passkey": {
       "label": "Passkey"
+    },
+    "tag-manager": {
+      "label": "Tag management"
+    },
+    "llm": {
+      "label": "LLM features"
+    },
+    "reminders": {
+      "label": "Reminders"
     }
   },
   "space": {
@@ -1593,5 +1602,101 @@
     "sync-now": "Sync now",
     "saved-locally": "Saved on this device; it syncs when you are back online",
     "attachments-need-connection": "Attaching files needs a connection."
+  },
+  "tag-manager": {
+    "title": "Tag management",
+    "description": "Put your tags in your own order: the sidebar and the tag filter follow it. Drag the ⋮⋮ handle to move a tag among its siblings; rename or delete a tag across all memos.",
+    "move": "Move",
+    "move-hint": "Drag to reorder, or use the up/down arrow keys",
+    "sort-name": "Sort by name",
+    "sort-count": "Sort by memo count",
+    "delete": "Delete tag",
+    "delete-confirm": "Remove #{{tag}} (and its sub-tags) from {{n}} memos? The memos stay; only the tag goes.",
+    "deleted": "Tag removed from {{n}} memos",
+    "empty": "No tags yet."
+  },
+  "tag-filter": {
+    "title": "Filter by tag",
+    "search": "Find a tag",
+    "clear": "Clear",
+    "none": "No matching tag"
+  },
+  "llm": {
+    "section-description": "Features that use an LLM. Providers and API keys (OpenAI, Gemini) are entered under AI; keys stay on the server.",
+    "suggest-tags": "Suggest tags",
+    "suggest-tags-description": "The ✨ button in the editor: the LLM reads the memo and picks fitting tags, preferring the tags you already use.",
+    "suggesting": "Suggesting tags…",
+    "enable": "Enabled",
+    "provider": "Provider",
+    "no-provider": "None",
+    "provider-help": "Pick a provider added under AI.",
+    "no-providers": "No providers yet: add one under AI first.",
+    "no-key": "This provider has no API key.",
+    "model": "Model",
+    "model-help": "Empty: gpt-4o-mini (OpenAI) or gemini-2.5-flash (Gemini).",
+    "max-tags": "Most tags",
+    "allow-new": "Allow new tags",
+    "allow-new-help": "When no tag fits, the LLM may propose a new one.",
+    "prompt": "Extra guidance",
+    "prompt-placeholder": "E.g. Expense notes always get finance/expenses.",
+    "voice-note": "Voice notes",
+    "voice-note-description": "The ＋ button offers Record: it records, transcribes (with the speech-to-text setting under AI) and keeps the recording.",
+    "voice-auto-tags": "Suggest tags for voice notes (needs Suggest tags)",
+    "transcription-off": "Speech-to-text is not set up under AI: recordings are kept without text.",
+    "saved": "LLM settings saved",
+    "write-first": "Write something before suggesting tags.",
+    "no-new-tags": "No new tags to add.",
+    "tags-added": "Added {{tags}}"
+  },
+  "voice-note": {
+    "title": "Voice note",
+    "record": "Record",
+    "write": "Write",
+    "start": "Start recording",
+    "pause": "Pause",
+    "resume": "Resume",
+    "done": "Done",
+    "tap-to-start": "Tap to start recording",
+    "tap-to-pause": "Recording · tap to pause",
+    "paused": "Paused · tap to resume",
+    "uploading": "Uploading the recording…",
+    "transcribing": "Transcribing…",
+    "transcribe-failed": "Could not transcribe",
+    "no-text": "No speech recognized; you can type it.",
+    "transcription-off": "Speech-to-text is off; you can type it.",
+    "text": "Text",
+    "new-tag": "(new)",
+    "saved": "Voice note saved",
+    "empty": "The recording is empty.",
+    "unsupported": "This browser cannot record audio.",
+    "no-microphone": "Could not open the microphone. Allow microphone access."
+  },
+  "reminder": {
+    "menu": "Remind me",
+    "title": "Reminders",
+    "when": "When",
+    "repeat": "Repeat",
+    "repeat-none": "Once",
+    "repeat-daily": "Daily",
+    "repeat-weekly": "Weekly",
+    "repeat-monthly": "Monthly",
+    "repeat-yearly": "Yearly",
+    "add": "Add reminder",
+    "added": "Reminder set",
+    "delete": "Delete reminder",
+    "section-description": "Get a notification about a memo at a time you choose, once or repeating, on every device you enabled. Set one from a memo's ⋮ menu.",
+    "this-device": "This device",
+    "this-device-description": "Each device (phone, computer) turns notifications on once.",
+    "device-on": "Notifications are on for this device.",
+    "device-off": "Reminder notifications are off on this device.",
+    "enable-device": "Turn on notifications here",
+    "disable-device": "Turn off",
+    "test": "Send a test",
+    "test-sent": "Sent to {{n}} devices",
+    "denied": "The browser blocks notifications from this site: allow them in the browser settings.",
+    "unsupported": "This browser does not support push notifications.",
+    "needs-install": "On iPhone/iPad: tap Share → Add to Home Screen, then open Memos from the home screen to turn notifications on.",
+    "upcoming": "Upcoming",
+    "none": "No reminders yet."
   }
 }

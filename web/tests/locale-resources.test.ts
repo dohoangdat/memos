@@ -37,6 +37,7 @@ const dynamicKeyParts: Record<string, readonly string[]> = {
   "memo.${}-description": ["layout-auto", "layout-columns", "layout-list"],
   "setting.notification.requirement-${}": ["gmail", "optional", "recommended", "required"],
   "space.icon.${}": ["emoji", "icons"],
+  "reminder.repeat-${}": ["none", "daily", "weekly", "monthly", "yearly"],
 };
 
 const collectReferences = (files: Record<string, string>) => {

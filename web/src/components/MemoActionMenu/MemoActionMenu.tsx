@@ -1,6 +1,7 @@
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { Button, Menu, menuClasses, Tooltip } from "@usememos/ui";
 import {
+  AlarmClockIcon,
   ArchiveIcon,
   ArchiveRestoreIcon,
   ArrowUpRightIcon,
@@ -23,6 +24,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useReactionActions } from "@/components/MemoReactionListView/hooks";
+import { ReminderDialog } from "@/components/Reminder/ReminderDialog";
 import { STAR_REACTION } from "@/lib/star";
 import { cn } from "@/lib/utils";
 import { State } from "@/types/proto/api/common_pb";
@@ -125,6 +127,9 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
     </>
   );
 
+  // Fork-only: remind me of this memo at a time, once or repeating (server/reminder).
+  const [reminderOpen, setReminderOpen] = useState(false);
+
   const starItem = canStar && (
     <Menu.Item
       onClick={() => handleReactionClick(STAR_REACTION)}
@@ -191,6 +196,9 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
             <Menu.Item onClick={handleToggleMemoStatusClick} icon={<ArchiveIcon />}>
               {t("common.archive")}
             </Menu.Item>
+            <Menu.Item onClick={() => setReminderOpen(true)} icon={<AlarmClockIcon />}>
+              {t("reminder.menu")}
+            </Menu.Item>
             <Menu.Separator />
             {protectItems}
           </>
@@ -227,6 +235,7 @@ const MemoActionMenu = (props: MemoActionMenuProps) => {
         onConfirm={confirmDeleteMemo}
         confirmVariant="danger"
       />
+      {reminderOpen && <ReminderDialog memoName={memo.name} open onClose={() => setReminderOpen(false)} />}
     </Menu.Root>
   );
 };

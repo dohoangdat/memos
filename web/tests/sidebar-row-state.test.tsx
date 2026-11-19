@@ -10,6 +10,12 @@ import MemoFilters from "@/components/MemoFilters";
 import { AppSidebarProvider } from "@/contexts/AppSidebarContext";
 import { MemoFilterProvider, useMemoFilterContext } from "@/contexts/MemoFilterContext";
 
+// The user's tag order comes from the server; without one, tags come most used first.
+vi.mock("@/hooks/useTagOrder", async () => {
+  const actual = await vi.importActual<typeof import("@/hooks/useTagOrder")>("@/hooks/useTagOrder");
+  return { ...actual, useOrderedTags: (counts: Record<string, number>) => actual.orderTags(counts, []) };
+});
+
 vi.mock("@/utils/i18n", () => ({ useTranslate: () => (key: string) => key }));
 vi.mock("@/hooks/useCurrentUser", () => ({ default: () => ({ name: "users/1" }) }));
 vi.mock("@/hooks/useUserQueries", () => ({

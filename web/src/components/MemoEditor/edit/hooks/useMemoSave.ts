@@ -1,6 +1,7 @@
 import { Code, ConnectError } from "@connectrpc/connect";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { useActiveFilterTag } from "@/contexts/MemoFilterContext";
 import { useNewMemo } from "@/contexts/NewMemoContext";
 import { attachmentKeys } from "@/hooks/useAttachmentQueries";
 import { memoDetailQueryOptions, memoKeys, patchMemoInCollectionQueries, useCreateMemo, useUpdateMemo } from "@/hooks/useMemoQueries";
@@ -11,6 +12,7 @@ import { showErrorToast, toast } from "@/lib/toast";
 import type { Attachment } from "@/types/proto/api/attachment_service_pb";
 import type { Memo, Visibility } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
+import { addTagToMarkdown } from "@/utils/memo-tags-markdown";
 import { errorService, memoService, validationService } from "../services";
 import { DrawingNotSavedError, DrawingSavedError, type MemoSaveOperations, mergeUploadedAttachments } from "../services/memoService";
 import { useEditorContext } from "../state";
@@ -56,6 +58,7 @@ export function useMemoSave({
   const { mutateAsync: updateMemo } = useUpdateMemo(memoName);
   const { markNewMemo } = useNewMemo();
   const { actions, dispatch, getState } = useEditorContext();
+  const filterTag = useActiveFilterTag();
 
   return useCallback(async () => {
     const state = getState();
@@ -137,7 +140,10 @@ export function useMemoSave({
             createTime: restampDefaultCreateTime(state.timestamps.createTime, defaultCreateTime, now),
             updateTime: restampDefaultCreateTime(state.timestamps.updateTime, defaultCreateTime, now),
           };
-      const content = transformContent ? await transformContent(state.content) : state.content;
+      // A new memo written while the feed is filtered by a tag gets that tag, so it shows in the
+      // list it was written from (fork). Comments and edits keep their text as written.
+      const tagged = !memoName && !parentMemoName && filterTag ? addTagToMarkdown(state.content, filterTag) : state.content;
+      const content = transformContent ? await transformContent(tagged) : tagged;
       const result = await memoService.save(
         { ...state, content, timestamps },
         {
@@ -229,6 +235,7 @@ export function useMemoSave({
     defaultVisibility,
     discardDraft,
     dispatch,
+    filterTag,
     getState,
     markNewMemo,
     memoName,

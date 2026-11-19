@@ -58,7 +58,8 @@ export const buildTagTree = (tagAmounts: [tag: string, amount: number][]) => {
     subTags: [],
   };
 
-  for (const [tag, amount] of [...tagAmounts].sort(([left], [right]) => left.localeCompare(right))) {
+  // Siblings keep the order the tags come in (the user's order, see useTagOrder).
+  for (const [tag, amount] of tagAmounts) {
     const segments = tag.split("/");
     let parent = root;
     let path = "";

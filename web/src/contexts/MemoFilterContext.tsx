@@ -191,6 +191,15 @@ export function useMemoFilterContext() {
   return context;
 }
 
+/**
+ * The tag the feed is filtered by, if any; undefined outside a MemoFilterProvider. A memo
+ * written while a tag filter is on gets that tag (fork).
+ */
+export function useActiveFilterTag(): string | undefined {
+  const context = useContext(MemoFilterContext);
+  return context?.filters.find((filter) => filter.factor === "tagSearch")?.value;
+}
+
 // Alias for backwards compatibility during migration
 export const useMemoFilter = useMemoFilterContext;
 

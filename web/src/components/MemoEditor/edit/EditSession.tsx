@@ -4,13 +4,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useInstance } from "@/contexts/InstanceContext";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { updateDevicePreferences, useDevicePreferences } from "@/hooks/useDevicePreferences";
+import { suggestTags, useLLMFeatures } from "@/hooks/useLLM";
 import { useSourceMode } from "@/hooks/useSourceMode";
 import { showErrorToast, toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { InstanceSetting_Key } from "@/types/proto/api/instance_service_pb";
 import { useTranslate } from "@/utils/i18n";
 import { convertVisibilityFromString } from "@/utils/memo";
-
+import { addTagToMarkdown, hasTag } from "@/utils/memo-tags-markdown";
 import { AudioRecorderPanel, EditorContent, EditorMetadata, FocusModeExitButton, FocusModeOverlay, TimestampPopover } from "./components";
 import { EditorSuggestions } from "./components/EditorSuggestions";
 import { TagPickerDialog } from "./components/TagPickerDialog";
@@ -85,6 +86,33 @@ export const EditSession: React.FC<EditSessionProps> = ({
   const [isTagPickerOpen, setIsTagPickerOpen] = useState(false);
   const getDraftMarkdown = useCallback(() => editorRef.current?.getMarkdown() ?? getState().content, [getState]);
   const setDraftMarkdown = useCallback((markdown: string) => editorRef.current?.setMarkdown(markdown), []);
+
+  // ✨ Suggest tags (fork): the LLM picks tags for the draft, preferring the user's tags, and
+  // they are added to the draft's tag line at once; the editor's undo takes them back.
+  const { data: llm } = useLLMFeatures();
+  const [suggestingTags, setSuggestingTags] = useState(false);
+  const handleSuggestTags = useCallback(async () => {
+    const markdown = getDraftMarkdown();
+    if (!markdown.trim()) {
+      showErrorToast(t("llm.write-first"));
+      return;
+    }
+    setSuggestingTags(true);
+    try {
+      const suggestions = await suggestTags(markdown);
+      const added = suggestions.map((item) => item.tag).filter((tag) => !hasTag(markdown, tag));
+      if (added.length === 0) {
+        toast.add({ title: t("llm.no-new-tags"), type: "info" });
+        return;
+      }
+      setDraftMarkdown(added.reduce((text, tag) => addTagToMarkdown(text, tag), markdown));
+      toast.add({ title: t("llm.tags-added", { tags: added.map((tag) => `#${tag}`).join(" ") }), type: "success" });
+    } catch (error) {
+      showErrorToast(error instanceof Error ? error.message : t("common.error-occurred"));
+    } finally {
+      setSuggestingTags(false);
+    }
+  }, [getDraftMarkdown, setDraftMarkdown, t]);
   const [isTranscribingAudio, setIsTranscribingAudio] = useState(false);
   const { createBlobUrl } = useBlobUrls();
   const saveMediaMetadata = userGeneralSetting?.saveMediaMetadata ?? false;
@@ -450,6 +478,8 @@ export const EditSession: React.FC<EditSessionProps> = ({
             onInsertImages={handleInsertImages}
             onDrawingClick={drawing.openNew}
             onAddTags={() => setIsTagPickerOpen(true)}
+            onSuggestTags={llm?.suggestTags ? handleSuggestTags : undefined}
+            suggestingTags={suggestingTags}
           />
         </div>
       </div>

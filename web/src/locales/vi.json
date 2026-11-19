@@ -1220,6 +1220,15 @@
     },
     "passkey": {
       "label": "Passkey"
+    },
+    "tag-manager": {
+      "label": "Quản lý tag"
+    },
+    "llm": {
+      "label": "Tính năng LLM"
+    },
+    "reminders": {
+      "label": "Nhắc lịch"
     }
   },
   "tooltip": {
@@ -1593,5 +1602,101 @@
     "sync-now": "Đồng bộ ngay",
     "saved-locally": "Đã lưu trên máy, sẽ đồng bộ khi có mạng",
     "attachments-need-connection": "Cần có mạng để đính kèm tệp."
+  },
+  "tag-manager": {
+    "title": "Quản lý tag",
+    "description": "Sắp xếp tag theo ý bạn: thanh bên và bộ lọc tag theo thứ tự này. Kéo biểu tượng ⋮⋮ để di chuyển trong cùng cấp; đổi tên hoặc xoá tag khỏi mọi ghi chú.",
+    "move": "Di chuyển",
+    "move-hint": "Kéo để đổi chỗ, hoặc dùng phím mũi tên lên/xuống",
+    "sort-name": "Sắp theo tên",
+    "sort-count": "Sắp theo số bài",
+    "delete": "Xoá tag",
+    "delete-confirm": "Xoá #{{tag}} (và các tag con) khỏi {{n}} ghi chú? Nội dung ghi chú được giữ lại, chỉ bỏ tag.",
+    "deleted": "Đã xoá tag khỏi {{n}} ghi chú",
+    "empty": "Chưa có tag nào."
+  },
+  "tag-filter": {
+    "title": "Lọc theo tag",
+    "search": "Tìm tag",
+    "clear": "Bỏ lọc",
+    "none": "Không có tag phù hợp"
+  },
+  "llm": {
+    "section-description": "Các tính năng dùng LLM. API key và nhà cung cấp (OpenAI, Gemini) nhập ở mục AI; key chỉ nằm trên server.",
+    "suggest-tags": "Gợi ý tag",
+    "suggest-tags-description": "Nút ✨ trong trình soạn: LLM đọc ghi chú và chọn tag phù hợp, ưu tiên các tag bạn đang có.",
+    "suggesting": "Đang gợi ý tag…",
+    "enable": "Bật",
+    "provider": "Nhà cung cấp",
+    "no-provider": "Chưa chọn",
+    "provider-help": "Chọn một nhà cung cấp đã thêm ở mục AI.",
+    "no-providers": "Chưa có nhà cung cấp nào: thêm ở mục AI trước.",
+    "no-key": "Nhà cung cấp này chưa có API key.",
+    "model": "Model",
+    "model-help": "Để trống: gpt-4o-mini (OpenAI) hoặc gemini-2.5-flash (Gemini).",
+    "max-tags": "Số tag tối đa",
+    "allow-new": "Cho phép tạo tag mới",
+    "allow-new-help": "Khi không tag nào hợp, LLM được đề xuất một tag mới.",
+    "prompt": "Hướng dẫn thêm",
+    "prompt-placeholder": "Ví dụ: Ghi chú chi tiêu luôn gắn tag tai-chinh/chi-tieu.",
+    "voice-note": "Ghi chú giọng nói",
+    "voice-note-description": "Nút ＋ có thêm lựa chọn Ghi âm: thu âm, chuyển thành chữ (theo cấu hình chuyển giọng nói ở mục AI) và giữ file ghi âm.",
+    "voice-auto-tags": "Tự gợi ý tag cho ghi chú giọng nói (cần bật Gợi ý tag)",
+    "transcription-off": "Chưa cấu hình chuyển giọng nói thành chữ ở mục AI: ghi âm vẫn lưu nhưng không có chữ.",
+    "saved": "Đã lưu cấu hình LLM",
+    "write-first": "Hãy viết nội dung trước khi gợi ý tag.",
+    "no-new-tags": "Không có tag mới để thêm.",
+    "tags-added": "Đã thêm {{tags}}"
+  },
+  "voice-note": {
+    "title": "Ghi chú giọng nói",
+    "record": "Ghi âm",
+    "write": "Viết",
+    "start": "Bắt đầu ghi",
+    "pause": "Tạm dừng",
+    "resume": "Ghi tiếp",
+    "done": "Xong",
+    "tap-to-start": "Chạm để bắt đầu ghi",
+    "tap-to-pause": "Đang ghi · chạm để tạm dừng",
+    "paused": "Đã tạm dừng · chạm để ghi tiếp",
+    "uploading": "Đang tải bản ghi âm…",
+    "transcribing": "Đang chuyển thành chữ…",
+    "transcribe-failed": "Không chuyển được thành chữ",
+    "no-text": "Không nhận ra lời nói; bạn có thể tự gõ.",
+    "transcription-off": "Chưa bật chuyển giọng nói thành chữ; bạn có thể tự gõ.",
+    "text": "Nội dung",
+    "new-tag": "(mới)",
+    "saved": "Đã lưu ghi chú giọng nói",
+    "empty": "Bản ghi trống.",
+    "unsupported": "Trình duyệt này không ghi âm được.",
+    "no-microphone": "Không mở được micro. Hãy cho phép quyền micro."
+  },
+  "reminder": {
+    "menu": "Nhắc lịch",
+    "title": "Nhắc lịch",
+    "when": "Thời gian",
+    "repeat": "Lặp lại",
+    "repeat-none": "Không lặp",
+    "repeat-daily": "Hằng ngày",
+    "repeat-weekly": "Hằng tuần",
+    "repeat-monthly": "Hằng tháng",
+    "repeat-yearly": "Hằng năm",
+    "add": "Thêm nhắc",
+    "added": "Đã đặt nhắc lịch",
+    "delete": "Xoá nhắc",
+    "section-description": "Nhắc lại một ghi chú vào ngày giờ bạn chọn, một lần hoặc lặp lại, bằng thông báo trên các thiết bị đã bật. Đặt nhắc từ menu ⋮ của ghi chú.",
+    "this-device": "Thiết bị này",
+    "this-device-description": "Mỗi thiết bị (điện thoại, máy tính) cần bật thông báo một lần.",
+    "device-on": "Đang nhận thông báo trên thiết bị này.",
+    "device-off": "Thiết bị này chưa bật thông báo nhắc lịch.",
+    "enable-device": "Bật thông báo trên thiết bị này",
+    "disable-device": "Tắt",
+    "test": "Gửi thử",
+    "test-sent": "Đã gửi tới {{n}} thiết bị",
+    "denied": "Trình duyệt đang chặn thông báo của trang này: bật lại trong cài đặt trình duyệt.",
+    "unsupported": "Trình duyệt này không hỗ trợ thông báo đẩy.",
+    "needs-install": "Trên iPhone/iPad: bấm Chia sẻ → Thêm vào màn hình chính, rồi mở Memos từ màn hình chính để bật thông báo.",
+    "upcoming": "Sắp tới",
+    "none": "Chưa có nhắc lịch nào."
   }
 }

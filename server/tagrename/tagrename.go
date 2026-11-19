@@ -1,13 +1,17 @@
-// Package tagrename renames one of the current user's tags, together with the tags under it,
-// across all of their memos: POST /api/x/tags/rename {from, to}. Each changed memo is saved
-// through the regular memo update, so its tags, versions and live updates follow as for any
-// edit. Tag display rules (colors) keyed by the old name move to the new one.
+// Package tagrename manages the current user's tags across all of their memos:
+//   - POST /api/x/tags/rename {from, to} renames a tag together with the tags under it;
+//   - POST /api/x/tags/delete {tag} removes a tag and the tags under it from the memos' text;
+//   - GET/PUT /api/x/tag-order keeps the user's own order of tags (order.go).
+//
+// Each changed memo is saved through the regular memo update, so its tags, versions and live
+// updates follow as for any edit. Tag display rules (colors) and the order follow a rename.
 //
 // Fork-only, kept in its own package so upstream updates merge cleanly.
 package tagrename
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"maps"
 	"net/http"
@@ -32,21 +36,29 @@ type Service struct {
 	authenticator *auth.Authenticator
 	markdown      markdown.Service
 	api           *api.APIService
+	db            *sql.DB
+	orderEnabled  bool
 }
 
 // New builds the service; changed memos are saved through apiService.
 func New(s *store.Store, secret string, apiService *api.APIService) *Service {
-	return &Service{
+	service := &Service{
 		store:         s,
 		authenticator: auth.NewAuthenticator(s, secret),
 		markdown:      markdown.NewService(markdown.WithTagExtension()),
 		api:           apiService,
+		db:            s.GetDriver().GetDB(),
 	}
+	service.prepareOrder(context.Background())
+	return service
 }
 
-// RegisterRoutes serves POST /api/x/tags/rename.
+// RegisterRoutes serves the tag management endpoints.
 func (s *Service) RegisterRoutes(mux *http.ServeMux) {
 	mux.Handle("POST /api/x/tags/rename", httphandler.Func(s.rename))
+	mux.Handle("POST /api/x/tags/delete", httphandler.Func(s.remove))
+	mux.Handle("GET /api/x/tag-order", httphandler.Func(s.getOrder))
+	mux.Handle("PUT /api/x/tag-order", httphandler.Func(s.setOrder))
 }
 
 // normalize trims the tag and drops a leading '#'.
@@ -69,11 +81,9 @@ func hasTagTree(tags []string, from string) bool {
 
 func (s *Service) rename(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
-	// Bearer token only: the refresh cookie also rides on requests from sibling
-	// subdomains (same-site under SameSite=Lax), which must not act for the user.
-	user, err := s.authenticator.AuthenticateToUser(ctx, r.Header.Get("Authorization"), "")
-	if err != nil || user == nil {
-		return &httphandler.Error{Code: http.StatusUnauthorized, Message: "authentication required"}
+	user, err := s.caller(r)
+	if err != nil {
+		return err
 	}
 	var body struct {
 		From string `json:"from"`
@@ -90,33 +100,89 @@ func (s *Service) rename(w http.ResponseWriter, r *http.Request) error {
 		return httphandler.JSON(w, http.StatusOK, map[string]any{"updated": []string{}})
 	}
 
+	updated, err := s.rewriteMemos(ctx, user, from, func(content []byte) (string, bool, error) {
+		return markdown.RenameTagTree(content, from, to)
+	})
+	if err != nil {
+		return err
+	}
+	if err := s.renameTagSettings(ctx, user.ID, from, to); err != nil {
+		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to move tag settings", Cause: err}
+	}
+	if err := s.renameInOrder(ctx, user.ID, from, to); err != nil {
+		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to move the tag order", Cause: err}
+	}
+	w.Header().Set("Cache-Control", "private, no-store")
+	return httphandler.JSON(w, http.StatusOK, map[string]any{"updated": updated})
+}
+
+// remove takes a tag, and the tags under it, out of every memo of the caller.
+func (s *Service) remove(w http.ResponseWriter, r *http.Request) error {
+	ctx := r.Context()
+	user, err := s.caller(r)
+	if err != nil {
+		return err
+	}
+	var body struct {
+		Tag string `json:"tag"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4<<10)).Decode(&body); err != nil {
+		return &httphandler.Error{Code: http.StatusBadRequest, Message: "invalid body"}
+	}
+	tag := normalize(body.Tag)
+	if tag == "" {
+		return &httphandler.Error{Code: http.StatusBadRequest, Message: "invalid tag name"}
+	}
+	updated, err := s.rewriteMemos(ctx, user, tag, func(content []byte) (string, bool, error) {
+		return markdown.RemoveTagTree(content, tag)
+	})
+	if err != nil {
+		return err
+	}
+	if err := s.renameInOrder(ctx, user.ID, tag, ""); err != nil {
+		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to update the tag order", Cause: err}
+	}
+	w.Header().Set("Cache-Control", "private, no-store")
+	return httphandler.JSON(w, http.StatusOK, map[string]any{"updated": updated})
+}
+
+// caller is the signed-in user of a request.
+func (s *Service) caller(r *http.Request) (*store.User, error) {
+	// Bearer token only: the refresh cookie also rides on requests from sibling
+	// subdomains (same-site under SameSite=Lax), which must not act for the user.
+	user, err := s.authenticator.AuthenticateToUser(r.Context(), r.Header.Get("Authorization"), "")
+	if err != nil || user == nil {
+		return nil, &httphandler.Error{Code: http.StatusUnauthorized, Message: "authentication required"}
+	}
+	return user, nil
+}
+
+// rewriteMemos applies rewrite to each of the user's memos that holds the tag `root` (or one
+// under it) and saves the ones it changes, answering their names.
+func (s *Service) rewriteMemos(ctx context.Context, user *store.User, root string, rewrite func([]byte) (string, bool, error)) ([]string, error) {
 	memos, err := s.store.ListMemos(ctx, &store.FindMemo{CreatorID: &user.ID})
 	if err != nil {
-		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to list memos", Cause: err}
+		return nil, &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to list memos", Cause: err}
 	}
 	updated := []string{}
 	for _, memo := range memos {
-		if memo.Payload == nil || !hasTagTree(memo.Payload.Tags, from) {
+		if memo.Payload == nil || !hasTagTree(memo.Payload.Tags, root) {
 			continue
 		}
-		content, changed, err := markdown.RenameTagTree([]byte(memo.Content), from, to)
+		content, changed, err := rewrite([]byte(memo.Content))
 		if err != nil {
-			return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to rename tag", Cause: err}
+			return nil, &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to rewrite tags", Cause: err}
 		}
 		if !changed {
 			continue
 		}
 		name := "memos/" + memo.UID
 		if err := s.updateContent(ctx, user, name, content); err != nil {
-			return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to update memo " + name, Cause: err}
+			return nil, &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to update memo " + name, Cause: err}
 		}
 		updated = append(updated, name)
 	}
-	if err := s.renameTagSettings(ctx, user.ID, from, to); err != nil {
-		return &httphandler.Error{Code: http.StatusInternalServerError, Message: "failed to move tag settings", Cause: err}
-	}
-	w.Header().Set("Cache-Control", "private, no-store")
-	return httphandler.JSON(w, http.StatusOK, map[string]any{"updated": updated})
+	return updated, nil
 }
 
 // updateContent saves a memo's new content as the user, like an edit from the app would.

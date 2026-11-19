@@ -1,5 +1,5 @@
 import { Button, Tooltip } from "@usememos/ui";
-import { CheckIcon, CircleAlertIcon } from "lucide-react";
+import { CheckIcon, CircleAlertIcon, SparklesIcon } from "lucide-react";
 import { type FC, useId } from "react";
 import { type Location, Visibility } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
@@ -23,6 +23,8 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
   onInsertImages,
   onDrawingClick,
   onAddTags,
+  onSuggestTags,
+  suggestingTags,
 }) => {
   const t = useTranslate();
   const { actions, dispatch } = useEditorContext();
@@ -65,14 +67,19 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
   };
 
   const blockedReasonId = useId();
+  // The commit button is the toolbar's main action: larger than the compact controls around it,
+  // so it is easy to hit on a phone (fork).
+  const commitClass = "h-10! min-w-24 px-5! font-semibold";
   const commitButton = justSaved ? (
-    <Button variant="primary" iconEnd={<CheckIcon />} disabled>
+    <Button variant="primary" iconEnd={<CheckIcon />} disabled className={commitClass}>
       {t("editor.saved")}
     </Button>
   ) : blockedMessage ? (
     // The disabled button stays focusable; its tooltip and its description say why it can't save.
     <Tooltip.Root>
-      <Tooltip.Trigger render={<Button variant="primary" disabled focusableWhenDisabled aria-describedby={blockedReasonId} />}>
+      <Tooltip.Trigger
+        render={<Button variant="primary" disabled focusableWhenDisabled aria-describedby={blockedReasonId} className={commitClass} />}
+      >
         {commitLabel}
       </Tooltip.Trigger>
       <Tooltip.Popup side="top">{blockedMessage}</Tooltip.Popup>
@@ -89,6 +96,7 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
         render={
           <Button
             variant="primary"
+            className={commitClass}
             iconEnd={drawingSaveError ? <CircleAlertIcon /> : undefined}
             onClick={onSave}
             loading={isSaving}
@@ -124,6 +132,24 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
           onDrawingClick={onDrawingClick}
           onAddTags={onAddTags}
         />
+        {onSuggestTags && (
+          <Tooltip.Root>
+            <Tooltip.Trigger
+              render={
+                <Button
+                  variant="ghost"
+                  icon={<SparklesIcon />}
+                  aria-label={t("llm.suggest-tags")}
+                  onClick={onSuggestTags}
+                  loading={suggestingTags}
+                  loadingLabel={t("llm.suggesting")}
+                  disabled={committing}
+                />
+              }
+            />
+            <Tooltip.Popup side="top">{t("llm.suggest-tags")}</Tooltip.Popup>
+          </Tooltip.Root>
+        )}
         <AudienceMenu
           value={visibility}
           space={space}

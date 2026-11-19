@@ -97,6 +97,9 @@ export interface EditorToolbarProps {
   onDrawingClick?: () => void;
   /** Opens the tag picker. */
   onAddTags?: () => void;
+  /** Suggests tags with the LLM and adds them (fork); absent when the feature is off. */
+  onSuggestTags?: () => void;
+  suggestingTags?: boolean;
 }
 
 export interface EditorMetadataProps {
@@ -148,6 +151,9 @@ export interface InsertMenuProps {
   onDrawingClick?: () => void;
   /** Opens the tag picker. */
   onAddTags?: () => void;
+  /** Suggests tags with the LLM and adds them (fork); absent when the feature is off. */
+  onSuggestTags?: () => void;
+  suggestingTags?: boolean;
 }
 
 export interface AudienceMenuProps {

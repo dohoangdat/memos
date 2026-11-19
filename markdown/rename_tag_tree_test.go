@@ -26,3 +26,10 @@ func TestRenameTagTree(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveTagTree(t *testing.T) {
+	got, changed, err := RemoveTagTree([]byte("note #a and #a/x, keep #ab\n\n`#a`\n\n#a"), "a")
+	require.NoError(t, err)
+	require.True(t, changed)
+	require.Equal(t, "note and, keep #ab\n\n`#a`\n\n", got)
+}

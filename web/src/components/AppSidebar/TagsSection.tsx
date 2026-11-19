@@ -1,9 +1,10 @@
 import { Button, Menu, Tooltip } from "@usememos/ui";
 import { HashIcon, ListTreeIcon, MoreHorizontalIcon, PencilIcon } from "lucide-react";
-import { forwardRef, useMemo, useState } from "react";
+import { forwardRef, useState } from "react";
 import { TagRenameDialog } from "@/components/TagRename/TagRenameDialog";
 import { useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import { useLocalStorage, useOverflowTitle } from "@/hooks";
+import { useOrderedTags } from "@/hooks/useTagOrder";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 import TagTree, { tagRowAriaLabel } from "../TagTree";
@@ -100,7 +101,8 @@ const TagsSection = ({ tagCount, onSelect, scope, canRename = false }: Props) =>
   const [treeMode, setTreeMode] = useLocalStorage<boolean>("tag-view-as-tree", false);
   const activeTags = new Set(getFiltersByFactor("tagSearch").map((filter) => filter.value));
   const activeTag = activeTags.values().next().value as string | undefined;
-  const tags = useMemo(() => Object.entries(tagCount).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])), [tagCount]);
+  // In the user's order (tag management), most used first otherwise.
+  const tags = useOrderedTags(tagCount);
 
   if (tags.length === 0) {
     return null;

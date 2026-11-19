@@ -30,6 +30,8 @@ const filteredStatsHook = vi.hoisted(() => vi.fn());
 const filterState = vi.hoisted(() => ({ filters: [] as MemoFilter[] }));
 const tagsSectionHook = vi.hoisted(() => vi.fn());
 
+// The mobile header's tag filter button (fork) has its own data; not under test here.
+vi.mock("@/components/AppSidebar/TagFilterSheet", () => ({ default: () => null }));
 vi.mock("@/components/MemosLogo", () => ({
   default: ({ size }: { size?: string }) => <span data-logo-size={size}>Memos logo</span>,
 }));
