@@ -14,6 +14,7 @@ import { memoKeys } from "@/hooks/useMemoQueries";
 import { userKeys } from "@/hooks/useUserQueries";
 import { showErrorToast, toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { fixWebmDuration } from "@/lib/webm-duration";
 import type { Attachment } from "@/types/proto/api/attachment_service_pb";
 import { AttachmentSchema } from "@/types/proto/api/attachment_service_pb";
 import { MemoSchema, Visibility } from "@/types/proto/api/memo_service_pb";
@@ -50,11 +51,22 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
+  // Milliseconds recorded, pauses excluded: the length written into the file.
+  const recordedMs = useRef(0);
+  const runningSince = useRef<number | null>(null);
+  const startedOnce = useRef(false);
   const chunks = useRef<Blob[]>([]);
   const saved = useRef(false);
   const attachmentRef = useRef<Attachment | null>(null);
   attachmentRef.current = attachment;
   useBackToClose(onClose);
+
+  // Opening the voice note starts recording at once (fork); the button then pauses and resumes.
+  useEffect(() => {
+    if (startedOnce.current) return;
+    startedOnce.current = true;
+    void start();
+  }, []);
 
   useEffect(() => {
     if (step !== "recording") return;
@@ -85,6 +97,8 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
       media.ondataavailable = (event) => event.data.size > 0 && chunks.current.push(event.data);
       media.start(1000);
       recorder.current = media;
+      recordedMs.current = 0;
+      runningSince.current = performance.now();
       setStep("recording");
     } catch {
       showErrorToast(t("voice-note.no-microphone"));
@@ -97,9 +111,12 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
     if (!media) return;
     if (step === "recording") {
       media.pause();
+      if (runningSince.current !== null) recordedMs.current += performance.now() - runningSince.current;
+      runningSince.current = null;
       setStep("paused");
     } else if (step === "paused") {
       media.resume();
+      runningSince.current = performance.now();
       setStep("recording");
     }
   };
@@ -110,10 +127,13 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
     const stopped = new Promise<void>((resolve) => {
       media.onstop = () => resolve();
     });
+    if (runningSince.current !== null) recordedMs.current += performance.now() - runningSince.current;
+    runningSince.current = null;
     media.stop();
     await stopped;
     media.stream.getTracks().forEach((track) => track.stop());
-    const blob = new Blob(chunks.current, { type: media.mimeType });
+    // Chrome leaves the length out of WebM; without it players show a wrong duration.
+    const blob = await fixWebmDuration(new Blob(chunks.current, { type: media.mimeType }), recordedMs.current);
     if (blob.size === 0) {
       showErrorToast(t("voice-note.empty"));
       setStep("idle");
@@ -220,8 +240,8 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
             ))}
           </div>
         )}
-        <div className="flex justify-end gap-2">
-          <Button variant="neutral" onClick={onClose} disabled={saving}>
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="neutral" onClick={onClose} disabled={saving} className="h-10!">
             {t("common.cancel")}
           </Button>
           <Button
@@ -258,8 +278,8 @@ const VoiceNoteBody = ({ onClose }: { onClose: () => void }) => {
       <span className="mu-caption text-mu-text-secondary">
         {step === "idle" ? t("voice-note.tap-to-start") : recording ? t("voice-note.tap-to-pause") : t("voice-note.paused")}
       </span>
-      <div className="flex w-full justify-end gap-2">
-        <Button variant="neutral" onClick={onClose}>
+      <div className="grid w-full grid-cols-2 gap-2">
+        <Button variant="neutral" onClick={onClose} className="h-10!">
           {t("common.cancel")}
         </Button>
         <Button
@@ -280,7 +300,7 @@ export const VoiceNoteDialog = ({ open, onClose }: { open: boolean; onClose: () 
   const t = useTranslate();
   return (
     <Dialog.Root open={open} onOpenChange={(next) => !next && onClose()}>
-      <Dialog.Popup className="w-md max-w-[calc(100vw-1rem)]">
+      <Dialog.Popup className="sm:w-md">
         <Dialog.Title className="flex items-center gap-2">
           <MicIcon className="mu-icon" />
           {t("voice-note.title")}

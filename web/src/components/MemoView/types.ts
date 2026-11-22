@@ -4,6 +4,8 @@ import type { Memo } from "@/types/proto/api/memo_service_pb";
 export type MemoTimeDisplay = "relative" | "time";
 
 export interface MemoViewProps {
+  /** The memo's place in a list from 1; the compact list shows it (fork). */
+  listIndex?: number;
   memo: Memo;
   compact?: boolean;
   timeDisplay?: MemoTimeDisplay;

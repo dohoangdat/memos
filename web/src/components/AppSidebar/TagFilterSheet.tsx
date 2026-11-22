@@ -1,12 +1,11 @@
 import { Button, Dialog, Input } from "@usememos/ui";
-import { HashIcon, LayoutGridIcon, ListIcon, SearchIcon, XIcon } from "lucide-react";
+import { HashIcon, SearchIcon, XIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import TagTree from "@/components/TagTree";
 import { useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import { useBackToClose } from "@/hooks/useBackToClose";
 import { useOrderedTags } from "@/hooks/useTagOrder";
 import { useTagCounts } from "@/hooks/useUserQueries";
-import { setDenseList, useDenseList } from "@/lib/list-density";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
 
@@ -85,24 +84,14 @@ const TagFilterSheet = () => {
   const { getFiltersByFactor } = useMemoFilterContext();
   const activeTag = getFiltersByFactor("tagSearch")[0]?.value;
   const [open, setOpen] = useState(false);
-  const dense = useDenseList();
   return (
     <>
-      {/* Cards or compact two-line rows (lib/list-density), at hand on a phone. */}
-      <Button
-        variant="ghost"
-        icon={dense ? <LayoutGridIcon /> : <ListIcon />}
-        aria-label={dense ? t("memo.density-cards") : t("memo.density-compact")}
-        aria-pressed={dense}
-        onClick={() => setDenseList(!dense)}
-        className="ms-auto"
-      />
       <Button
         variant={activeTag ? "neutral" : "ghost"}
         icon={<HashIcon />}
         aria-label={activeTag ? `${t("tag-filter.title")}: #${activeTag}` : t("tag-filter.title")}
         onClick={() => setOpen(true)}
-        className={cn("max-w-[45%]", activeTag && "bg-mu-primary/10")}
+        className={cn("ms-auto max-w-[45%]", activeTag && "bg-mu-primary/10")}
       >
         {activeTag && <span className="truncate">{activeTag.split("/").pop()}</span>}
       </Button>

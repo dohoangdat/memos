@@ -672,7 +672,8 @@ describe("App sidebar logo", () => {
     expect(screen.getByRole("button", { name: "common.open-navigation" })).toHaveAttribute("data-mobile-navigation-trigger");
     const mobileBrand = screen.getByRole("button", { name: "space.switch: common.memos" });
     expect(mobileBrand).toHaveClass("h-9", "gap-1.5", "px-1");
-    expect(screen.queryByRole("button", { name: "common.search" })).not.toBeInTheDocument();
+    // Search sits in the mobile header (fork); writing stays with the floating ＋ button.
+    expect(screen.getByRole("button", { name: "common.search" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "editor.new-memo" })).not.toBeInTheDocument();
   });
 

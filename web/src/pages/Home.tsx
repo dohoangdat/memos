@@ -51,7 +51,7 @@ const Home = () => {
       <WelcomeGuideDialog open={welcomeGuide.open} onOpenChange={welcomeGuide.onOpenChange} />
       <NewMemoProvider>
         <PagedMemoList
-          renderer={(memo: Memo, { compact }) => (
+          renderer={(memo: Memo, { compact, index }) => (
             <MemoView
               key={getMemoKey(memo)}
               memo={memo}
@@ -60,6 +60,7 @@ const Home = () => {
               showPinned={honorPinned}
               showSpace={!selectedSpaceName}
               compact={compact}
+              listIndex={index}
             />
           )}
           listSort={listSort}

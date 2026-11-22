@@ -26,11 +26,14 @@ const DenseMemoRow = ({
   readonly,
   parentPage,
   showPinned,
+  index,
 }: {
   memo: Memo;
   readonly: boolean;
   parentPage?: string;
   showPinned?: boolean;
+  /** The memo's place in the list from 1. */
+  index?: number;
 }) => {
   const t = useTranslate();
   const protection = useMemoProtectionMode(memo.name);
@@ -46,6 +49,7 @@ const DenseMemoRow = ({
     <div className="flex w-full min-w-0 items-center gap-3 self-stretch">
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-2">
+          {index ? <span className="shrink-0 mu-caption tabular-nums text-mu-text-secondary">{index}.</span> : null}
           {showPinned && memo.pinned && <PinIcon className="mu-icon-xs shrink-0 text-mu-text-secondary" />}
           <span className="min-w-0 flex-1 truncate mu-label text-mu-text">{title || t("memo.untitled")}</span>
           <span className="shrink-0 mu-caption text-mu-text-secondary">
@@ -55,14 +59,14 @@ const DenseMemoRow = ({
             <MemoActionMenu memo={memo} readonly={readonly} parentPage={parentPage} />
           </span>
         </div>
-        <p className="flex min-w-0 items-center gap-1 truncate mu-caption text-mu-text-secondary">
+        <p className="flex min-h-[2lh] min-w-0 items-start gap-1 mu-caption text-mu-text-secondary">
           {hidden ? (
             <>
               {locked ? <LockKeyholeIcon className="mu-icon-xs" /> : <EyeOffIcon className="mu-icon-xs" />}
               {locked ? t("protect.locked-hint") : t("protect.blurred-hint")}
             </>
           ) : (
-            <span className="min-w-0 truncate">{description || "\u00a0"}</span>
+            <span className="line-clamp-2 min-w-0 break-words">{description || "\u00a0"}</span>
           )}
         </p>
       </div>

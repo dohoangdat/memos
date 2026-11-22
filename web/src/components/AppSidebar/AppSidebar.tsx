@@ -438,7 +438,7 @@ const AppSidebar = ({ className }: { className?: string }) => {
 
 export const MobileAppHeader = () => {
   const t = useTranslate();
-  const { setMobileOpen } = useAppSidebar();
+  const { setMobileOpen, setQuickFindOpen } = useAppSidebar();
   return (
     <header className="sticky top-0 z-20 flex h-12 w-full shrink-0 items-center justify-start gap-1 border-b border-mu-line/70 bg-mu-canvas/90 px-2 backdrop-blur-md md:hidden">
       <Tooltip.Root>
@@ -456,8 +456,9 @@ export const MobileAppHeader = () => {
         <Tooltip.Popup side="bottom">{t("common.open-navigation")}</Tooltip.Popup>
       </Tooltip.Root>
       <SpaceSwitcher className="max-w-[12rem]" size="md" />
-      {/* Filter by tag without opening the sidebar (fork). */}
+      {/* Filter by tag and search without opening the sidebar (fork). */}
       <TagFilterSheet />
+      <Button variant="ghost" icon={<SearchIcon />} aria-label={t("common.search")} onClick={() => setQuickFindOpen(true)} />
     </header>
   );
 };

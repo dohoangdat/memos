@@ -47,7 +47,8 @@ const Loader = ({ count = 3 }: { count?: number }) => {
 };
 
 interface Props {
-  renderer: (memo: Memo, options: { compact: boolean }) => ReactElement;
+  /** `index` is the memo's place in the feed from 1 (the compact list numbers its rows). */
+  renderer: (memo: Memo, options: { compact: boolean; index: number }) => ReactElement;
   listSort?: (list: Memo[]) => Memo[];
   state?: State;
   orderBy?: string;
@@ -229,6 +230,8 @@ const PagedMemoList = (props: Props) => {
   // A freshly created memo is hoisted to the front; pin it to the top of column one so it
   // appears right under the composer instead of dropping into a random (shortest) column.
   const displayMemoList = isDisplayPending || isInitialError ? [] : sortedMemoList;
+  const positions = new Map(displayMemoList.map((memo, index) => [getMemoKey(memo), index + 1]));
+  const positionOf = (memo: Memo) => positions.get(getMemoKey(memo)) ?? 0;
   const firstMemo = displayMemoList[0];
   const priorityKey = newMemoName && firstMemo?.name === newMemoName ? getMemoKey(firstMemo) : undefined;
 
@@ -310,7 +313,7 @@ const PagedMemoList = (props: Props) => {
                 <ColumnGrid
                   items={displayMemoList}
                   getKey={getMemoKey}
-                  renderItem={(memo) => props.renderer(memo, { compact: effectiveCompact })}
+                  renderItem={(memo) => props.renderer(memo, { compact: effectiveCompact, index: positionOf(memo) })}
                   estimateHeight={estimateMemoCardHeight}
                   header={headerContent}
                   leading={gridLeading}
@@ -328,7 +331,7 @@ const PagedMemoList = (props: Props) => {
               {countLine}
               {initialLoader}
               {initialError}
-              {displayMemoList.map((memo) => props.renderer(memo, { compact: effectiveCompact }))}
+              {displayMemoList.map((memo) => props.renderer(memo, { compact: effectiveCompact, index: positionOf(memo) }))}
               {emptyPlaceholder}
               {!isDisplayPending && footer}
             </>

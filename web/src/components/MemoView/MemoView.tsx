@@ -248,7 +248,7 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     >
       {dense ? (
         // Compact list (fork): two lines per memo; opening and editing work as on a card.
-        <DenseMemoRow memo={memoData} readonly={readonly} parentPage={parentPage} showPinned={showPinned} />
+        <DenseMemoRow memo={memoData} readonly={readonly} parentPage={parentPage} showPinned={showPinned} index={props.listIndex} />
       ) : (
         <>
           {/* The pinned mark steps aside while the memo is edited in place. */}

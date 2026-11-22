@@ -3,6 +3,8 @@ import {
   ChevronDownIcon,
   Columns2Icon,
   Columns3Icon,
+  EyeIcon,
+  EyeOffIcon,
   InfinityIcon,
   LayoutGridIcon,
   ListIcon,
@@ -11,6 +13,7 @@ import {
 } from "lucide-react";
 import type { RefObject } from "react";
 import { MAX_COLUMNS_VALUES, type MemoMaxColumns, useView } from "@/contexts/ViewContext";
+import { setBlurAll, useBlurAll } from "@/lib/blur-all";
 import { setDenseList, useDenseList } from "@/lib/list-density";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/utils/i18n";
@@ -28,6 +31,17 @@ const LAYOUT_OPTIONS: Record<MemoMaxColumns, { icon: LucideIcon; key: "layout-li
   3: { icon: Columns3Icon, key: "layout-columns" },
   0: { icon: InfinityIcon, key: "layout-auto" },
 };
+
+/** Blur every memo in lists (lib/blur-all); was a floating button. */
+function BlurAllToggle() {
+  const t = useTranslate();
+  const blurred = useBlurAll();
+  return (
+    <Toggle pressed={blurred} onPressedChange={setBlurAll} icon={blurred ? <EyeOffIcon /> : <EyeIcon />}>
+      {blurred ? t("protect.unblur-all") : t("protect.blur-all")}
+    </Toggle>
+  );
+}
 
 /** Cards, or compact two-line rows (fork, lib/list-density). */
 export function DensityToggle() {
@@ -61,6 +75,7 @@ function MemoDisplaySettingsContent() {
   return (
     <div className="flex flex-col gap-3">
       <DensityToggle />
+      <BlurAllToggle />
       <ToggleGroup
         size="md"
         fullWidth

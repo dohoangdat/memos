@@ -315,7 +315,7 @@ describe("<PagedMemoList>", () => {
     it("always renders memos as previews at one column", () => {
       const renderer = vi.fn((m: Memo) => <div key={m.name} />);
       renderList(renderer);
-      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true });
+      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true, index: 1 });
     });
 
     it("renders previews in the narrow-width fallback when columns are allowed", () => {
@@ -323,7 +323,7 @@ describe("<PagedMemoList>", () => {
       view.maxColumns = 0;
       const renderer = vi.fn((m: Memo) => <div key={m.name} />);
       renderList(renderer);
-      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true });
+      expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true, index: 1 });
     });
 
     it("forces compact once the width fits the grid", () => {
@@ -332,7 +332,7 @@ describe("<PagedMemoList>", () => {
       try {
         const renderer = vi.fn((m: Memo) => <div key={m.name} />);
         renderList(renderer);
-        expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true });
+        expect(renderer).toHaveBeenCalledWith(expect.objectContaining({ name: "memos/1" }), { compact: true, index: 1 });
       } finally {
         widthSpy.mockRestore();
       }
