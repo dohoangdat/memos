@@ -7,6 +7,16 @@ export interface SharedData {
   url?: string | null;
 }
 
+/** What the linked page says about itself (MemoService.GetLinkMetadata), fetched on sharing. */
+export interface SharedLinkMetadata {
+  title?: string;
+  description?: string;
+}
+
+/** The link in what was shared: `url`, or the first link inside `text`. */
+export const sharedLink = ({ text, url }: SharedData): string =>
+  (url ?? "").trim() || ((text ?? "").match(/https?:\/\/[^\s<>"]+/)?.[0] ?? "");
+
 const URL_PATTERN = /https?:\/\/[^\s<>"]+/;
 
 /** Hashtags in shared text (#fyp, #xuhuong…) stay text, so they do not become memo tags. */
@@ -19,7 +29,7 @@ const escapeHashtags = (value: string) => value.replace(/(^|\s)#(?=\S)/g, "$1\\#
  * repeat the link or the title, so the link is pulled out and repeats are dropped.
  * Returns "" when nothing was shared.
  */
-export function buildSharedMemoContent({ title, text, url }: SharedData): string {
+export function buildSharedMemoContent({ title, text, url }: SharedData, metadata?: SharedLinkMetadata): string {
   let heading = (title ?? "").trim();
   let body = (text ?? "").trim();
   let link = (url ?? "").trim();
@@ -36,8 +46,18 @@ export function buildSharedMemoContent({ title, text, url }: SharedData): string
       .trim();
   if (heading && heading === link) heading = "";
   if (body && body === heading) body = "";
+  // The page's own title and description, so the memo says what the link is about (fork).
+  const pageTitle = (metadata?.title ?? "").trim();
+  const pageDescription = (metadata?.description ?? "").trim().replace(/\s+/g, " ");
+  if (!heading && pageTitle) heading = pageTitle;
+  const quote = pageDescription && pageDescription !== body && pageDescription !== heading ? pageDescription : "";
 
-  const parts = [heading && `**${escapeHashtags(heading)}**`, body && escapeHashtags(body), link].filter(Boolean);
+  const parts = [
+    heading && `**${escapeHashtags(heading)}**`,
+    body && escapeHashtags(body),
+    quote && `> ${escapeHashtags(quote)}`,
+    link,
+  ].filter(Boolean);
   if (!parts.length) return "";
   return [...parts, `#${SHARED_MEMO_TAG}`].join("\n\n");
 }

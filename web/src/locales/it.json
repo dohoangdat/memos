@@ -506,7 +506,8 @@
     "density": "Density",
     "density-cards": "Cards",
     "density-compact": "Compact",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "count": "{{n}} memos"
   },
   "message": {
     "archived-successfully": "Archiviato con successo",
@@ -1505,7 +1506,10 @@
     "saved": "Saved to Memos",
     "title": "Save to Memos",
     "new-memo": "New memo",
-    "append": "Add to an existing memo"
+    "append": "Add to an existing memo",
+    "fetching": "Fetching the page's title and summary…",
+    "search": "Find a memo to add to",
+    "no-match": "No matching memo"
   },
   "memo-info": {
     "title": "Memo info",

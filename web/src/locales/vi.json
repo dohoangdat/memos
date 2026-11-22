@@ -500,7 +500,8 @@
     "density": "Kiểu hiển thị",
     "density-cards": "Thẻ",
     "density-compact": "Gọn",
-    "untitled": "Không tiêu đề"
+    "untitled": "Không tiêu đề",
+    "count": "{{n}} ghi chú"
   },
   "message": {
     "archived-successfully": "Lưu trữ thành công",
@@ -1503,8 +1504,11 @@
   "share-target": {
     "saved": "Đã lưu vào Memos",
     "title": "Lưu vào Memos",
-    "new-memo": "Tạo bài mới",
-    "append": "Thêm vào bài cũ"
+    "new-memo": "Tạo memo mới",
+    "append": "Thêm vào memo có sẵn",
+    "fetching": "Đang lấy tiêu đề và nội dung trang…",
+    "search": "Tìm memo để thêm vào",
+    "no-match": "Không có memo phù hợp"
   },
   "memo-info": {
     "title": "Thông tin bài",

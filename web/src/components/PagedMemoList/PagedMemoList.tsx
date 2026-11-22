@@ -10,8 +10,10 @@ import { useView } from "@/contexts/ViewContext";
 import { useDelayedFlag } from "@/hooks/useDelayedFlag";
 import { useInfiniteMemos } from "@/hooks/useMemoQueries";
 import { hoistMemoToFront } from "@/hooks/useMemoSorting";
+import { useAllUserStats } from "@/hooks/useUserQueries";
 import { combineCELFilters } from "@/lib/cel-filter";
 import { DEFAULT_LIST_MEMOS_PAGE_SIZE, LOADING_INDICATOR_DELAY_MS } from "@/lib/constants";
+import { useDenseList } from "@/lib/list-density";
 import { State } from "@/types/proto/api/common_pb";
 import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
@@ -167,6 +169,16 @@ const PagedMemoList = (props: Props) => {
       { enabled: props.enabled ?? true },
     );
 
+  // Compact list (fork): how many memos the feed holds, over all pages.
+  const dense = useDenseList();
+  const listFilter = combineCELFilters(props.contextFilter, props.filter);
+  const { data: countStats } = useAllUserStats({ state: props.state || State.NORMAL, filter: listFilter }, { enabled: dense });
+  const totalCount = countStats?.reduce((sum, stats) => sum + stats.totalMemoCount, 0);
+  const countLine =
+    dense && totalCount !== undefined ? (
+      <p className="mb-1 px-1 mu-caption text-mu-text-secondary tabular-nums">{t("memo.count", { n: totalCount })}</p>
+    ) : null;
+
   // Tag settings decide whether sensitive memo content must be blurred. Keep that
   // privacy boundary, but do not wait for unrelated memo views or instance settings.
   const isDisplayPending = isLoading || !isUserSettingsInitialized;
@@ -268,10 +280,11 @@ const PagedMemoList = (props: Props) => {
   // above). Every vertical seam inside the stack uses GRID_GAP so y-spacing matches the
   // grid's x-spacing exactly.
   const gridLeading =
-    leadingContent || hasFilters || initialLoader || emptyPlaceholder || initialError ? (
+    leadingContent || hasFilters || countLine || initialLoader || emptyPlaceholder || initialError ? (
       <div className="flex w-full flex-col" style={{ gap: GRID_GAP }}>
         {leadingContent}
         <MemoFilters />
+        {countLine}
         {initialLoader}
         {initialError}
         {emptyPlaceholder}
@@ -312,6 +325,7 @@ const PagedMemoList = (props: Props) => {
               {headerContent}
               {leadingContent}
               <MemoFilters className="mb-2" />
+              {countLine}
               {initialLoader}
               {initialError}
               {displayMemoList.map((memo) => props.renderer(memo, { compact: effectiveCompact }))}

@@ -30,3 +30,20 @@ describe("buildSharedMemoContent", () => {
     expect(buildSharedMemoContent({ title: " ", text: "", url: null })).toBe("");
   });
 });
+
+describe("shared link page details (fork)", () => {
+  it("writes the page title and description when the app shared only a link", () => {
+    expect(
+      buildSharedMemoContent(
+        { text: "https://vnexpress.net/a" },
+        { title: "Lãi suất #tiết-kiệm giảm", description: "Nhiều ngân hàng hạ lãi suất." },
+      ),
+    ).toBe("**Lãi suất \\#tiết-kiệm giảm**\n\n> Nhiều ngân hàng hạ lãi suất.\n\nhttps://vnexpress.net/a\n\n#chia-se");
+  });
+
+  it("keeps the app's own title and skips a description it already shared", () => {
+    expect(
+      buildSharedMemoContent({ title: "Bài hay", text: "Đọc thử", url: "https://x.vn" }, { title: "Trang X", description: "Đọc thử" }),
+    ).toBe("**Bài hay**\n\nĐọc thử\n\nhttps://x.vn\n\n#chia-se");
+  });
+});
