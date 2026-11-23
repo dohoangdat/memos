@@ -320,7 +320,9 @@ const NavPill = ({ label, icon: Icon, to, onClick, active = false, expanded = fa
   };
   return (
     <Tooltip.Root disabled={expanded}>
-      <Tooltip.Trigger render={to ? <Link to={to} {...props} /> : <button type="button" {...props} />}>
+      {/* Main destinations replace each other in history (fork): Back from any of them leaves the app
+          instead of walking back through Calendar, Map and Attachments. */}
+      <Tooltip.Trigger render={to ? <Link to={to} replace {...props} /> : <button type="button" {...props} />}>
         <span className={SIDEBAR_NAV_LEADING_SLOT_CLASSES} aria-hidden="true">
           <Icon className="mu-icon" />
         </span>

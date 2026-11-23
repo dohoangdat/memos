@@ -14,6 +14,7 @@ import { canManageMemo } from "@/utils/user";
 import { MemoBody, MemoCommentListView, MemoHeader } from "./components";
 import DenseMemoRow from "./components/DenseMemoRow";
 import MemoPinnedMark from "./components/MemoPinnedMark";
+import MemoTagLine from "./components/MemoTagLine";
 import { MEMO_CARD_BASE_CLASSES } from "./constants";
 import { useImagePreview } from "./hooks";
 import { computeCommentAmount, MemoViewContext } from "./MemoViewContext";
@@ -248,7 +249,10 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
     >
       {dense ? (
         // Compact list (fork): two lines per memo; opening and editing work as on a card.
-        <DenseMemoRow memo={memoData} readonly={readonly} parentPage={parentPage} showPinned={showPinned} index={props.listIndex} />
+        <>
+          <DenseMemoRow memo={memoData} readonly={readonly} parentPage={parentPage} showPinned={showPinned} index={props.listIndex} />
+          <MemoTagLine memo={memoData} />
+        </>
       ) : (
         <>
           {/* The pinned mark steps aside while the memo is edited in place. */}
@@ -256,6 +260,8 @@ const MemoView = forwardRef<MemoViewHandle, MemoViewProps>((props, ref) => {
           <MemoHeader timeDisplay={timeDisplay} showCreator={showCreator} showVisibility={showVisibility} showSpace={showSpace} />
 
           <MemoBody compact={compact} showCreator={showCreator} />
+          {/* The memo's tags at the foot of a list card (fork). */}
+          {readerEnabled && <MemoTagLine memo={memoData} />}
         </>
       )}
 

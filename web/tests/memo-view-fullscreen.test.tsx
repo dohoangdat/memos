@@ -11,6 +11,8 @@ vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ userTagsSetting: un
 vi.mock("@/contexts/MentionResolutionContext", () => ({ useResolvedUser: () => undefined }));
 vi.mock("@/hooks/useCurrentUser", () => ({ default: () => ({ name: "users/1" }) }));
 vi.mock("@/utils/user", () => ({ canManageMemo: () => mocks.canManage }));
+// The tag line at the foot of a list card reads protection state from the server; not under test here.
+vi.mock("@/components/MemoView/components/MemoTagLine", () => ({ default: () => null }));
 vi.mock("@/components/MemoView/components", () => ({
   MemoHeader: () => <div>header</div>,
   MemoBody: () => (

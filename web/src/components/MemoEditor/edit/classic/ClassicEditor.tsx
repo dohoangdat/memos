@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
 import { isCompleteTagValue } from "@/utils/tag-grammar";
 import type { EditorFileOrigin } from "../extensions";
 import type { EditorController } from "../types/editorController";
+import { ClassicTagSuggest } from "./ClassicTagSuggest";
 import { ClassicToolbar } from "./ClassicToolbar";
 import { Column, Columns } from "./columns";
-import { htmlToMarkdown, markdownToHtml } from "./markdown";
+import { cleanPastedHtml, htmlToMarkdown, markdownToHtml } from "./markdown";
 import "./classic.css";
 
 export interface ClassicEditorProps {
@@ -100,6 +101,8 @@ const ClassicEditor = forwardRef(function ClassicEditor(props: ClassicEditorProp
         autocapitalize: "on",
         spellcheck: "true",
       },
+      // Pasted content takes the memo's standard look: no colors, fonts or sizes from the source.
+      transformPastedHTML: (html) => cleanPastedHtml(html),
       handlePaste: (_view, event) => {
         const files = filesOf(event.clipboardData);
         if (!files.length) return false;
@@ -213,6 +216,7 @@ const ClassicEditor = forwardRef(function ClassicEditor(props: ClassicEditorProp
       <ClassicToolbar editor={editor} onPickImages={(files) => callbacks.current.onFiles(files, { source: "drop", position: null })} />
       <div className={cn("w-full text-base leading-6", isFocusMode ? "min-h-0 flex-1 overflow-y-auto" : "max-h-[70vh] overflow-y-auto")}>
         <EditorContent editor={editor} />
+        {editor && <ClassicTagSuggest editor={editor} />}
       </div>
     </div>
   );

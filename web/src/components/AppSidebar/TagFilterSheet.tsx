@@ -1,6 +1,6 @@
 import { Button, Dialog, Input } from "@usememos/ui";
 import { HashIcon, SearchIcon, XIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import TagTree from "@/components/TagTree";
 import { useMemoFilterContext } from "@/contexts/MemoFilterContext";
 import { useBackToClose } from "@/hooks/useBackToClose";
@@ -31,7 +31,6 @@ const TagFilterPanel = ({ onClose }: { onClose: () => void }) => {
     <>
       <div className="flex items-center gap-2">
         <Input
-          autoFocus
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           prefix={<SearchIcon />}
@@ -84,6 +83,7 @@ const TagFilterSheet = () => {
   const { getFiltersByFactor } = useMemoFilterContext();
   const activeTag = getFiltersByFactor("tagSearch")[0]?.value;
   const [open, setOpen] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   return (
     <>
       <Button
@@ -96,8 +96,11 @@ const TagFilterSheet = () => {
         {activeTag && <span className="truncate">{activeTag.split("/").pop()}</span>}
       </Button>
       <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Popup className="w-lg max-w-[calc(100vw-1rem)]">
-          <Dialog.Title>{t("tag-filter.title")}</Dialog.Title>
+        {/* Focus lands on the title, not the search field: the keyboard opens only when the user taps it. */}
+        <Dialog.Popup className="w-lg max-w-[calc(100vw-1rem)]" initialFocus={titleRef}>
+          <Dialog.Title ref={titleRef} tabIndex={-1} className="outline-none">
+            {t("tag-filter.title")}
+          </Dialog.Title>
           {open && <TagFilterPanel onClose={() => setOpen(false)} />}
         </Dialog.Popup>
       </Dialog.Root>

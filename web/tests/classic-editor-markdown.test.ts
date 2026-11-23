@@ -105,3 +105,13 @@ describe("classic editor HTML safety", () => {
     created.mockRestore();
   });
 });
+
+describe("pasted HTML (fork)", () => {
+  it("drops the source's colors, fonts and styles but keeps the structure", async () => {
+    const { cleanPastedHtml } = await import("@/components/MemoEditor/edit/classic/markdown");
+    const html = cleanPastedHtml(
+      '<h2 style="color:red" class="x">Tiêu đề</h2><p><font color="#f00" face="Comic Sans">đỏ</font> <span style="background:yellow;font-size:30px">vàng</span> <b style="color:blue">đậm</b> <a href="https://x.vn" style="color:green" target="_blank">link</a></p><ul><li style="color:red">một</li></ul>',
+    );
+    expect(html).toBe('<h2>Tiêu đề</h2><p>đỏ vàng <b>đậm</b> <a href="https://x.vn">link</a></p><ul><li>một</li></ul>');
+  });
+});

@@ -186,3 +186,24 @@ export function htmlToMarkdown(html: string): string {
   if (!root.textContent?.trim() && !root.querySelector("img, hr, table, input, .wpc-columns")) return "";
   return turndown.turndown(root).trim();
 }
+
+/** Attributes a pasted element keeps: what the content needs, never its look. */
+const PASTE_KEEP_ATTRIBUTES = new Set(["href", "src", "alt", "title", "colspan", "rowspan", "type", "checked", "start"]);
+
+/**
+ * Pasted HTML in the memo's standard look (fork): colors, fonts, sizes, backgrounds, classes and
+ * inline styles from the source page are dropped, `<font>` and bare `<span>` wrappers are
+ * unwrapped; headings, lists, links, emphasis, tables and images stay.
+ */
+export function cleanPastedHtml(html: string): string {
+  const root = inertRoot(DOMPurify.sanitize(html, { FORBID_TAGS: ["style", "meta", "link", "title"] }));
+  for (const element of Array.from(root.querySelectorAll("*"))) {
+    for (const attribute of Array.from(element.attributes)) {
+      if (!PASTE_KEEP_ATTRIBUTES.has(attribute.name)) element.removeAttribute(attribute.name);
+    }
+  }
+  for (const wrapper of Array.from(root.querySelectorAll("font, span"))) {
+    wrapper.replaceWith(...Array.from(wrapper.childNodes));
+  }
+  return root.innerHTML;
+}
