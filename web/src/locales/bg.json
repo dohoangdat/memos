@@ -411,7 +411,11 @@
       "columns": "Columns",
       "column-count": "{{n}} columns",
       "remove-columns": "Remove columns",
-      "clear-formatting": "Clear formatting"
+      "clear-formatting": "Clear formatting",
+      "quick-insert": "Quick insert",
+      "line-above": "New line above",
+      "heading-above": "Heading above",
+      "section-break": "Section break (---)"
     },
     "tag-picker": {
       "search": "Search or create a tag",

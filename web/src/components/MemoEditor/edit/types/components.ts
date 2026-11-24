@@ -154,6 +154,9 @@ export interface InsertMenuProps {
   /** Suggests tags with the LLM and adds them (fork); absent when the feature is off. */
   onSuggestTags?: () => void;
   suggestingTags?: boolean;
+  /** The memo's visibility, chosen from the menu (fork: the separate audience button is hidden). */
+  visibility?: Visibility;
+  onVisibilityChange?: (visibility: Visibility) => void;
 }
 
 export interface AudienceMenuProps {

@@ -373,7 +373,11 @@
       "columns": "Chia cột",
       "column-count": "{{n}} cột",
       "remove-columns": "Bỏ chia cột",
-      "clear-formatting": "Xoá định dạng"
+      "clear-formatting": "Xoá định dạng",
+      "quick-insert": "Chèn nhanh",
+      "line-above": "Dòng mới phía trên",
+      "heading-above": "Tiêu đề phía trên",
+      "section-break": "Ngắt đoạn (---)"
     },
     "tag-picker": {
       "search": "Tìm hoặc tạo tag",

@@ -66,8 +66,16 @@
   gap: 0.5rem;
 }
 .classic-editor-content ul[data-type="taskList"] li > label {
-  margin-top: 0.3rem;
+  /* One text line tall with the box centred in it, so the box sits on the first line's middle
+     whatever the font size. */
+  display: flex;
+  align-items: center;
+  height: 1lh;
+  margin: 0;
   user-select: none;
+}
+.classic-editor-content ul[data-type="taskList"] li > label input {
+  margin: 0;
 }
 .classic-editor-content ul[data-type="taskList"] li > div {
   flex: 1;

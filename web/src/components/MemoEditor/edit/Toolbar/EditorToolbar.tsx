@@ -131,6 +131,8 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
           onInsertImages={onInsertImages}
           onDrawingClick={onDrawingClick}
           onAddTags={onAddTags}
+          visibility={space ? undefined : visibility}
+          onVisibilityChange={handleVisibilityChange}
         />
         {onSuggestTags && (
           <Tooltip.Root>
@@ -150,13 +152,16 @@ export const EditorToolbar: FC<EditorToolbarProps> = ({
             <Tooltip.Popup side="top">{t("llm.suggest-tags")}</Tooltip.Popup>
           </Tooltip.Root>
         )}
-        <AudienceMenu
-          value={visibility}
-          space={space}
-          onChange={handleVisibilityChange}
-          onSpaceChange={canChooseSpace ? handleSpaceChange : undefined}
-          disabled={committing}
-        />
+        {/* Fork: visibility lives in the ＋ menu; this button stays only for a memo in a Space. */}
+        {space && (
+          <AudienceMenu
+            value={visibility}
+            space={space}
+            onChange={handleVisibilityChange}
+            onSpaceChange={canChooseSpace ? handleSpaceChange : undefined}
+            disabled={committing}
+          />
+        )}
       </div>
 
       <div className="flex shrink-0 flex-row items-center justify-end gap-1">

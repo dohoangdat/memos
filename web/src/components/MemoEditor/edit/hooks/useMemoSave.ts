@@ -9,6 +9,7 @@ import { userKeys } from "@/hooks/useUserQueries";
 import { handleError } from "@/lib/error";
 import { queueCreate, queueUpdate } from "@/lib/offline/outbox";
 import { showErrorToast, toast } from "@/lib/toast";
+import { ROUTES } from "@/router/routes";
 import type { Attachment } from "@/types/proto/api/attachment_service_pb";
 import type { Memo, Visibility } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
@@ -58,7 +59,10 @@ export function useMemoSave({
   const { mutateAsync: updateMemo } = useUpdateMemo(memoName);
   const { markNewMemo } = useNewMemo();
   const { actions, dispatch, getState } = useEditorContext();
-  const filterTag = useActiveFilterTag();
+  // A memo shared from another app is not about the tag the feed happens to be filtered by;
+  // tags come only from the user (or the AI button) there.
+  const activeFilterTag = useActiveFilterTag();
+  const filterTag = window.location.pathname === ROUTES.SHARE_TARGET ? undefined : activeFilterTag;
 
   return useCallback(async () => {
     const state = getState();

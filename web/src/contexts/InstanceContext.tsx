@@ -111,6 +111,15 @@ export function InstanceProvider({ children }: { children: ReactNode }) {
 
   const initialize = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true }));
+    // Fork: open at once with the profile last seen; the request below refreshes it.
+    void loadOfflineProfile<typeof state.profile>().then((saved) => {
+      if (!saved) return;
+      setState((prev) => {
+        if (prev.profileLoaded) return prev;
+        setManagedAttachmentInstanceUrl(saved.instanceUrl);
+        return { ...prev, profile: saved, profileLoaded: true, isProfileInitialized: true };
+      });
+    });
 
     const profileRequest = instanceServiceClient
       .getInstanceProfile({})

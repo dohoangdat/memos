@@ -17,9 +17,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LinkMemoDialog, LocationDialog } from "@/components/MemoMetadata";
 import type { MapPoint } from "@/components/map/types";
 import { useReverseGeocoding } from "@/components/map/useReverseGeocoding";
+import VisibilityIcon from "@/components/VisibilityIcon";
 import { useDebouncedEffect } from "@/hooks";
 import type { MemoRelation } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
+import { getAssignableVisibilityOptions, getVisibilityOption } from "@/utils/memo";
 import { useFileUpload, useLinkMemo, useLocation } from "../hooks";
 import { useEditorContext, useEditorSelector } from "../state";
 import type { InsertMenuProps } from "../types";
@@ -174,6 +176,31 @@ const InsertMenu = (props: InsertMenuProps) => {
               {item.label}
             </Menu.Item>
           ))}
+          {props.visibility !== undefined && props.onVisibilityChange && (
+            <>
+              <Menu.Separator />
+              <Menu.SubmenuRoot>
+                <Menu.SubmenuTrigger icon={<VisibilityIcon visibility={props.visibility} />} disabled={props.isSaving}>
+                  {t("common.visibility")}: {t(getVisibilityOption(props.visibility)?.labelKey ?? "common.visibility")}
+                </Menu.SubmenuTrigger>
+                <Menu.Popup className="w-56" aria-label={t("common.visibility")}>
+                  <Menu.RadioGroup value={props.visibility} onValueChange={(next) => props.onVisibilityChange?.(next)}>
+                    {getAssignableVisibilityOptions({ hasSpacePlacement: false, current: props.visibility }).map((option) => (
+                      <Menu.RadioItem
+                        key={option.value}
+                        value={option.value}
+                        closeOnClick
+                        icon={<VisibilityIcon visibility={option.value} />}
+                        description={t(option.descriptionKey, { space: "" })}
+                      >
+                        {t(option.labelKey)}
+                      </Menu.RadioItem>
+                    ))}
+                  </Menu.RadioGroup>
+                </Menu.Popup>
+              </Menu.SubmenuRoot>
+            </>
+          )}
           {/* How the composer presents itself. Focus mode is absent when a host owns the
               editor's presentation; Markdown mode (the editor's source mode) only changes how
               the text is edited, so every composer has it. Checked while on.

@@ -1,18 +1,21 @@
 import { timestampDate } from "@bufbuild/protobuf/wkt";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Spinner } from "@usememos/ui";
 import { FilePlus2Icon, LinkIcon, SearchIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { MemoEditor } from "@/components/MemoEditor";
 import { useLinkMemo } from "@/components/MemoEditor/edit/hooks";
 import RelativeTime from "@/components/RelativeTime";
 import { memoServiceClient } from "@/connect";
 import { useBackToClose } from "@/hooks/useBackToClose";
+import { memoKeys } from "@/hooks/useMemoQueries";
 import { memoSummary } from "@/lib/list-density";
 import { OFFLINE_MEMO_PREFIX } from "@/lib/offline/outbox";
 import { toast } from "@/lib/toast";
 import { ROUTES } from "@/router/routes";
+import { State } from "@/types/proto/api/common_pb";
+import type { Memo } from "@/types/proto/api/memo_service_pb";
 import { useTranslate } from "@/utils/i18n";
 import { buildSharedMemoContent, sharedLink } from "@/utils/share-target";
 
@@ -25,7 +28,7 @@ const ShareEditorStep = ({ onClose, children }: { onClose: () => void; children:
 };
 
 /** How long the shared page may take to describe itself before the memo goes without it. */
-const METADATA_TIMEOUT_MS = 6000;
+const METADATA_TIMEOUT_MS = 3000;
 
 /**
  * The installed app's share target (see `share_target` in site.webmanifest): another app's
@@ -42,6 +45,8 @@ const ShareTarget = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [step, setStep] = useState<Step>({ kind: "choose" });
+  // A choice made while the page is still being read waits for it (at most METADATA_TIMEOUT_MS).
+  const [pending, setPending] = useState<Step | undefined>();
   const shared = { title: params.get("title"), text: params.get("text"), url: params.get("url") };
   const link = sharedLink(shared);
   const metadata = useQuery({
@@ -54,6 +59,13 @@ const ShareTarget = () => {
   });
   const content = buildSharedMemoContent(shared, metadata.data);
   const fetchingPage = Boolean(link) && metadata.isLoading;
+  useEffect(() => {
+    if (pending && !fetchingPage) {
+      setStep(pending);
+      setPending(undefined);
+    }
+  }, [pending, fetchingPage]);
+  const choose = (next: Step) => (fetchingPage ? setPending(next) : setStep(next));
 
   const recent = useLinkMemo({
     isOpen: step.kind === "choose",
@@ -61,6 +73,20 @@ const ShareTarget = () => {
     existingRelations: [],
     onAddRelation: () => undefined,
   });
+
+  // Until the server answers, the memos the app already holds (the feed's saved copy) are listed,
+  // so the share opens at once.
+  const queryClient = useQueryClient();
+  const cachedMemos = useMemo(() => {
+    const byName = new Map<string, Memo>();
+    for (const [, data] of queryClient.getQueriesData<{ pages?: { memos?: Memo[] }[]; memos?: Memo[] }>({ queryKey: memoKeys.lists() })) {
+      for (const memo of data?.pages?.flatMap((page) => page.memos ?? []) ?? data?.memos ?? [])
+        if (memo.state === State.NORMAL) byName.set(memo.name, memo);
+    }
+    const time = (memo: Memo) => Number(memo.updateTime?.seconds ?? 0);
+    return [...byName.values()].sort((a, b) => time(b) - time(a)).slice(0, 20);
+  }, [queryClient]);
+  const listed = recent.isFetching && recent.filteredMemos.length === 0 && !recent.searchText ? cachedMemos : recent.filteredMemos;
 
   useEffect(() => {
     if (!buildSharedMemoContent(shared)) navigate(ROUTES.HOME, { replace: true });
@@ -115,14 +141,14 @@ const ShareTarget = () => {
         aria-label={t("share-target.search")}
       />
       <ul className="flex max-h-[55svh] flex-col overflow-y-auto rounded-mu-lg border border-mu-line bg-mu-surface">
-        {recent.filteredMemos.map((memo) => {
+        {listed.map((memo) => {
           const { title, description } = memoSummary(memo.content);
           return (
             <li key={memo.name} className="border-b border-mu-line/60 last:border-b-0">
               <button
                 type="button"
-                disabled={fetchingPage}
-                onClick={() => setStep({ kind: "append", name: memo.name })}
+                disabled={Boolean(pending)}
+                onClick={() => choose({ kind: "append", name: memo.name })}
                 className="flex w-full min-w-0 flex-col gap-0.5 border border-transparent px-3 py-2 text-start hover:bg-mu-hover mu-focus disabled:opacity-60"
               >
                 <span className="flex w-full min-w-0 items-center gap-2">
@@ -136,12 +162,12 @@ const ShareTarget = () => {
             </li>
           );
         })}
-        {recent.isFetching && recent.filteredMemos.length === 0 && (
+        {recent.isFetching && listed.length === 0 && (
           <li className="flex justify-center py-4">
             <Spinner />
           </li>
         )}
-        {!recent.isFetching && recent.filteredMemos.length === 0 && (
+        {!recent.isFetching && listed.length === 0 && (
           <li className="px-3 py-4 mu-caption text-mu-text-secondary">{t("share-target.no-match")}</li>
         )}
       </ul>
@@ -150,7 +176,13 @@ const ShareTarget = () => {
         <Button variant="ghost" onClick={leave}>
           {t("common.cancel")}
         </Button>
-        <Button variant="neutral" icon={<FilePlus2Icon />} disabled={fetchingPage} onClick={() => setStep({ kind: "new" })}>
+        <Button
+          variant="neutral"
+          icon={<FilePlus2Icon />}
+          loading={pending?.kind === "new"}
+          disabled={Boolean(pending)}
+          onClick={() => choose({ kind: "new" })}
+        >
           {t("share-target.new-memo")}
         </Button>
       </div>

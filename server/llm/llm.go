@@ -22,6 +22,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
+
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/usememos/memos/internal/httphandler"
 	"github.com/usememos/memos/internal/profile"
@@ -292,7 +295,8 @@ func (s *Service) userTags(ctx context.Context, userID int32) ([]string, error) 
 
 const suggestInstruction = `You tag notes in a personal note app. Choose the tags that best describe the note.
 Rules:
-- Prefer tags from the user's existing tag list, spelled exactly as listed (they may be hierarchical like "parent/child").
+- Use the user's existing tags first: pick from the list, spelled exactly as listed (they may be hierarchical like "parent/child"). Most-used tags come first in the list.
+- A tag that means the same as an existing one (a synonym, translation, plural, other spelling) is the existing one: answer with the existing spelling.
 - Pick the most specific fitting tag; do not add a parent when you add its child.
 - Return at most %d tags, ordered by relevance. Return fewer when few fit; return none if nothing fits.
 - %s
@@ -346,7 +350,7 @@ func (s *Service) suggestTags(w http.ResponseWriter, r *http.Request) error {
 	}
 	newRule := "Only use tags from the existing list."
 	if config.AllowNew {
-		newRule = "If no existing tag fits a clear topic, you may propose one short new tag in the same style (lowercase, words joined by '-')."
+		newRule = "Only when no existing tag fits a clear topic of the note, you may add one new tag in the style of the existing ones; never propose a new tag close to an existing one."
 	}
 	system := strings.Replace(strings.Replace(suggestInstruction, "%d", strconv.Itoa(config.MaxTags), 1), "%s", newRule, 1)
 	if extra := strings.TrimSpace(config.Prompt); extra != "" {
@@ -382,12 +386,23 @@ func (s *Service) parseTags(answer string, existing []string, config SuggestTags
 		return []suggestion{}
 	}
 	known := map[string]bool{}
+	canonical := map[string]string{}
+	// A new tag that only differs from an existing one in case, punctuation or accents, or that
+	// names an existing tag's last part ("hermes" for "work/hermes"), is that existing tag.
+	loose := map[string]string{}
+	leaf := map[string]string{}
+	leafCount := map[string]int{}
 	for _, tag := range existing {
 		known[strings.ToLower(tag)] = true
-	}
-	canonical := map[string]string{}
-	for _, tag := range existing {
 		canonical[strings.ToLower(tag)] = tag
+		if _, ok := loose[looseKey(tag)]; !ok {
+			loose[looseKey(tag)] = tag
+		}
+		last := looseKey(tag[strings.LastIndex(tag, "/")+1:])
+		leafCount[last]++
+		if _, ok := leaf[last]; !ok {
+			leaf[last] = tag
+		}
 	}
 	picked := []string{}
 	for _, raw := range parsed.Tags {
@@ -397,6 +412,10 @@ func (s *Service) parseTags(answer string, existing []string, config SuggestTags
 		}
 		if exact, ok := canonical[strings.ToLower(tag)]; ok {
 			tag = exact
+		} else if match, ok := loose[looseKey(tag)]; ok {
+			tag = match
+		} else if match, ok := leaf[looseKey(tag)]; ok && leafCount[looseKey(tag)] == 1 {
+			tag = match
 		} else if !config.AllowNew {
 			continue
 		}
@@ -405,6 +424,17 @@ func (s *Service) parseTags(answer string, existing []string, config SuggestTags
 		}
 		picked = append(picked, tag)
 	}
+	// Existing tags come first; at most one new tag, and only after them.
+	existingFirst := []string{}
+	newTags := []string{}
+	for _, tag := range picked {
+		if known[strings.ToLower(tag)] {
+			existingFirst = append(existingFirst, tag)
+		} else if len(newTags) == 0 {
+			newTags = append(newTags, tag)
+		}
+	}
+	picked = append(existingFirst, newTags...)
 	result := []suggestion{}
 	for _, tag := range picked {
 		if slices.ContainsFunc(picked, func(other string) bool { return strings.HasPrefix(other, tag+"/") }) {
@@ -416,6 +446,23 @@ func (s *Service) parseTags(answer string, existing []string, config SuggestTags
 		}
 	}
 	return result
+}
+
+// looseKey folds case, Vietnamese/Latin accents and separators, so "Công-Việc" and "cong_viec"
+// compare equal.
+func looseKey(tag string) string {
+	var b strings.Builder
+	for _, r := range norm.NFD.String(strings.ToLower(tag)) {
+		switch {
+		case unicode.Is(unicode.Mn, r), r == '-', r == '_', r == ' ', r == '.':
+			continue
+		case r == 'đ':
+			b.WriteRune('d')
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 func (s *Service) isTag(tag string) bool {

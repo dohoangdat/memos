@@ -4,7 +4,7 @@
  *
  * - The app's scripts and styles of this build are cached on install, so every screen opens
  *   offline, not only the ones visited before.
- * - Pages are fetched from the network first; offline, the cached app page answers.
+ * - Pages: the cached app page answers at once and is refreshed in the background.
  * - API calls, files and live updates are never cached here: memo data is kept by the app
  *   itself (lib/offline), where it is cleared on sign-out.
  */
@@ -66,16 +66,25 @@ self.addEventListener("fetch", (event) => {
   if (isPassThrough(url)) return;
 
   if (request.mode === "navigate") {
-    // Every route is the same app page: fresh from the network, the saved copy offline.
+    // Every route is the same app page. The saved copy answers at once, so the app (and a share
+    // from another app) opens without waiting for the network; a fresh copy is saved for next
+    // time. The copy belongs to this worker's build, whose files are all cached with it.
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE);
-        try {
-          const response = await withTimeout(fetch(request), NAVIGATION_TIMEOUT_MS);
+        const cached = await cache.match(PAGE);
+        const refresh = withTimeout(fetch(request), NAVIGATION_TIMEOUT_MS).then(async (response) => {
           if (response.ok) await cache.put(PAGE, response.clone());
           return response;
+        });
+        if (cached) {
+          event.waitUntil(refresh.catch(() => undefined));
+          return cached;
+        }
+        try {
+          return await refresh;
         } catch {
-          return (await cache.match(PAGE)) || Response.error();
+          return Response.error();
         }
       })(),
     );

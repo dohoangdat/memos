@@ -5,11 +5,13 @@ import {
   AlignJustifyIcon,
   AlignLeftIcon,
   AlignRightIcon,
+  ArrowUpToLineIcon,
   BaselineIcon,
   BoldIcon,
   ChevronDownIcon,
   CodeIcon,
   Columns2Icon,
+  Heading1Icon,
   HighlighterIcon,
   ImageIcon,
   ItalicIcon,
@@ -17,10 +19,12 @@ import {
   ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
+  ListPlusIcon,
   MinusIcon,
   QuoteIcon,
   Redo2Icon,
   RemoveFormattingIcon,
+  SeparatorHorizontalIcon,
   StrikethroughIcon,
   TableIcon,
   UnderlineIcon,
@@ -143,6 +147,7 @@ const ColorPicker = (props: { editor: Editor; kind: "color" | "background"; labe
 export const ClassicToolbar = ({ editor, onPickImages }: ClassicToolbarProps) => {
   const t = useTranslate();
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const pendingInsert = useRef<(() => void) | undefined>(undefined);
   // Whether the second row of less used tools shows; remembered on this device.
   const [expanded, setExpanded] = useLocalStorage<boolean>("classic-toolbar-expanded", false);
 
@@ -206,6 +211,31 @@ export const ClassicToolbar = ({ editor, onPickImages }: ClassicToolbarProps) =>
     if (url === null) return;
     const chain = editor.chain().focus().extendMarkRange("link");
     (url.trim() ? chain.setLink({ href: url.trim() }) : chain.unsetLink()).run();
+  };
+
+  // Fork: a new empty line (or heading) above the block the caret is in, caret on it, so text
+  // can be added at the top of the current section.
+  const insertAbove = (heading: boolean) => {
+    const { $from } = editor.state.selection;
+    const pos = $from.depth > 0 ? $from.before(1) : 0;
+    editor
+      .chain()
+      .focus()
+      .insertContentAt(pos, heading ? { type: "heading", attrs: { level: 1 } } : { type: "paragraph" })
+      .setTextSelection(pos + 1)
+      .run();
+  };
+
+  // Fork: a --- after the current block, then an empty line with the caret, ready for the next part.
+  const insertSectionBreak = () => {
+    const { $from } = editor.state.selection;
+    const pos = $from.depth > 0 ? $from.after(1) : editor.state.doc.content.size;
+    editor
+      .chain()
+      .focus()
+      .insertContentAt(pos, [{ type: "horizontalRule" }, { type: "paragraph" }])
+      .setTextSelection(pos + 2)
+      .run();
   };
 
   const align = (value: "left" | "center" | "right" | "justify") => {
@@ -278,6 +308,43 @@ export const ClassicToolbar = ({ editor, onPickImages }: ClassicToolbarProps) =>
           <ToolButton label={t("editor.classic.image")} onClick={() => imageInputRef.current?.click()}>
             <ImageIcon />
           </ToolButton>
+          <Menu.Root
+            modal={false}
+            size="md"
+            // Each action runs once the menu has fully closed and handed focus back, so the
+            // editor keeps it for the text typed next.
+            onOpenChangeComplete={(open) => {
+              if (open) return;
+              const action = pendingInsert.current;
+              pendingInsert.current = undefined;
+              action?.();
+            }}
+          >
+            <Menu.Trigger
+              render={
+                <button
+                  type="button"
+                  title={t("editor.classic.quick-insert")}
+                  aria-label={t("editor.classic.quick-insert")}
+                  onMouseDown={(event) => event.preventDefault()}
+                  className="inline-flex size-8 shrink-0 items-center justify-center rounded-mu-md text-mu-text-secondary hover:bg-mu-well hover:text-mu-text [&_svg]:size-4"
+                />
+              }
+            >
+              <ListPlusIcon />
+            </Menu.Trigger>
+            <Menu.Popup align="start">
+              <Menu.Item icon={<ArrowUpToLineIcon />} onClick={() => (pendingInsert.current = () => insertAbove(false))}>
+                {t("editor.classic.line-above")}
+              </Menu.Item>
+              <Menu.Item icon={<Heading1Icon />} onClick={() => (pendingInsert.current = () => insertAbove(true))}>
+                {t("editor.classic.heading-above")}
+              </Menu.Item>
+              <Menu.Item icon={<SeparatorHorizontalIcon />} onClick={() => (pendingInsert.current = insertSectionBreak)}>
+                {t("editor.classic.section-break")}
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Root>
           <input
             ref={imageInputRef}
             type="file"

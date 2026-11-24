@@ -102,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const initializeRef = useRef<(() => Promise<void>) | undefined>(undefined);
+  const coldStartDoneRef = useRef(false);
   const initialize = useCallback(async () => {
     // `initialize` also runs after sign-in, when the previous unauthenticated
     // state is already marked initialized. Reset the full-readiness flag so
@@ -133,6 +134,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.addEventListener("online", recheck);
       return true;
     };
+
+    // Fork: on a cold start the app opens at once as the user it last saw (the copy kept for
+    // offline use), while the session is checked below; a refused session still signs out.
+    if (!coldStartDoneRef.current) {
+      coldStartDoneRef.current = true;
+      const identity = await loadOfflineIdentity<OfflineIdentity>();
+      if (identity) {
+        queryClient.setQueryData(userKeys.currentUser(), identity.currentUser);
+        setState({
+          ...identity.settings,
+          currentUser: identity.currentUser,
+          isIdentityInitialized: true,
+          isUserSettingsInitialized: true,
+          isInitialized: true,
+          isLoading: true,
+        });
+      }
+    }
 
     if (!getAccessToken()) {
       try {
